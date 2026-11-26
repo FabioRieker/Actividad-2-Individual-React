@@ -20,6 +20,7 @@ import { checkmarkCircleOutline, closeCircleOutline, cubeOutline, fileTrayOutlin
 import { useCallback, useMemo, useState } from 'react';
 
 import { PackageCard } from '../components/PackageCard';
+import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
 import type { PriorityFilter, StatusChangeEvent } from '../models/package.model';
 import { updateStatus, usePackages } from '../services/packageStore';
 import './Home.css';
@@ -38,16 +39,16 @@ function isPriorityFilter(value: unknown): value is PriorityFilter {
 const Home: React.FC = () => {
   const packages = usePackages();
   const [query, setQuery] = useState('');
+  const [term, setSearchInput] = useDebouncedSearchTerm();
   const [priority, setPriority] = useState<PriorityFilter>('ALL');
 
   const visible = useMemo(() => {
-    const term = query.trim().toLowerCase();
     return packages.filter(
       (p) =>
         (priority === 'ALL' || p.priority === priority) &&
         (term === '' || p.trackingCode.toLowerCase().includes(term) || p.destinationHub.toLowerCase().includes(term)),
     );
-  }, [packages, query, priority]);
+  }, [packages, term, priority]);
 
   const kpis = useMemo(
     () => ({
@@ -60,8 +61,9 @@ const Home: React.FC = () => {
 
   const clearFilters = useCallback((): void => {
     setQuery('');
+    setSearchInput('');
     setPriority('ALL');
-  }, []);
+  }, [setSearchInput]);
 
   const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
     updateStatus(e.id, e.newStatus);
@@ -107,12 +109,17 @@ const Home: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen className="lt-content">
         <div className="lt-controls">
-          <div className="lt-controls__inner">
+          <div className="lt-controls__inner" role="search">
             <IonSearchbar
+              debounce={0}
               aria-label="Buscar paquete por código o destino"
               placeholder="Buscar código o destino"
               value={query}
-              onIonInput={(e) => setQuery(e.detail.value ?? '')}
+              onIonInput={(e) => {
+                const value = e.detail.value ?? '';
+                setQuery(value);
+                setSearchInput(value);
+              }}
             />
             <IonSegment
               aria-label="Filtrar por prioridad"

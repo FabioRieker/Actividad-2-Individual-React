@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { resetStore } from '../services/packageStore';
 
@@ -13,10 +13,17 @@ function kpiValue(label: string): string | null {
   return item?.querySelector('.lt-kpi__value')?.textContent ?? null;
 }
 
-function typeInSearch(value: string): void {
+function typeWithoutWaiting(value: string): void {
   const searchbar = screen.getByPlaceholderText('Buscar código o destino');
   act(() => {
     fireEvent(searchbar, new CustomEvent('ionInput', { detail: { value }, bubbles: true }));
+  });
+}
+
+function typeInSearch(value: string): void {
+  typeWithoutWaiting(value);
+  act(() => {
+    vi.advanceTimersByTime(300);
   });
 }
 
@@ -29,7 +36,12 @@ function selectPriority(value: string): void {
 
 describe('Home', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     resetStore();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   test('muestra los 8 paquetes y los indicadores iniciales', () => {
@@ -51,6 +63,25 @@ describe('Home', () => {
     typeInSearch('ltk-0002');
     expect(screen.getByRole('heading', { name: 'LTK-0002-ES' })).toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(1);
+  });
+
+  test('la búsqueda se aplica tras 300 ms sin teclear y la UI conserva el texto', () => {
+    render(<Home />);
+    typeWithoutWaiting('bilbao');
+    act(() => {
+      vi.advanceTimersByTime(299);
+    });
+    expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(screen.getByText('1 paquete mostrado')).toBeInTheDocument();
+  });
+
+  test('el contenedor de búsqueda expone role search', () => {
+    render(<Home />);
+    expect(screen.getByRole('search')).toContainElement(screen.getByPlaceholderText('Buscar código o destino'));
+    expect(screen.getByRole('status')).toHaveTextContent('8 paquetes mostrados');
   });
 
   test('el filtro de prioridad restringe la lista', () => {
@@ -76,6 +107,9 @@ describe('Home', () => {
     expect(screen.getByText('0 paquetes mostrados')).toBeInTheDocument();
     expect(screen.getByText('Sin paquetes')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Limpiar filtros'));
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
     expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
     expect(screen.queryByText('Sin paquetes')).not.toBeInTheDocument();
   });
