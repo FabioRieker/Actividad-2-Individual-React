@@ -11,25 +11,3 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
-
-  localstack:
-    image: localstack/localstack:4.4.0
-    ports:
-      - "4566:4566"
-    environment:
-      SERVICES: s3,dynamodb
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_DEFAULT_REGION: eu-west-1
-    volumes:
-      - ./localstack/init/ready.d:/etc/localstack/init/ready.d:ro
-      - ./localstack/seed:/opt/seed:ro
-      - ./dist:/opt/build:ro
-    tmpfs:
-      - /var/lib/localstack
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:4566/_localstack/health | grep -q '\"s3\": \"\\(available\\|running\\)\"'"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 15s
