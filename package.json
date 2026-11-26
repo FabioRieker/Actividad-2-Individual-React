@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "prepare": "husky",
     "capture": "node scripts/capture.mjs",
+    "capture:paginas": "node scripts/capture-paginas.mjs",
     "lint:fix": "eslint --fix && prettier --write --ignore-unknown \"{src,e2e,scripts,public,.github}/**/*\" \"*.{ts,js,mjs,json,html,md,yml}\""
   },
   "dependencies": {
