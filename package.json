@@ -7,13 +7,13 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint --max-warnings 0 && prettier --check .",
+    "lint": "eslint --max-warnings 0 && prettier --check --ignore-unknown \"{src,e2e,scripts,public,.github}/**/*\" \"*.{ts,js,mjs,json,html,md,yml}\"",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "prepare": "husky",
     "capture": "node scripts/capture.mjs",
-    "lint:fix": "eslint --fix && prettier --write ."
+    "lint:fix": "eslint --fix && prettier --write --ignore-unknown \"{src,e2e,scripts,public,.github}/**/*\" \"*.{ts,js,mjs,json,html,md,yml}\""
   },
   "dependencies": {
     "@capacitor/app": "8.1.2",
