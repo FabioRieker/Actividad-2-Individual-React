@@ -1,24 +1,18 @@
-/* PackageCard.css - tarjeta de paquete (article.lt-card) */
+/* PackageCard.css - tarjeta de paquete de cristal (article.lt-card)
+   La disposicion depende del ancho del contenedor (.lt-card-host), no del viewport. */
 
-.lt-card {
-  display: block;
-  position: relative;
-  background: var(--lt-surface-2);
-  color: var(--lt-text);
-  border: 1px solid var(--lt-border);
-  border-radius: var(--lt-radius-lg);
-  padding: var(--lt-space-4) var(--lt-space-4) var(--lt-space-4) calc(var(--lt-space-4) + 8px);
-  overflow: hidden;
-  --lt-status-color: var(--lt-status-transit);
+.lt-card-host {
+  container: lt-card / inline-size;
 }
 
-/* Indicador lateral de estado (no es el unico canal: el chip lleva texto + icono) */
-.lt-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 8px;
-  background: var(--lt-status-color);
+.lt-card {
+  --lt-status-color: var(--lt-status-transit);
+  --card-pad: clamp(1rem, 4.5cqi, 1.5rem);
+  position: relative;
+  display: grid;
+  gap: var(--lt-space-3);
+  padding: var(--card-pad);
+  color: var(--lt-text);
 }
 .lt-card[data-status='transit'] {
   --lt-status-color: var(--lt-status-transit);
@@ -28,6 +22,17 @@
 }
 .lt-card[data-status='rejected'] {
   --lt-status-color: var(--lt-status-rejected);
+}
+
+/* Borde mas marcado al pasar el puntero: solo opacidad */
+.lt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--lt-glass-edge-hover);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .lt-card__head {
@@ -42,152 +47,188 @@
   margin: 0;
   font-family: var(--lt-font-mono);
   font-variant-numeric: tabular-nums slashed-zero;
-  font-size: 1.5rem; /* 24 px: legible a un brazo de distancia */
-  font-weight: 700;
+  font-size: var(--lt-fs-code);
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.04em;
-  color: var(--lt-accent);
+  letter-spacing: 0.01em;
+  color: var(--lt-text);
   overflow-wrap: anywhere;
 }
 
+/* Datos: etiqueta a la izquierda, valor alineado en una segunda columna */
 .lt-card__meta {
-  list-style: none;
-  margin: var(--lt-space-3) 0 0;
-  padding: 0;
   display: grid;
   gap: var(--lt-space-2);
+  margin: 0;
+  font-size: 0.9375rem;
+}
+.lt-card__meta > div {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 28cqi) minmax(0, 1fr);
+  gap: var(--lt-space-3);
+  align-items: baseline;
+}
+.lt-card__meta dt {
   color: var(--lt-text-muted);
-  font-size: 1rem;
 }
-.lt-card__meta li {
-  display: flex;
-  align-items: center;
-  gap: var(--lt-space-2);
-}
-.lt-card__meta ion-icon {
-  flex: none;
-  font-size: 22px;
+.lt-card__meta dd {
+  margin: 0;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: var(--lt-text);
-}
-.lt-card__meta strong {
-  color: var(--lt-text);
-  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
-/* Chips (ion-chip o span): icono + texto + color. Nunca solo color. */
-.lt-chips {
+/* Badges: texto + punto; el estado nunca depende solo del color */
+.lt-card__tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--lt-space-2);
-  margin-top: var(--lt-space-3);
 }
-
-.lt-chip {
-  --chip-color: var(--lt-text);
+.lt-badge {
+  --badge-color: var(--lt-text-muted);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 32px;
-  margin: 0;
-  padding: 0 var(--lt-space-3);
-  background: var(--lt-surface-3);
-  color: var(--chip-color);
-  border: 1.5px solid var(--chip-color);
+  min-height: 28px;
+  padding: 0 10px;
+  background: var(--lt-chip-bg);
+  color: var(--badge-color);
+  border: 1px solid var(--lt-glass-edge);
   border-radius: var(--lt-radius-pill);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: 0.8125rem;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
-.lt-chip ion-icon {
-  font-size: 18px;
-  color: var(--chip-color);
+.lt-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.lt-badge--status-transit {
+  --badge-color: var(--lt-status-transit);
+}
+.lt-badge--status-inspected {
+  --badge-color: var(--lt-status-inspected);
+}
+.lt-badge--status-rejected {
+  --badge-color: var(--lt-status-rejected);
+}
+.lt-badge--priority-high {
+  --badge-color: var(--lt-priority-high);
+}
+.lt-badge--priority-medium {
+  --badge-color: var(--lt-priority-medium);
+}
+.lt-badge--priority-low {
+  --badge-color: var(--lt-priority-low);
 }
 
-.lt-chip--priority-high {
-  --chip-color: var(--lt-priority-high);
-}
-.lt-chip--priority-medium {
-  --chip-color: var(--lt-priority-medium);
-}
-.lt-chip--priority-low {
-  --chip-color: var(--lt-priority-low);
-}
-.lt-chip--status-transit {
-  --chip-color: var(--lt-status-transit);
-}
-.lt-chip--status-inspected {
-  --chip-color: var(--lt-status-inspected);
-}
-.lt-chip--status-rejected {
-  --chip-color: var(--lt-status-rejected);
-}
-
-/* Acciones: dos botones grandes, ancho 50/50, 56 px de alto */
+/* Acciones: inspeccionar (tono del acento) y rechazar (neutra), ambas tonales */
 .lt-card__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--lt-space-3);
-  margin-top: var(--lt-space-4);
+  margin-top: var(--lt-space-1);
 }
 .lt-btn-inspect,
 .lt-btn-reject {
   --border-radius: var(--lt-radius-md);
-  min-height: 56px;
+  min-height: 52px;
   margin: 0;
   font-size: 1.0625rem;
 }
 .lt-btn-inspect {
-  --background: var(--lt-action-ok-bg);
-  --background-hover: var(--lt-action-ok-bg);
-  --background-activated: var(--lt-action-ok-bg);
-  --color: var(--lt-action-ok-fg);
-  --color-hover: var(--lt-action-ok-fg);
+  --background: color-mix(in oklch, var(--lt-accent) 18%, transparent);
+  --background-hover: color-mix(in oklch, var(--lt-accent) 28%, transparent);
+  --background-activated: color-mix(in oklch, var(--lt-accent) 28%, transparent);
+  --color: var(--lt-accent);
+  --color-hover: var(--lt-accent);
+  --border-color: color-mix(in oklch, var(--lt-accent) 55%, transparent);
+  --border-style: solid;
+  --border-width: 1px;
 }
 .lt-btn-reject {
-  --background: transparent;
-  --background-hover: transparent;
+  --background: var(--lt-chip-bg);
+  --background-hover: var(--lt-chip-bg);
+  --background-activated: var(--lt-chip-bg);
   --color: var(--lt-action-ko-fg);
   --color-hover: var(--lt-action-ko-fg);
-  --border-color: var(--lt-action-ko-fg);
+  --border-color: var(--lt-glass-edge-hover);
   --border-style: solid;
-  --border-width: 2px;
-}
-.lt-btn-inspect:active,
-.lt-btn-reject:active {
-  transform: scale(0.98);
+  --border-width: 1px;
 }
 .lt-btn-inspect[aria-disabled='true'],
 .lt-btn-reject[aria-disabled='true'] {
   cursor: default;
-  opacity: 1;
-  filter: saturate(0.4) brightness(0.8);
+  opacity: 0.45;
 }
 
-/* Estado resuelto: feedback visual sin depender del color */
-.lt-card[data-status='inspected'] .lt-card__actions,
-.lt-card[data-status='rejected'] .lt-card__actions {
-  opacity: 0.9;
-}
-
-@media (prefers-reduced-motion: no-preference) {
+/* Contenedor ancho (>= 520 px): datos a la izquierda, acciones a la derecha */
+@container lt-card (min-width: 32.5rem) {
   .lt-card {
-    transition:
-      border-color 160ms ease,
-      transform 160ms ease;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head actions'
+      'meta actions'
+      'tags actions';
+    column-gap: var(--lt-space-5);
+    align-items: start;
   }
-  .lt-card:hover {
-    border-color: var(--lt-border-control);
+  .lt-card__head {
+    grid-area: head;
+    justify-content: flex-start;
   }
-  .lt-btn-inspect,
-  .lt-btn-reject {
-    transition: transform 80ms ease;
+  .lt-card__meta {
+    grid-area: meta;
+  }
+  .lt-card__tags {
+    grid-area: tags;
+  }
+  .lt-card__actions {
+    grid-area: actions;
+    grid-template-columns: repeat(2, 3.5rem);
+    align-self: center;
+    margin-top: 0;
   }
 }
 
-/* Movil estrecho: botones apilados */
-@media (max-width: 359px) {
+/* Contenedor muy estrecho (movil de 320 px): botones apilados */
+@container lt-card (max-width: 20.5rem) {
   .lt-card__actions {
     grid-template-columns: 1fr;
   }
+}
+
+/* Hover y pulsacion: solo transform y opacity, <= 150 ms */
+@media (prefers-reduced-motion: no-preference) {
+  .lt-card,
+  .lt-btn-inspect,
+  .lt-btn-reject {
+    transition: transform var(--lt-dur) var(--lt-ease);
+  }
+  .lt-card::after {
+    transition: opacity var(--lt-dur) var(--lt-ease);
+  }
+}
+@media (hover: hover) {
+  .lt-card:hover {
+    transform: translateY(-2px);
+  }
+  .lt-card:hover::after {
+    opacity: 1;
+  }
+  .lt-btn-inspect:not([aria-disabled='true']):hover,
+  .lt-btn-reject:not([aria-disabled='true']):hover {
+    transform: translateY(-1px);
+  }
+}
+.lt-card:active:not(:has(ion-button:active)) {
+  transform: scale(0.992);
+}
+.lt-btn-inspect:not([aria-disabled='true']):active,
+.lt-btn-reject:not([aria-disabled='true']):active {
+  transform: scale(0.97);
 }
