@@ -165,19 +165,24 @@ ion-button[size='large'] {
   min-height: 56px;
 }
 
-ion-segment-button {
-  min-height: var(--lt-touch-min);
-  --color: var(--lt-text);
-  --color-checked: var(--ion-color-primary-contrast);
-  --indicator-color: transparent;
-  --background-checked: var(--ion-color-primary);
-  font-weight: 600;
-  text-transform: none;
-}
+/* Segment propio: pista de cristal con 4 px de margen y pildora interior ambar para el elemento activo */
 ion-segment {
   --background: var(--lt-field);
+  min-height: var(--lt-touch-min);
+  padding: 4px;
   border: 1px solid var(--lt-border-control);
   border-radius: var(--lt-radius-md);
+}
+ion-segment-button {
+  min-height: calc(var(--lt-touch-min) - 10px);
+  margin: 0;
+  --color: var(--lt-text);
+  --color-checked: var(--lt-on-accent);
+  --indicator-color: transparent;
+  --background-checked: var(--lt-accent-fill);
+  --border-radius: var(--lt-radius-sm);
+  font-weight: 600;
+  text-transform: none;
 }
 
 /* --------------------------------------------------------------------------
