@@ -1,9 +1,11 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 
-import ExploreContainer from '../components/ExploreContainer';
+import { usePackages } from '../services/packageStore';
 import './Home.css';
 
 const Home: React.FC = () => {
+  const packages = usePackages();
+
   return (
     <IonPage>
       <IonHeader>
@@ -11,13 +13,9 @@ const Home: React.FC = () => {
           <IonTitle>LogiTrack Express</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">LogiTrack Express</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <ExploreContainer />
+      <IonContent fullscreen className="ion-padding">
+        <h1>Recepción, inspección y clasificación de paquetes.</h1>
+        <p>{packages.length} paquetes registrados</p>
       </IonContent>
     </IonPage>
   );

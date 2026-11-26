@@ -81,8 +81,8 @@ function createMock(): readonly WarehousePackage[] {
 }
 
 /**
- * Estado equivalente a un `signal` privado de solo lectura: el array nunca se
- * muta, solo se reemplaza por una copia nueva mediante `updateStatus`.
+ * Estado privado del módulo; el array nunca se muta, solo se reemplaza por una
+ * copia nueva en `updateStatus`.
  */
 let state: readonly WarehousePackage[] = createMock();
 const listeners = new Set<() => void>();
