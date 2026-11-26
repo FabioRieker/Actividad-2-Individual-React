@@ -32,11 +32,11 @@ describe('navegación por pestañas', () => {
     expect(screen.getByText(`${getSnapshot().length} paquetes`)).toBeInTheDocument();
   });
 
-  test('la barra tiene las cuatro pestañas con texto visible y navega entre ellas', async () => {
+  test('la barra tiene las cinco pestañas con texto visible y navega entre ellas', async () => {
     go('/paquetes');
     render(<App />);
     const bar = screen.getByLabelText('Navegación principal');
-    for (const label of ['Paquetes', 'Resumen', 'Actividad', 'Ajustes']) {
+    for (const label of ['Paquetes', 'Resumen', 'Red', 'Actividad', 'Ajustes']) {
       expect(await within(bar).findByText(label)).toBeInTheDocument();
     }
 

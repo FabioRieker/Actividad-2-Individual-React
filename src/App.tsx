@@ -9,12 +9,13 @@ import {
   setupIonicReact,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { cubeOutline, pieChartOutline, settingsOutline, timeOutline } from 'ionicons/icons';
+import { cubeOutline, gitNetworkOutline, pieChartOutline, settingsOutline, timeOutline } from 'ionicons/icons';
 import { Redirect, Route } from 'react-router-dom';
 
 import Activity from './pages/Activity';
 import Home from './pages/Home';
 import PackageDetail from './pages/PackageDetail';
+import Red from './pages/Red';
 import Settings from './pages/Settings';
 import Summary from './pages/Summary';
 
@@ -54,6 +55,9 @@ const App: React.FC = () => (
           <Route exact path="/resumen">
             <Summary />
           </Route>
+          <Route exact path="/red">
+            <Red />
+          </Route>
           <Route exact path="/actividad">
             <Activity />
           </Route>
@@ -72,6 +76,10 @@ const App: React.FC = () => (
           <IonTabButton tab="resumen" href="/resumen">
             <IonIcon icon={pieChartOutline} aria-hidden="true" />
             <IonLabel>Resumen</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="red" href="/red">
+            <IonIcon icon={gitNetworkOutline} aria-hidden="true" />
+            <IonLabel>Red</IonLabel>
           </IonTabButton>
           <IonTabButton tab="actividad" href="/actividad">
             <IonIcon icon={timeOutline} aria-hidden="true" />
