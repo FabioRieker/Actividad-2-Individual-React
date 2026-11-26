@@ -1,8 +1,6 @@
 import {
   IonButton,
   IonContent,
-  IonHeader,
-  IonIcon,
   IonPage,
   IonSearchbar,
   IonSegment,
@@ -13,10 +11,7 @@ import {
   IonItemSliding,
   IonLabel,
   IonList,
-  IonTitle,
-  IonToolbar,
 } from '@ionic/react';
-import { checkmarkCircleOutline, closeCircleOutline, cubeOutline, fileTrayOutline, timeOutline } from 'ionicons/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { PackageCard } from '../components/PackageCard';
@@ -43,6 +38,10 @@ const STATUS_ANNOUNCEMENT: Record<PackageStatus, string> = {
 };
 
 const SEARCH_LABEL = 'Buscar código o destino';
+
+function percentage(part: number, total: number): number {
+  return total === 0 ? 0 : Math.round((part / total) * 100);
+}
 
 const Home: React.FC = () => {
   const searchbarRef = useRef<HTMLIonSearchbarElement>(null);
@@ -101,47 +100,37 @@ const Home: React.FC = () => {
     [packages],
   );
 
+  const total = packages.length;
+  const kpiCells: readonly {
+    readonly key: string;
+    readonly label: string;
+    readonly value: number;
+    readonly bar: 'total' | PackageStatus;
+  }[] = [
+    { key: 'total', label: 'Total', value: total, bar: 'total' },
+    { key: 'transit', label: 'En tránsito', value: kpis.transit, bar: 'IN_TRANSIT' },
+    { key: 'inspected', label: 'Inspeccionados', value: kpis.inspected, bar: 'INSPECTED' },
+    { key: 'rejected', label: 'Rechazados', value: kpis.rejected, bar: 'REJECTED' },
+  ];
+
   return (
     <IonPage>
-      <IonHeader className="lt-header">
-        <IonToolbar>
-          <IonTitle>LogiTrack Express</IonTitle>
-        </IonToolbar>
-        <p className="lt-brand__tag">Recepción, inspección y clasificación de paquetes.</p>
-        <ul className="lt-kpis" aria-label="Resumen por estado">
-          <li className="lt-kpi lt-kpi--total">
-            <span className="lt-kpi__value">{packages.length}</span>
-            <span className="lt-kpi__label">
-              <IonIcon icon={cubeOutline} aria-hidden="true" />
-              Total
-            </span>
-          </li>
-          <li className="lt-kpi lt-kpi--transit">
-            <span className="lt-kpi__value">{kpis.transit}</span>
-            <span className="lt-kpi__label">
-              <IonIcon icon={timeOutline} aria-hidden="true" />
-              En tránsito
-            </span>
-          </li>
-          <li className="lt-kpi lt-kpi--inspected">
-            <span className="lt-kpi__value">{kpis.inspected}</span>
-            <span className="lt-kpi__label">
-              <IonIcon icon={checkmarkCircleOutline} aria-hidden="true" />
-              Inspeccionados
-            </span>
-          </li>
-          <li className="lt-kpi lt-kpi--rejected">
-            <span className="lt-kpi__value">{kpis.rejected}</span>
-            <span className="lt-kpi__label">
-              <IonIcon icon={closeCircleOutline} aria-hidden="true" />
-              Rechazados
-            </span>
-          </li>
-        </ul>
-      </IonHeader>
       <IonContent fullscreen className="lt-content">
-        <div className="lt-controls">
-          <div className="lt-controls__inner" role="search">
+        <div className="lt-dock lt-glass lt-glass--strong">
+          <header className="lt-brand">
+            <svg className="lt-brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+              <rect width="32" height="32" rx="9" />
+              <path d="M16 6.8 24.6 11.4v9.2L16 25.2 7.4 20.6v-9.2z" />
+              <path d="M7.8 11.6 16 16l8.2-4.4M16 16v9" />
+            </svg>
+            <div className="lt-brand__text">
+              <p className="lt-brand__name">
+                LogiTrack <span>Express</span>
+              </p>
+              <p className="lt-brand__tag">Recepción, inspección y clasificación de paquetes.</p>
+            </div>
+          </header>
+          <div className="lt-controls" role="search">
             <IonSearchbar
               ref={searchbarRef}
               debounce={0}
@@ -172,6 +161,44 @@ const Home: React.FC = () => {
         </div>
         <main className="lt-main">
           <h1 className="lt-sr-only">Listado de paquetes</h1>
+          <div className="lt-overview">
+            <ul className="lt-kpis" aria-label="Resumen por estado">
+              {kpiCells.map((cell) => (
+                <li key={cell.key} className={`lt-kpi lt-kpi--${cell.key} lt-glass`}>
+                  <span className="lt-kpi__label">
+                    <span className="lt-kpi__dot" aria-hidden="true" />
+                    {cell.label}
+                  </span>
+                  <span className="lt-kpi__value">{cell.value}</span>
+                  {cell.bar === 'total' ? (
+                    <span className="lt-meter lt-meter--stack" aria-hidden="true">
+                      {kpis.transit > 0 && (
+                        <span className="lt-meter__seg lt-meter__seg--transit" style={{ flexGrow: kpis.transit }} />
+                      )}
+                      {kpis.inspected > 0 && (
+                        <span className="lt-meter__seg lt-meter__seg--inspected" style={{ flexGrow: kpis.inspected }} />
+                      )}
+                      {kpis.rejected > 0 && (
+                        <span className="lt-meter__seg lt-meter__seg--rejected" style={{ flexGrow: kpis.rejected }} />
+                      )}
+                    </span>
+                  ) : (
+                    <span className="lt-meter" aria-hidden="true">
+                      <span
+                        className="lt-meter__fill"
+                        style={{ transform: `scaleX(${total === 0 ? 0 : cell.value / total})` }}
+                      />
+                    </span>
+                  )}
+                  <span className="lt-kpi__meta">
+                    {cell.bar === 'total'
+                      ? `${percentage(kpis.inspected, total)} % inspeccionado`
+                      : `${percentage(cell.value, total)} % del total`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
           <div role="status" className="lt-sr-only">
             {announcement}
           </div>
@@ -179,8 +206,7 @@ const Home: React.FC = () => {
             {visible.length === 1 ? '1 paquete mostrado' : `${visible.length} paquetes mostrados`}
           </p>
           {visible.length === 0 ? (
-            <div className="lt-empty">
-              <IonIcon icon={fileTrayOutline} aria-hidden="true" />
+            <div className="lt-empty lt-glass">
               <h2 className="lt-empty__title">Sin paquetes</h2>
               <p className="lt-empty__text">
                 Ningún paquete coincide con la búsqueda o el filtro. Prueba con otro código o selecciona Todas.
