@@ -12,6 +12,8 @@ import {
 import { memo, useEffect, useRef } from 'react';
 
 import type { PackagePriority, PackageStatus, StatusChangeEvent, WarehousePackage } from '../models/package.model';
+
+import { PackageLink } from './PackageLink';
 import './PackageCard.css';
 
 interface PackageCardProps {
@@ -92,7 +94,7 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
     >
       <header className="lt-card__head">
         <h2 className="lt-card__code" id={titleId}>
-          {pkg.trackingCode}
+          <PackageLink id={pkg.id} trackingCode={pkg.trackingCode} />
         </h2>
         <span className={`lt-chip lt-chip--status-${status.modifier}`}>
           <IonIcon icon={status.icon} aria-hidden="true" />

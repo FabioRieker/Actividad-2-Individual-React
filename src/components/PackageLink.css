@@ -1,0 +1,8 @@
+.lt-pkg-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--lt-touch-min);
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
