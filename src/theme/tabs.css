@@ -1,0 +1,13 @@
+/* Barra de pestañas inferior: colores con contraste AA a partir de los tokens */
+ion-tab-bar {
+  --background: var(--lt-surface-1);
+  --border: 1px solid var(--lt-border);
+  --color: var(--lt-text-muted);
+  --color-selected: var(--lt-accent);
+}
+ion-tab-button {
+  --color: var(--lt-text-muted);
+  --color-selected: var(--lt-accent);
+  min-height: var(--lt-touch-min);
+  font-size: 0.75rem;
+}

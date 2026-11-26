@@ -1,0 +1,55 @@
+.lt-det-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lt-space-2);
+  margin-bottom: var(--lt-space-4);
+}
+.lt-det-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lt-space-1);
+  padding: var(--lt-space-1) var(--lt-space-3);
+  font-weight: 600;
+  color: var(--lt-text);
+  background: var(--lt-surface-3);
+  border: 1px solid var(--lt-border-control);
+  border-radius: var(--lt-radius-pill);
+}
+.lt-det-fields {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--lt-space-2) var(--lt-space-4);
+  margin: 0;
+}
+.lt-det-fields dt {
+  color: var(--lt-text-muted);
+}
+.lt-det-fields dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.lt-det-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lt-space-3);
+}
+.lt-timeline {
+  display: grid;
+  gap: var(--lt-space-3);
+  margin: 0;
+  padding: 0 0 0 var(--lt-space-5);
+}
+.lt-timeline__item {
+  padding-left: var(--lt-space-2);
+}
+.lt-timeline__time {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--lt-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lt-det-missing {
+  padding: var(--lt-space-5) var(--lt-space-4);
+  text-align: center;
+}

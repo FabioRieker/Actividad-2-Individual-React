@@ -1,0 +1,6 @@
+
+> logitrack-express@0.0.1 lint
+> eslint --max-warnings 0 && prettier --check --ignore-unknown "{src,e2e,scripts,public,.github}/**/*" "*.{ts,js,mjs,json,html,md,yml}"
+
+Checking formatting...
+All matched files use Prettier code style!

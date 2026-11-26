@@ -17,6 +17,7 @@ import { flushSync } from 'react-dom';
 
 import { PackageCard } from '../components/PackageCard';
 import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
+import { useFocusHeading } from '../hooks/useFocusHeading';
 import type { PackageStatus, PriorityFilter, StatusChangeEvent } from '../models/package.model';
 import { updateStatus, usePackages } from '../services/packageStore';
 import './Home.css';
@@ -58,6 +59,7 @@ function runWithViewTransition(update: () => void): void {
 
 const Home: React.FC = () => {
   const searchbarRef = useRef<HTMLIonSearchbarElement>(null);
+  const headingRef = useFocusHeading();
   const packages = usePackages();
   const [query, setQuery] = useState('');
   const [term, setSearchInput] = useDebouncedSearchTerm();
@@ -171,7 +173,9 @@ const Home: React.FC = () => {
           </div>
         </div>
         <main className="lt-main">
-          <h1 className="lt-sr-only">Listado de paquetes</h1>
+          <h1 className="lt-sr-only" ref={headingRef} tabIndex={-1}>
+            Listado de paquetes
+          </h1>
           <div className="lt-overview lt-glass">
             <ul className="lt-kpis" aria-label="Resumen por estado">
               {kpiCells.map((cell) => (

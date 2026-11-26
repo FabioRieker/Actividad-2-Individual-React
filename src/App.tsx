@@ -1,8 +1,22 @@
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import {
+  IonApp,
+  IonIcon,
+  IonLabel,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  setupIonicReact,
+} from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { cubeOutline, pieChartOutline, settingsOutline, timeOutline } from 'ionicons/icons';
 import { Redirect, Route } from 'react-router-dom';
 
+import Activity from './pages/Activity';
 import Home from './pages/Home';
+import PackageDetail from './pages/PackageDetail';
+import Settings from './pages/Settings';
+import Summary from './pages/Summary';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -22,20 +36,54 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './theme/theme-switch.css';
+import './theme/tabs.css';
 
 setupIonicReact({ mode: 'md' });
 
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
+      <IonTabs>
+        <IonRouterOutlet>
+          <Route exact path="/paquetes">
+            <Home />
+          </Route>
+          <Route exact path="/paquetes/:id">
+            <PackageDetail />
+          </Route>
+          <Route exact path="/resumen">
+            <Summary />
+          </Route>
+          <Route exact path="/actividad">
+            <Activity />
+          </Route>
+          <Route exact path="/ajustes">
+            <Settings />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/paquetes" />
+          </Route>
+        </IonRouterOutlet>
+        <IonTabBar slot="bottom" aria-label="Navegación principal">
+          <IonTabButton tab="paquetes" href="/paquetes">
+            <IonIcon icon={cubeOutline} aria-hidden="true" />
+            <IonLabel>Paquetes</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="resumen" href="/resumen">
+            <IonIcon icon={pieChartOutline} aria-hidden="true" />
+            <IonLabel>Resumen</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="actividad" href="/actividad">
+            <IonIcon icon={timeOutline} aria-hidden="true" />
+            <IonLabel>Actividad</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="ajustes" href="/ajustes">
+            <IonIcon icon={settingsOutline} aria-hidden="true" />
+            <IonLabel>Ajustes</IonLabel>
+          </IonTabButton>
+        </IonTabBar>
+      </IonTabs>
     </IonReactRouter>
   </IonApp>
 );
