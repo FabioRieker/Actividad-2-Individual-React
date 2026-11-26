@@ -111,3 +111,10 @@
 .lt-btn:not([aria-disabled='true']):active {
   transform: scale(0.97);
 }
+
+.lt-page ion-back-button {
+  --color: var(--lt-text);
+  --min-height: var(--lt-touch-min);
+  text-transform: none;
+  font-weight: 600;
+}

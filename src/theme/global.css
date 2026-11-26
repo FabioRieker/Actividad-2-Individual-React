@@ -82,6 +82,24 @@ ion-tab-bar {
   }
 }
 
+/* Texto solo para lectores de pantalla */
+.lt-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lt-mono {
+  font-family: var(--lt-font-mono);
+  font-variant-numeric: tabular-nums slashed-zero; /* 0 distinguible de O en codigos */
+}
+
 /* Margen lateral comun de las pantallas */
 :root {
   --lt-gutter: var(--lt-space-3);
