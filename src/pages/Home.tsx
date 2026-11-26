@@ -1,6 +1,8 @@
 import {
+  IonButton,
   IonContent,
   IonHeader,
+  IonIcon,
   IonPage,
   IonSearchbar,
   IonSegment,
@@ -14,6 +16,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
+import { checkmarkCircleOutline, closeCircleOutline, cubeOutline, fileTrayOutline, timeOutline } from 'ionicons/icons';
 import { useCallback, useMemo, useState } from 'react';
 
 import { PackageCard } from '../components/PackageCard';
@@ -46,6 +49,20 @@ const Home: React.FC = () => {
     );
   }, [packages, query, priority]);
 
+  const kpis = useMemo(
+    () => ({
+      transit: packages.filter((p) => p.status === 'IN_TRANSIT').length,
+      inspected: packages.filter((p) => p.status === 'INSPECTED').length,
+      rejected: packages.filter((p) => p.status === 'REJECTED').length,
+    }),
+    [packages],
+  );
+
+  const clearFilters = useCallback((): void => {
+    setQuery('');
+    setPriority('ALL');
+  }, []);
+
   const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
     updateStatus(e.id, e.newStatus);
   }, []);
@@ -56,6 +73,37 @@ const Home: React.FC = () => {
         <IonToolbar>
           <IonTitle>LogiTrack Express</IonTitle>
         </IonToolbar>
+        <p className="lt-brand__tag">Recepción, inspección y clasificación de paquetes.</p>
+        <ul className="lt-kpis" aria-label="Resumen por estado">
+          <li className="lt-kpi lt-kpi--total">
+            <span className="lt-kpi__value">{packages.length}</span>
+            <span className="lt-kpi__label">
+              <IonIcon icon={cubeOutline} aria-hidden="true" />
+              Total
+            </span>
+          </li>
+          <li className="lt-kpi lt-kpi--transit">
+            <span className="lt-kpi__value">{kpis.transit}</span>
+            <span className="lt-kpi__label">
+              <IonIcon icon={timeOutline} aria-hidden="true" />
+              En tránsito
+            </span>
+          </li>
+          <li className="lt-kpi lt-kpi--inspected">
+            <span className="lt-kpi__value">{kpis.inspected}</span>
+            <span className="lt-kpi__label">
+              <IonIcon icon={checkmarkCircleOutline} aria-hidden="true" />
+              Inspeccionados
+            </span>
+          </li>
+          <li className="lt-kpi lt-kpi--rejected">
+            <span className="lt-kpi__value">{kpis.rejected}</span>
+            <span className="lt-kpi__label">
+              <IonIcon icon={closeCircleOutline} aria-hidden="true" />
+              Rechazados
+            </span>
+          </li>
+        </ul>
       </IonHeader>
       <IonContent fullscreen className="lt-content">
         <div className="lt-controls">
@@ -84,27 +132,39 @@ const Home: React.FC = () => {
         </div>
         <main className="lt-main">
           <h1 className="lt-sr-only">Listado de paquetes</h1>
-          <p>Recepción, inspección y clasificación de paquetes.</p>
           <p className="lt-result-count" role="status" aria-live="polite">
             {visible.length} paquetes mostrados
           </p>
-          <IonList className="lt-grid" lines="none" role="list" aria-label="Paquetes">
-            {visible.map((pkg) => (
-              <IonItemSliding key={pkg.id} role="listitem">
-                <IonItem lines="none" className="lt-item">
-                  <PackageCard pkg={pkg} onStatusChange={handleStatusChange} />
-                </IonItem>
-                <IonItemOptions side="end">
-                  <IonItemOption className="lt-option-inspect" onClick={() => updateStatus(pkg.id, 'INSPECTED')}>
-                    Inspeccionar
-                  </IonItemOption>
-                  <IonItemOption className="lt-option-reject" onClick={() => updateStatus(pkg.id, 'REJECTED')}>
-                    Rechazar
-                  </IonItemOption>
-                </IonItemOptions>
-              </IonItemSliding>
-            ))}
-          </IonList>
+          {visible.length === 0 ? (
+            <div className="lt-empty">
+              <IonIcon icon={fileTrayOutline} aria-hidden="true" />
+              <h2 className="lt-empty__title">Sin paquetes</h2>
+              <p className="lt-empty__text">
+                Ningún paquete coincide con la búsqueda o el filtro. Prueba con otro código o selecciona Todas.
+              </p>
+              <IonButton fill="outline" onClick={clearFilters}>
+                Limpiar filtros
+              </IonButton>
+            </div>
+          ) : (
+            <IonList className="lt-grid" lines="none" role="list" aria-label="Paquetes">
+              {visible.map((pkg) => (
+                <IonItemSliding key={pkg.id} role="listitem">
+                  <IonItem lines="none" className="lt-item">
+                    <PackageCard pkg={pkg} onStatusChange={handleStatusChange} />
+                  </IonItem>
+                  <IonItemOptions side="end">
+                    <IonItemOption className="lt-option-inspect" onClick={() => updateStatus(pkg.id, 'INSPECTED')}>
+                      Inspeccionar
+                    </IonItemOption>
+                    <IonItemOption className="lt-option-reject" onClick={() => updateStatus(pkg.id, 'REJECTED')}>
+                      Rechazar
+                    </IonItemOption>
+                  </IonItemOptions>
+                </IonItemSliding>
+              ))}
+            </IonList>
+          )}
         </main>
       </IonContent>
     </IonPage>
