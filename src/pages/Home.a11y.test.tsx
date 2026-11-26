@@ -39,7 +39,7 @@ describe('Home accesibilidad', () => {
     act(() => {
       fireEvent(searchbar, new CustomEvent('ionInput', { detail: { value: 'zzzz' }, bubbles: true }));
     });
-    const count = screen.getByText(/paquetes? mostrados?/);
+    const count = screen.getByText(/^\d+( de \d+)? paquetes?$/);
     expect(count).toHaveAttribute('role', 'status');
     expect(count).toHaveAttribute('aria-live', 'polite');
   });

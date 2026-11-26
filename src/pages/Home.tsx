@@ -56,10 +56,6 @@ function runWithViewTransition(update: () => void): void {
   });
 }
 
-function percentage(part: number, total: number): number {
-  return total === 0 ? 0 : Math.round((part / total) * 100);
-}
-
 const Home: React.FC = () => {
   const searchbarRef = useRef<HTMLIonSearchbarElement>(null);
   const packages = usePackages();
@@ -120,17 +116,18 @@ const Home: React.FC = () => {
   );
 
   const total = packages.length;
-  const kpiCells: readonly {
-    readonly key: string;
-    readonly label: string;
-    readonly value: number;
-    readonly bar: 'total' | PackageStatus;
-  }[] = [
-    { key: 'total', label: 'Total', value: total, bar: 'total' },
-    { key: 'transit', label: 'En tránsito', value: kpis.transit, bar: 'IN_TRANSIT' },
-    { key: 'inspected', label: 'Inspeccionados', value: kpis.inspected, bar: 'INSPECTED' },
-    { key: 'rejected', label: 'Rechazados', value: kpis.rejected, bar: 'REJECTED' },
+  const kpiCells: readonly { readonly key: string; readonly label: string; readonly value: number }[] = [
+    { key: 'total', label: 'Total', value: total },
+    { key: 'transit', label: 'En tránsito', value: kpis.transit },
+    { key: 'inspected', label: 'Inspeccionados', value: kpis.inspected },
+    { key: 'rejected', label: 'Rechazados', value: kpis.rejected },
   ];
+  const countLabel =
+    visible.length === total
+      ? total === 1
+        ? '1 paquete'
+        : `${total} paquetes`
+      : `${visible.length} de ${total} ${total === 1 ? 'paquete' : 'paquetes'}`;
 
   return (
     <IonPage>
@@ -142,12 +139,9 @@ const Home: React.FC = () => {
               <path d="M16 6.8 24.6 11.4v9.2L16 25.2 7.4 20.6v-9.2z" />
               <path d="M7.8 11.6 16 16l8.2-4.4M16 16v9" />
             </svg>
-            <div className="lt-brand__text">
-              <p className="lt-brand__name">LogiTrack Express</p>
-              <p className="lt-brand__tag">Recepción, inspección y clasificación de paquetes.</p>
-            </div>
+            <p className="lt-brand__name">LogiTrack Express</p>
           </header>
-          <div className="lt-controls" role="search">
+          <div className="lt-controls lt-glass lt-glass--strong" role="search">
             <IonSearchbar
               ref={searchbarRef}
               debounce={0}
@@ -178,49 +172,35 @@ const Home: React.FC = () => {
         </div>
         <main className="lt-main">
           <h1 className="lt-sr-only">Listado de paquetes</h1>
-          <div className="lt-overview">
+          <div className="lt-overview lt-glass">
             <ul className="lt-kpis" aria-label="Resumen por estado">
               {kpiCells.map((cell) => (
-                <li key={cell.key} className={`lt-kpi lt-kpi--${cell.key} lt-glass`}>
+                <li key={cell.key} className={`lt-kpi lt-kpi--${cell.key}`}>
+                  <span className="lt-kpi__value">{cell.value}</span>
                   <span className="lt-kpi__label">
                     <span className="lt-kpi__dot" aria-hidden="true" />
                     {cell.label}
                   </span>
-                  <span className="lt-kpi__value">{cell.value}</span>
-                  {cell.bar === 'total' ? (
-                    <span className="lt-meter lt-meter--stack" aria-hidden="true">
-                      {kpis.transit > 0 && (
-                        <span className="lt-meter__seg lt-meter__seg--transit" style={{ flexGrow: kpis.transit }} />
-                      )}
-                      {kpis.inspected > 0 && (
-                        <span className="lt-meter__seg lt-meter__seg--inspected" style={{ flexGrow: kpis.inspected }} />
-                      )}
-                      {kpis.rejected > 0 && (
-                        <span className="lt-meter__seg lt-meter__seg--rejected" style={{ flexGrow: kpis.rejected }} />
-                      )}
-                    </span>
-                  ) : (
-                    <span className="lt-meter" aria-hidden="true">
-                      <span
-                        className="lt-meter__fill"
-                        style={{ transform: `scaleX(${total === 0 ? 0 : cell.value / total})` }}
-                      />
-                    </span>
-                  )}
-                  <span className="lt-kpi__meta">
-                    {cell.bar === 'total'
-                      ? `${percentage(kpis.inspected, total)} % inspeccionado`
-                      : `${percentage(cell.value, total)} % del total`}
-                  </span>
                 </li>
               ))}
             </ul>
+            <span className="lt-meter" aria-hidden="true">
+              {kpis.transit > 0 && (
+                <span className="lt-meter__seg lt-meter__seg--transit" style={{ flexGrow: kpis.transit }} />
+              )}
+              {kpis.inspected > 0 && (
+                <span className="lt-meter__seg lt-meter__seg--inspected" style={{ flexGrow: kpis.inspected }} />
+              )}
+              {kpis.rejected > 0 && (
+                <span className="lt-meter__seg lt-meter__seg--rejected" style={{ flexGrow: kpis.rejected }} />
+              )}
+            </span>
           </div>
           <div role="status" className="lt-sr-only">
             {announcement}
           </div>
           <p className="lt-result-count" role="status" aria-live="polite">
-            {visible.length === 1 ? '1 paquete mostrado' : `${visible.length} paquetes mostrados`}
+            {countLabel}
           </p>
           {visible.length === 0 ? (
             <div className="lt-empty lt-glass">

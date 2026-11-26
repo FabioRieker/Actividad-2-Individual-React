@@ -46,7 +46,7 @@ describe('Home', () => {
 
   test('muestra los 8 paquetes y los indicadores iniciales', () => {
     render(<Home />);
-    expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('8 paquetes')).toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(8);
     expect(kpiValue('Total')).toBe('8');
     expect(kpiValue('En tránsito')).toBe('3');
@@ -58,7 +58,7 @@ describe('Home', () => {
   test('la búsqueda filtra por código o destino sin distinguir mayúsculas', () => {
     render(<Home />);
     typeInSearch('bilbao');
-    expect(screen.getByText('1 paquete mostrado')).toBeInTheDocument();
+    expect(screen.getByText('1 de 8 paquetes')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'LTK-0005-ES' })).toBeInTheDocument();
     typeInSearch('ltk-0002');
     expect(screen.getByRole('heading', { name: 'LTK-0002-ES' })).toBeInTheDocument();
@@ -71,46 +71,46 @@ describe('Home', () => {
     act(() => {
       vi.advanceTimersByTime(299);
     });
-    expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('8 paquetes')).toBeInTheDocument();
     act(() => {
       vi.advanceTimersByTime(1);
     });
-    expect(screen.getByText('1 paquete mostrado')).toBeInTheDocument();
+    expect(screen.getByText('1 de 8 paquetes')).toBeInTheDocument();
   });
 
   test('el contenedor de búsqueda expone role search', () => {
     render(<Home />);
     expect(screen.getByRole('search')).toContainElement(screen.getByPlaceholderText('Buscar código o destino'));
-    expect(screen.getByText('8 paquetes mostrados')).toHaveAttribute('role', 'status');
+    expect(screen.getByText('8 paquetes')).toHaveAttribute('role', 'status');
   });
 
   test('el filtro de prioridad restringe la lista', () => {
     render(<Home />);
     selectPriority('CRITICAL');
-    expect(screen.getByText('3 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('3 de 8 paquetes')).toBeInTheDocument();
     selectPriority('LOW');
-    expect(screen.getByText('2 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('2 de 8 paquetes')).toBeInTheDocument();
     selectPriority('ALL');
-    expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('8 paquetes')).toBeInTheDocument();
   });
 
   test('ignora valores de segmento que no son un filtro válido', () => {
     render(<Home />);
     selectPriority('CRITICAL');
     selectPriority('otro');
-    expect(screen.getByText('3 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('3 de 8 paquetes')).toBeInTheDocument();
   });
 
   test('muestra el estado vacío y limpia los filtros', () => {
     render(<Home />);
     typeInSearch('zzz');
-    expect(screen.getByText('0 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('0 de 8 paquetes')).toBeInTheDocument();
     expect(screen.getByText('Sin paquetes')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Limpiar filtros'));
     act(() => {
       vi.advanceTimersByTime(0);
     });
-    expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('8 paquetes')).toBeInTheDocument();
     expect(screen.queryByText('Sin paquetes')).not.toBeInTheDocument();
   });
 

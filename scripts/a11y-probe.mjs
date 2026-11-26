@@ -99,7 +99,7 @@ try {
     const context = await browser.newContext({ viewport: VIEWPORT, colorScheme: scheme, locale: 'es-ES' });
     const page = await context.newPage();
     await page.goto(APP_URL);
-    await page.getByText('Recepción, inspección y clasificación de paquetes.').waitFor();
+    await page.getByRole('searchbox', { name: 'Buscar código o destino' }).waitFor();
     await page.waitForTimeout(600);
     const m = await page.evaluate(measure);
     console.log(`  datos: ${JSON.stringify(m)}`);
