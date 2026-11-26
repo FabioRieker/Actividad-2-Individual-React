@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 
+/* Fuentes variables autoalojadas (sin CDN): un solo archivo woff2 por familia */
+import '@fontsource-variable/geist';
+import '@fontsource-variable/jetbrains-mono';
+
 /* Estilos globales propios: despues de los CSS de Ionic (importados en App) */
 import './theme/global.css';
 
