@@ -1,0 +1,108 @@
+# docker version
+Docker version 29.9.3, build 5457199
+Docker Compose version v5.0.1
+# docker compose build
+#17 7.145 
+#17 7.145   total  %build  calls    avg   max  callback
+#17 7.145    4.3s     85%     10  429ms  4.2s  plugin vite:legacy-post-process · renderChunk
+#17 7.145 
+#17 7.145 Learn more at https://rolldown.rs/reference/InputOptions.checks#bundlertimings
+#17 7.145 
+#17 DONE 7.3s
+
+#18 [serve 4/4] COPY --from=build /app/dist /usr/share/nginx/html
+#18 DONE 0.1s
+
+#19 exporting to image
+#19 exporting layers
+#19 exporting layers 0.2s done
+#19 exporting manifest sha256:abdf4396df7e30273af314c77534064f93d164155b4cf3a1d7bf45e7fc6da574 0.0s done
+#19 exporting config sha256:dfe13383ab51e582145231ca737101c4d9bb0df36763cb06a2c912db4e81a533 0.0s done
+#19 exporting attestation manifest sha256:7785ec39c14280ec59643b6d88b3b80740168638d2c33489c4e3ff571befe3f1 0.0s done
+#19 exporting manifest list sha256:cbdecfdfed30cef1e3fc1e3170f5c0cd22aa30222905fe1322d58663fed18283 0.0s done
+#19 naming to docker.io/library/logitrack-express:local done
+#19 unpacking to docker.io/library/logitrack-express:local 0.1s done
+#19 DONE 0.3s
+
+#20 resolving provenance for metadata file
+#20 DONE 0.0s
+ Image logitrack-express:local Built 
+exit=0
+# docker compose up -d
+time="2026-11-26T18:21:03+01:00" level=warning msg="No services to build"
+ Network fase-f_default Creating 
+ Network fase-f_default Created 
+ Container fase-f-web-1 Creating 
+ Container fase-f-web-1 Created 
+ Container fase-f-web-1 Starting 
+ Container fase-f-web-1 Started 
+exit=0
+# docker compose ps
+NAME           IMAGE                     COMMAND                  SERVICE   CREATED         STATUS                   PORTS
+fase-f-web-1   logitrack-express:local   "/docker-entrypoint.…"   web       8 seconds ago   Up 8 seconds (healthy)   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+# curl -sI /
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 26 Nov 2026 17:21:11 GMT
+Content-Type: text/html
+Content-Length: 2322
+Last-Modified: Thu, 26 Nov 2026 17:21:02 GMT
+Connection: keep-alive
+Vary: Accept-Encoding
+ETag: "6b086a7e-912"
+Cache-Control: no-cache
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Accept-Ranges: bytes
+
+# curl -s / | head
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>LogiTrack Express</title>
+
+    <base href="/" />
+
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <link rel="manifest" href="/manifest.json" />
+
+# curl -sI /ruta-inexistente
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 26 Nov 2026 17:21:11 GMT
+Content-Type: text/html
+Content-Length: 2322
+Last-Modified: Thu, 26 Nov 2026 17:21:02 GMT
+Connection: keep-alive
+Vary: Accept-Encoding
+ETag: "6b086a7e-912"
+Cache-Control: no-cache
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Accept-Ranges: bytes
+
+# curl -s /ruta-inexistente | head -3
+<!doctype html>
+<html lang="es">
+  <head>
+# docker compose down
+ Container fase-f-web-1 Stopping 
+ Container fase-f-web-1 Stopped 
+ Container fase-f-web-1 Removing 
+ Container fase-f-web-1 Removed 
+ Network fase-f_default Removing 
+ Network fase-f_default Removed 
+exit=0

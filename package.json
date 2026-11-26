@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "prepare": "husky",
     "capture": "node scripts/capture.mjs",
+    "deploy:local": "npm run build && docker compose up -d --build",
+    "deploy:aws-emulator": "npm run build && bash scripts/deploy-aws-emulator.sh",
     "lint:fix": "eslint --fix && prettier --write --ignore-unknown \"{src,e2e,scripts,public,.github}/**/*\" \"*.{ts,js,mjs,json,html,md,yml}\""
   },
   "dependencies": {
@@ -45,7 +47,6 @@
     "@types/react-dom": "19.0.4",
     "@types/react-router": "5.1.20",
     "@types/react-router-dom": "5.3.3",
-    "@vitejs/plugin-legacy": "^8.0.0",
     "@vitejs/plugin-react": "^6.0.0",
     "eslint": "^10.13.0",
     "eslint-plugin-react-hooks": "^7.1.1",

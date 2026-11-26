@@ -1,0 +1,29 @@
+name: fase-f
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -q
+        - --spider
+        - http://127.0.0.1/
+      timeout: 3s
+      interval: 30s
+      retries: 3
+      start_period: 5s
+    image: logitrack-express:local
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
+    restart: unless-stopped
+networks:
+  default:
+    name: fase-f_default

@@ -1,0 +1,74 @@
+# versiones
+Version: 1.0.628
+Release date: 2026.11.26
+aws-cli/2.42.4 Python/3.14.10 Linux/7.0.0-43-generic exe/x86_64.ubuntu.24
+v24.21.0
+# npm run deploy:aws-emulator
+==> Identidad
+{
+    "UserId": "AIDAH5I7GEMO7ADXNFAZU",
+    "Account": "000000000000",
+    "Arn": "arn:aws:iam::000000000000:user/emulator"
+}
+==> Creando bucket logitrack-web
+{
+    "Location": "/logitrack-web",
+    "BucketArn": "arn:aws:s3:::logitrack-web"
+}
+==> Subiendo ./dist a s3://logitrack-web
+upload: dist/assets/index-w3zUSGdI.css to s3://logitrack-web/assets/index-w3zUSGdI.css
+upload: dist/assets/index-legacy-DSdapGaA.js to s3://logitrack-web/assets/index-legacy-DSdapGaA.js
+upload: dist/assets/index-B7od4YQU.js to s3://logitrack-web/assets/index-B7od4YQU.js
+upload: dist/assets/p-DlwWvSZ--legacy-B6BzCHHC.js to s3://logitrack-web/assets/p-DlwWvSZ--legacy-B6BzCHHC.js
+upload: dist/manifest.json to s3://logitrack-web/manifest.json
+upload: dist/index.html to s3://logitrack-web/index.html
+upload: dist/favicon.png to s3://logitrack-web/favicon.png
+upload: dist/assets/p-du4WR5yd-legacy-Du9FXS1D.js to s3://logitrack-web/assets/p-du4WR5yd-legacy-Du9FXS1D.js
+upload: dist/assets/p-du4WR5yd-brUfZ4Ks.js to s3://logitrack-web/assets/p-du4WR5yd-brUfZ4Ks.js
+upload: dist/assets/p-LIYB2NaM-legacy-DRedr9yL.js to s3://logitrack-web/assets/p-LIYB2NaM-legacy-DRedr9yL.js
+upload: dist/assets/p-LIYB2NaM-BV0zExGH.js to s3://logitrack-web/assets/p-LIYB2NaM-BV0zExGH.js
+upload: dist/assets/p-CRcc_AVn-C7b1SIx2.js to s3://logitrack-web/assets/p-CRcc_AVn-C7b1SIx2.js
+upload: dist/assets/p-CRcc_AVn-legacy-BJ6PvWNz.js to s3://logitrack-web/assets/p-CRcc_AVn-legacy-BJ6PvWNz.js
+upload: dist/assets/p-DlwWvSZ--CDUzzVBp.js to s3://logitrack-web/assets/p-DlwWvSZ--CDUzzVBp.js
+upload: dist/assets/polyfills-legacy-D-iwYujv.js to s3://logitrack-web/assets/polyfills-legacy-D-iwYujv.js
+==> Website hosting configurado
+==> Creando tabla packages
+==> Sembrando packages desde infra/seed/packages.json
+==> Buckets
+2026-11-26 18:21:28 logitrack-web
+==> Contenido de s3://logitrack-web
+2026-11-26 18:21:29       2322 index.html
+2026-11-26 18:21:29        438 manifest.json
+Total Objects: 15
+   Total Size: 2958072
+==> Elementos en packages
+8
+==> Despliegue en el emulador completado
+exit=0
+# aws s3 ls s3://logitrack-web --recursive | head
+2026-11-26 18:21:29    1359944 assets/index-B7od4YQU.js
+2026-11-26 18:21:29    1435095 assets/index-legacy-DSdapGaA.js
+2026-11-26 18:21:29      69850 assets/index-w3zUSGdI.css
+2026-11-26 18:21:29        579 assets/p-CRcc_AVn-C7b1SIx2.js
+2026-11-26 18:21:29        669 assets/p-CRcc_AVn-legacy-BJ6PvWNz.js
+2026-11-26 18:21:29       4617 assets/p-DlwWvSZ--CDUzzVBp.js
+2026-11-26 18:21:29       4765 assets/p-DlwWvSZ--legacy-B6BzCHHC.js
+2026-11-26 18:21:29       1530 assets/p-LIYB2NaM-BV0zExGH.js
+2026-11-26 18:21:29       1623 assets/p-LIYB2NaM-legacy-DRedr9yL.js
+2026-11-26 18:21:29        413 assets/p-du4WR5yd-brUfZ4Ks.js
+
+Exception ignored while flushing sys.stdout:
+# nº objetos
+15
+# aws dynamodb scan COUNT
+{
+    "Count": 8,
+    "ScannedCount": 8,
+    "ConsumedCapacity": null
+}
+# segunda ejecucion (idempotencia)
+   Total Size: 2958072
+==> Elementos en packages
+8
+==> Despliegue en el emulador completado
+exit=0
