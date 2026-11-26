@@ -156,7 +156,7 @@ const Home: React.FC = () => {
           ) : (
             <IonList className="lt-grid" lines="none" role="list" aria-label="Paquetes">
               {visible.map((pkg) => (
-                <IonItemSliding key={pkg.id} role="listitem">
+                <IonItemSliding key={pkg.id}>
                   <IonItem lines="none" className="lt-item">
                     <PackageCard pkg={pkg} onStatusChange={handleStatusChange} />
                   </IonItem>
