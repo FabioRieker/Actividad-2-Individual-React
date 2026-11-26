@@ -28,3 +28,44 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+
+  lighthouse:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Servir la build en segundo plano
+        run: |
+          node node_modules/vite/bin/vite.js preview --port 4173 --strictPort &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4173/ >/dev/null && exit 0
+            sleep 1
+          done
+          echo "El servidor de vista previa no respondió" >&2
+          exit 1
+      - name: Auditoría de accesibilidad (móvil)
+        run: |
+          mkdir -p evidence/tarea4/ci
+          npx -y lighthouse@12 http://localhost:4173/ \
+            --only-categories=accessibility --form-factor=mobile \
+            --output=json --output=html --output-path=evidence/tarea4/ci/lh-ci \
+            --chrome-flags="--headless=new --no-sandbox"
+          node -e '
+            const r = JSON.parse(require("fs").readFileSync("evidence/tarea4/ci/lh-ci.report.json", "utf8"));
+            const score = r.categories.accessibility.score;
+            console.log("Puntuación de accesibilidad:", score * 100);
+            if (score < 1) process.exit(1);
+          '
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-accesibilidad
+          path: evidence/tarea4/ci
+          if-no-files-found: warn
