@@ -1,0 +1,4 @@
+
+> logitrack-express@0.0.1 typecheck
+> tsc --noEmit && tsc -p tsconfig.e2e.json --noEmit
+

@@ -1,0 +1,192 @@
+/* PackageCard.css - tarjeta de paquete (article.lt-card) */
+
+.lt-card {
+  display: block;
+  position: relative;
+  background: var(--lt-surface-2);
+  color: var(--lt-text);
+  border: 1px solid var(--lt-border);
+  border-radius: var(--lt-radius-lg);
+  padding: var(--lt-space-4) var(--lt-space-4) var(--lt-space-4) calc(var(--lt-space-4) + 8px);
+  overflow: hidden;
+  --lt-status-color: var(--lt-status-transit);
+}
+
+/* Indicador lateral de estado (no es el unico canal: el chip lleva texto + icono) */
+.lt-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 8px;
+  background: var(--lt-status-color);
+}
+.lt-card[data-status='transit'] {
+  --lt-status-color: var(--lt-status-transit);
+}
+.lt-card[data-status='inspected'] {
+  --lt-status-color: var(--lt-status-inspected);
+}
+.lt-card[data-status='rejected'] {
+  --lt-status-color: var(--lt-status-rejected);
+}
+
+.lt-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lt-space-2) var(--lt-space-3);
+}
+
+.lt-card__code {
+  margin: 0;
+  font-family: var(--lt-font-mono);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-size: 1.5rem; /* 24 px: legible a un brazo de distancia */
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--lt-accent);
+  overflow-wrap: anywhere;
+}
+
+.lt-card__meta {
+  list-style: none;
+  margin: var(--lt-space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--lt-space-2);
+  color: var(--lt-text-muted);
+  font-size: 1rem;
+}
+.lt-card__meta li {
+  display: flex;
+  align-items: center;
+  gap: var(--lt-space-2);
+}
+.lt-card__meta ion-icon {
+  flex: none;
+  font-size: 22px;
+  color: var(--lt-text);
+}
+.lt-card__meta strong {
+  color: var(--lt-text);
+  font-weight: 600;
+}
+
+/* Chips (ion-chip o span): icono + texto + color. Nunca solo color. */
+.lt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lt-space-2);
+  margin-top: var(--lt-space-3);
+}
+
+.lt-chip {
+  --chip-color: var(--lt-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 var(--lt-space-3);
+  background: var(--lt-surface-3);
+  color: var(--chip-color);
+  border: 1.5px solid var(--chip-color);
+  border-radius: var(--lt-radius-pill);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.lt-chip ion-icon {
+  font-size: 18px;
+  color: var(--chip-color);
+}
+
+.lt-chip--priority-high {
+  --chip-color: var(--lt-priority-high);
+}
+.lt-chip--priority-medium {
+  --chip-color: var(--lt-priority-medium);
+}
+.lt-chip--priority-low {
+  --chip-color: var(--lt-priority-low);
+}
+.lt-chip--status-transit {
+  --chip-color: var(--lt-status-transit);
+}
+.lt-chip--status-inspected {
+  --chip-color: var(--lt-status-inspected);
+}
+.lt-chip--status-rejected {
+  --chip-color: var(--lt-status-rejected);
+}
+
+/* Acciones: dos botones grandes, ancho 50/50, 56 px de alto */
+.lt-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--lt-space-3);
+  margin-top: var(--lt-space-4);
+}
+.lt-btn-inspect,
+.lt-btn-reject {
+  --border-radius: var(--lt-radius-md);
+  min-height: 56px;
+  margin: 0;
+  font-size: 1.0625rem;
+}
+.lt-btn-inspect {
+  --background: var(--lt-action-ok-bg);
+  --background-hover: var(--lt-action-ok-bg);
+  --background-activated: var(--lt-action-ok-bg);
+  --color: var(--lt-action-ok-fg);
+  --color-hover: var(--lt-action-ok-fg);
+}
+.lt-btn-reject {
+  --background: transparent;
+  --background-hover: transparent;
+  --color: var(--lt-action-ko-fg);
+  --color-hover: var(--lt-action-ko-fg);
+  --border-color: var(--lt-action-ko-fg);
+  --border-style: solid;
+  --border-width: 2px;
+}
+.lt-btn-inspect:active,
+.lt-btn-reject:active {
+  transform: scale(0.98);
+}
+.lt-btn-inspect[disabled],
+.lt-btn-reject[disabled] {
+  opacity: 1;
+  filter: saturate(0.4) brightness(0.8);
+}
+
+/* Estado resuelto: feedback visual sin depender del color */
+.lt-card[data-status='inspected'] .lt-card__actions,
+.lt-card[data-status='rejected'] .lt-card__actions {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lt-card {
+    transition:
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+  .lt-card:hover {
+    border-color: var(--lt-border-control);
+  }
+  .lt-btn-inspect,
+  .lt-btn-reject {
+    transition: transform 80ms ease;
+  }
+}
+
+/* Movil estrecho: botones apilados */
+@media (max-width: 359px) {
+  .lt-card__actions {
+    grid-template-columns: 1fr;
+  }
+}
