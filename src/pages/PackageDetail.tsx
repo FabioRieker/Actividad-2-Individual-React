@@ -9,7 +9,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { checkmarkCircleOutline, closeCircleOutline, timeOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -19,6 +19,12 @@ import { updateStatus, useActivity, usePackages } from '../services/packageStore
 import { formatDateTime, PRIORITY_LABEL, STATUS_LABEL } from '../utils/labels';
 import './PageShell.css';
 import './PackageDetail.css';
+
+const STATUS_CLASS: Record<PackageStatus, string> = {
+  IN_TRANSIT: 'transit',
+  INSPECTED: 'inspected',
+  REJECTED: 'rejected',
+};
 
 const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 
@@ -45,7 +51,7 @@ const PackageDetail: React.FC = () => {
             <IonBackButton defaultHref="/paquetes" text="Paquetes" />
           </IonButtons>
           <IonTitle>
-            <h1 className="lt-page__title" ref={headingRef} tabIndex={-1}>
+            <h1 className={`lt-page__title${pkg ? ' lt-page__title--code' : ''}`} ref={headingRef} tabIndex={-1}>
               {pkg ? pkg.trackingCode : 'Paquete no encontrado'}
             </h1>
           </IonTitle>
@@ -55,12 +61,12 @@ const PackageDetail: React.FC = () => {
         <main className="lt-page__main">
           {pkg ? (
             <>
-              <div className="lt-det-chips">
-                <span className="lt-det-chip">
-                  <IonIcon icon={timeOutline} aria-hidden="true" />
+              <div className="lt-det-badges">
+                <span className={`lt-badge lt-badge--status-${STATUS_CLASS[pkg.status]}`}>
+                  <span className="lt-badge__dot" aria-hidden="true" />
                   {STATUS_LABEL[pkg.status]}
                 </span>
-                <span className="lt-det-chip">{PRIORITY_LABEL[pkg.priority]}</span>
+                <span className="lt-badge">{PRIORITY_LABEL[pkg.priority]}</span>
               </div>
               <section className="lt-panel" aria-labelledby="det-data">
                 <h2 className="lt-panel__title" id="det-data">
@@ -68,7 +74,7 @@ const PackageDetail: React.FC = () => {
                 </h2>
                 <dl className="lt-det-fields">
                   <dt>Identificador</dt>
-                  <dd>{pkg.id}</dd>
+                  <dd className="lt-det-fields__mono">{pkg.id}</dd>
                   <dt>Código</dt>
                   <dd>{pkg.trackingCode}</dd>
                   <dt>Destino</dt>
@@ -92,7 +98,7 @@ const PackageDetail: React.FC = () => {
                 <div className="lt-det-actions">
                   <button
                     type="button"
-                    className="lt-btn lt-btn--primary"
+                    className="lt-btn lt-btn--ok"
                     aria-disabled={pkg.status === 'INSPECTED'}
                     onClick={() => change('INSPECTED')}
                   >
@@ -101,7 +107,7 @@ const PackageDetail: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    className="lt-btn"
+                    className="lt-btn lt-btn--ko"
                     aria-disabled={pkg.status === 'REJECTED'}
                     onClick={() => change('REJECTED')}
                   >
@@ -118,14 +124,14 @@ const PackageDetail: React.FC = () => {
                   Línea de tiempo
                 </h2>
                 <ol className="lt-timeline" aria-label="Historial del paquete">
-                  <li className="lt-timeline__item">
+                  <li className="lt-timeline__item" data-status={history[0]?.from ?? pkg.status}>
                     Registrado como {STATUS_LABEL[history[0]?.from ?? pkg.status].toLowerCase()}
                     <time className="lt-timeline__time" dateTime={pkg.timestamp.toISOString()}>
                       {formatDateTime(pkg.timestamp)}
                     </time>
                   </li>
                   {history.map((entry) => (
-                    <li className="lt-timeline__item" key={entry.id}>
+                    <li className="lt-timeline__item" key={entry.id} data-status={entry.to}>
                       {STATUS_LABEL[entry.from]} → {STATUS_LABEL[entry.to]}
                       <time className="lt-timeline__time" dateTime={entry.at.toISOString()}>
                         {formatDateTime(entry.at)}

@@ -1,9 +1,12 @@
+/* Ajustes: grupos de cristal tipo panel de preferencias */
 .lt-set-hint {
   margin: 0 0 var(--lt-space-3);
+  max-width: 48ch;
+  text-wrap: pretty;
 }
 .lt-set-about {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: var(--lt-space-2) var(--lt-space-4);
   margin: 0;
 }
@@ -12,5 +15,6 @@
 }
 .lt-set-about dd {
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }

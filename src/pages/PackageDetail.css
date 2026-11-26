@@ -1,55 +1,86 @@
-.lt-det-chips {
+/* Detalle: datos alineados como en la tarjeta, acciones neutras y linea de tiempo fina */
+.lt-det-badges {
   display: flex;
   flex-wrap: wrap;
   gap: var(--lt-space-2);
   margin-bottom: var(--lt-space-4);
 }
-.lt-det-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--lt-space-1);
-  padding: var(--lt-space-1) var(--lt-space-3);
-  font-weight: 600;
-  color: var(--lt-text);
-  background: var(--lt-surface-3);
-  border: 1px solid var(--lt-border-control);
-  border-radius: var(--lt-radius-pill);
-}
 .lt-det-fields {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: var(--lt-space-2) var(--lt-space-4);
   margin: 0;
+  font-size: 0.9375rem;
 }
 .lt-det-fields dt {
   color: var(--lt-text-muted);
 }
 .lt-det-fields dd {
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
+.lt-det-fields__mono {
+  font-family: var(--lt-font-mono);
+  font-size: 0.8125rem;
+}
 .lt-det-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   gap: var(--lt-space-3);
 }
 .lt-timeline {
+  --dot-color: var(--lt-text-muted);
+  position: relative;
   display: grid;
-  gap: var(--lt-space-3);
+  gap: var(--lt-space-4);
   margin: 0;
-  padding: 0 0 0 var(--lt-space-5);
+  padding: 0;
+  list-style: none;
+}
+.lt-timeline::before {
+  content: '';
+  position: absolute;
+  inset-block: 0.6rem;
+  inset-inline-start: 3.5px;
+  width: 1px;
+  background: var(--lt-border);
 }
 .lt-timeline__item {
-  padding-left: var(--lt-space-2);
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding-inline-start: var(--lt-space-5);
+}
+.lt-timeline__item::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0.45rem;
+  inset-inline-start: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color);
+}
+.lt-timeline__item[data-status='IN_TRANSIT'] {
+  --dot-color: var(--lt-status-transit);
+}
+.lt-timeline__item[data-status='INSPECTED'] {
+  --dot-color: var(--lt-status-inspected);
+}
+.lt-timeline__item[data-status='REJECTED'] {
+  --dot-color: var(--lt-status-rejected);
 }
 .lt-timeline__time {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--lt-text-muted);
   font-variant-numeric: tabular-nums;
 }
 .lt-det-missing {
+  display: grid;
+  justify-items: start;
+  gap: var(--lt-space-3);
   padding: var(--lt-space-5) var(--lt-space-4);
-  text-align: center;
 }

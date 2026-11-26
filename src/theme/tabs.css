@@ -1,13 +1,26 @@
-/* Barra de pestañas inferior: colores con contraste AA a partir de los tokens */
+/* Barra de pestanas inferior: isla de cristal; la activa lleva pildora ambar y texto con contraste AA */
 ion-tab-bar {
-  --background: var(--lt-surface-1);
-  --border: 1px solid var(--lt-border);
+  --background: transparent;
+  --border: 0 solid transparent;
   --color: var(--lt-text-muted);
-  --color-selected: var(--lt-accent);
+  --color-selected: var(--lt-accent-text);
+  width: min(calc(100% - 2 * var(--lt-gutter)), 32rem);
+  margin: 0 auto var(--lt-space-2);
+  padding: var(--lt-space-1);
+  contain: none;
 }
 ion-tab-button {
   --color: var(--lt-text-muted);
-  --color-selected: var(--lt-accent);
+  --color-selected: var(--lt-accent-text);
+  --background-focused: transparent;
+  --ripple-color: transparent;
   min-height: var(--lt-touch-min);
-  font-size: 0.75rem;
+  margin: 0;
+  border-radius: var(--lt-radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+ion-tab-button.tab-selected {
+  background: color-mix(in oklch, var(--lt-accent-fill) 22%, transparent);
+  font-weight: 650;
 }

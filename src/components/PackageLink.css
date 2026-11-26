@@ -1,8 +1,14 @@
 .lt-pkg-link {
   display: inline-flex;
   align-items: center;
-  min-height: var(--lt-touch-min);
+  min-height: 32px;
   color: inherit;
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
+  text-underline-offset: 5px;
+}
+@media (hover: hover) {
+  .lt-pkg-link:hover {
+    text-decoration-color: currentColor;
+  }
 }

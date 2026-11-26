@@ -1,5 +1,5 @@
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { arrowUndoOutline, timeOutline } from 'ionicons/icons';
+import { arrowUndoOutline } from 'ionicons/icons';
 import { useState } from 'react';
 
 import { useFocusHeading } from '../hooks/useFocusHeading';
@@ -37,9 +37,7 @@ const Activity: React.FC = () => {
       <IonContent fullscreen className="lt-page__content">
         <main className="lt-page__main">
           <div className="lt-act-toolbar">
-            <p className="lt-muted" style={{ margin: 0 }}>
-              Cambios de estado, del más reciente al más antiguo.
-            </p>
+            <p className="lt-muted">Cambios de estado, del más reciente al más antiguo.</p>
             <button type="button" className="lt-btn lt-btn--primary" aria-disabled={empty} onClick={handleUndo}>
               <IonIcon icon={arrowUndoOutline} aria-hidden="true" />
               Deshacer último cambio
@@ -50,18 +48,16 @@ const Activity: React.FC = () => {
           </div>
           {empty ? (
             <div className="lt-act-empty">
-              <IonIcon icon={timeOutline} aria-hidden="true" />
               <h2 className="lt-panel__title">Sin actividad</h2>
-              <p className="lt-muted" style={{ margin: 0 }}>
-                Aún no se ha cambiado el estado de ningún paquete. Los cambios aparecerán aquí.
-              </p>
+              <p>Aún no se ha cambiado el estado de ningún paquete. Los cambios aparecerán aquí.</p>
             </div>
           ) : (
             <ul className="lt-act-list" aria-label="Historial de cambios">
               {entries.map((entry) => (
-                <li className="lt-act-item" key={entry.id}>
+                <li className="lt-act-item" key={entry.id} data-status={entry.to}>
                   <span>
-                    {entry.trackingCode}: {STATUS_LABEL[entry.from]} → {STATUS_LABEL[entry.to]}
+                    <span className="lt-act-item__code">{entry.trackingCode}</span>: {STATUS_LABEL[entry.from]} →{' '}
+                    {STATUS_LABEL[entry.to]}
                   </span>
                   <time className="lt-act-item__time" dateTime={entry.at.toISOString()}>
                     {formatDateTime(entry.at)}

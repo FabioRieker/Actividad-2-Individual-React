@@ -1,65 +1,75 @@
+/* Resumen: franja de indicadores de cristal y barras horizontales como la barra apilada de Paquetes */
 .lt-sum-kpis {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--lt-space-3);
+  gap: var(--lt-space-4) var(--lt-space-3);
   margin: 0 0 var(--lt-space-4);
-  padding: 0;
+  padding: var(--lt-space-4);
   list-style: none;
+}
+.lt-sum-kpi {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.lt-sum-kpi__value {
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lt-sum-kpi__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--lt-text-muted);
 }
 @media (min-width: 640px) {
   .lt-sum-kpis {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-.lt-sum-kpi {
-  display: flex;
-  flex-direction: column;
-  gap: var(--lt-space-1);
-  padding: var(--lt-space-3) var(--lt-space-4);
-  background: var(--lt-surface-2);
-  border: 1px solid var(--lt-border);
-  border-radius: var(--lt-radius-md);
+@media (min-width: 900px) {
+  .lt-sum-kpis {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
-.lt-sum-kpi__value {
-  font-size: 1.75rem;
-  font-weight: 800;
-  line-height: 1.1;
-  font-variant-numeric: tabular-nums;
-}
-.lt-sum-kpi__label {
-  font-size: 0.875rem;
-  color: var(--lt-text-muted);
-}
+
 .lt-bars {
   display: grid;
-  gap: var(--lt-space-3);
+  gap: var(--lt-space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 }
+.lt-bars li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--lt-space-1) var(--lt-space-3);
+  align-items: baseline;
+}
 .lt-bars__name {
-  display: block;
-  margin-bottom: var(--lt-space-1);
   font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.lt-bars__value {
+  font-size: 0.8125rem;
+  color: var(--lt-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
 }
 .lt-bars__track {
+  grid-column: 1 / -1;
+  grid-row: 2;
   display: block;
-  height: 12px;
+  height: 6px;
   overflow: hidden;
-  background: var(--lt-surface-3);
-  border: 1px solid var(--lt-border-control);
-  border-radius: var(--lt-radius-pill);
+  background: var(--lt-track);
+  border-radius: 6px;
 }
 .lt-bars__fill {
   display: block;
   height: 100%;
-  background: var(--lt-accent);
-  border-radius: var(--lt-radius-pill);
-}
-.lt-bars__value {
-  display: block;
-  margin-top: var(--lt-space-1);
-  font-size: 0.875rem;
-  color: var(--lt-text-muted);
-  font-variant-numeric: tabular-nums;
+  background: color-mix(in oklch, var(--lt-text) 72%, transparent);
+  border-radius: 6px;
 }

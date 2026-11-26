@@ -90,39 +90,6 @@
   color: var(--lt-text-muted);
 }
 
-/* Badge de estado: texto + punto; el estado nunca depende solo del color */
-.lt-badge {
-  --badge-color: var(--lt-text-muted);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 28px;
-  padding: 0 10px;
-  background: var(--lt-chip-bg);
-  color: var(--badge-color);
-  border: 1px solid var(--lt-glass-edge);
-  border-radius: var(--lt-radius-pill);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-}
-.lt-badge__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.lt-badge--status-transit {
-  --badge-color: var(--lt-status-transit);
-}
-.lt-badge--status-inspected {
-  --badge-color: var(--lt-status-inspected);
-}
-.lt-badge--status-rejected {
-  --badge-color: var(--lt-status-rejected);
-}
-
 /* Acciones: cristal neutro, texto visible y color semantico solo en el icono */
 .lt-card__actions {
   display: grid;

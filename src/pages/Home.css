@@ -2,12 +2,6 @@
 
 .lt-content {
   --background: transparent; /* las manchas de luz fijas van detras (body::before) */
-  --lt-gutter: var(--lt-space-3);
-}
-@media (min-width: 768px) {
-  .lt-content {
-    --lt-gutter: var(--lt-space-5);
-  }
 }
 
 /* ---------- Marca y controles ----------
@@ -109,7 +103,8 @@
 .lt-main {
   max-width: var(--lt-content-max);
   margin-inline: auto;
-  padding: var(--lt-space-3) var(--lt-gutter) calc(var(--lt-space-6) + env(safe-area-inset-bottom));
+  /* hueco inferior para que la ultima tarjeta quede por encima de la barra de pestanas */
+  padding: var(--lt-space-3) var(--lt-gutter) calc(var(--lt-space-5) + 5rem + env(safe-area-inset-bottom));
 }
 
 /* ---------- Indicadores: una franja de cristal con 4 cifras y una barra apilada ---------- */

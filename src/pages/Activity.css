@@ -1,39 +1,73 @@
+/* Actividad: historial como lista de cristal con una linea de tiempo sobria */
 .lt-act-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--lt-space-3);
   margin-bottom: var(--lt-space-4);
 }
-.lt-act-list {
-  display: grid;
-  gap: var(--lt-space-2);
+.lt-act-toolbar p {
   margin: 0;
-  padding: 0;
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+.lt-act-list {
+  --dot-color: var(--lt-text-muted);
+  display: grid;
+  margin: 0;
+  padding: var(--lt-space-2) var(--lt-space-4);
   list-style: none;
 }
 .lt-act-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--lt-space-1);
-  padding: var(--lt-space-3) var(--lt-space-4);
-  background: var(--lt-surface-2);
-  border: 1px solid var(--lt-border);
-  border-radius: var(--lt-radius-md);
-}
-.lt-act-item__time {
-  font-size: 0.875rem;
-  color: var(--lt-text-muted);
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: var(--lt-space-3) 0 var(--lt-space-3) var(--lt-space-5);
   font-variant-numeric: tabular-nums;
 }
-.lt-act-item__link {
-  color: inherit;
-  font-weight: 700;
+.lt-act-item + .lt-act-item {
+  border-top: 1px solid var(--lt-border);
+}
+.lt-act-item::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 1.2rem;
+  inset-inline-start: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color);
+}
+.lt-act-item[data-status='IN_TRANSIT'] {
+  --dot-color: var(--lt-status-transit);
+}
+.lt-act-item[data-status='INSPECTED'] {
+  --dot-color: var(--lt-status-inspected);
+}
+.lt-act-item[data-status='REJECTED'] {
+  --dot-color: var(--lt-status-rejected);
+}
+.lt-act-item__code {
+  font-family: var(--lt-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.lt-act-item__time {
+  font-size: 0.8125rem;
+  color: var(--lt-text-muted);
 }
 .lt-act-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--lt-space-2);
+  min-height: min(16rem, 40dvh);
+  align-content: center;
   padding: var(--lt-space-5) var(--lt-space-4);
   text-align: center;
-  background: var(--lt-surface-2);
-  border: 1px dashed var(--lt-border-control);
-  border-radius: var(--lt-radius-md);
+  color: var(--lt-text-muted);
+}
+.lt-act-empty .lt-panel__title {
+  margin: 0;
+  color: var(--lt-text);
 }
