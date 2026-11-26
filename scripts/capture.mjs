@@ -3,10 +3,11 @@
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium, devices } from '@playwright/test';
 
 const PORT = 5173;
-const URL = `http://localhost:${PORT}/`;
+const APP_URL = `http://localhost:${PORT}/`;
 const OUT = process.argv[2] ?? 'evidence/tarea1/ionic-serve.png';
 const DEVICE = process.argv[3] ?? 'Pixel 7';
 
@@ -24,16 +25,18 @@ async function waitFor(url, timeoutMs) {
   throw new Error(`Timeout esperando ${url}`);
 }
 
-const server = spawn('npx', ['vite', '--port', String(PORT), '--strictPort'], { stdio: 'inherit' });
+// Se lanza vite con node directamente (sin npx) para que SIGTERM llegue al servidor y no quede huérfano.
+const viteBin = fileURLToPath(new URL('../node_modules/vite/bin/vite.js', import.meta.url));
+const server = spawn(process.execPath, [viteBin, '--port', String(PORT), '--strictPort'], { stdio: 'inherit' });
 try {
-  await waitFor(URL, 60_000);
+  await waitFor(APP_URL, 60_000);
   await mkdir(dirname(OUT), { recursive: true });
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const descriptor = devices[DEVICE];
   if (!descriptor) throw new Error(`Dispositivo desconocido: ${DEVICE}`);
   const context = await browser.newContext({ ...descriptor });
   const page = await context.newPage();
-  await page.goto(URL);
+  await page.goto(APP_URL);
   await page.getByText('Recepción, inspección y clasificación de paquetes.').waitFor();
   await page.waitForTimeout(500);
   await page.screenshot({ path: OUT });
