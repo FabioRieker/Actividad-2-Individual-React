@@ -1,33 +1,40 @@
-/* PackageCard.css - tarjeta de paquete (article.lt-card) */
+/* PackageCard.css - placa de identificacion de paquete (article.lt-card)
+   La disposicion depende del ancho del contenedor (.lt-card-host), no del viewport. */
 
-.lt-card {
-  display: block;
-  position: relative;
-  background: var(--lt-surface-2);
-  color: var(--lt-text);
-  border: 1px solid var(--lt-border);
-  border-radius: var(--lt-radius-lg);
-  padding: var(--lt-space-4) var(--lt-space-4) var(--lt-space-4) calc(var(--lt-space-4) + 8px);
-  overflow: hidden;
-  --lt-status-color: var(--lt-status-transit);
+.lt-card-host {
+  container: lt-card / inline-size;
 }
 
-/* Indicador lateral de estado (no es el unico canal: el chip lleva texto + icono) */
+.lt-card {
+  --band-h: 14px;
+  --band-bg: var(--lt-fill-transit);
+  --card-pad: clamp(1rem, 4.5cqi, 1.5rem);
+  position: relative;
+  display: grid;
+  gap: var(--lt-space-3);
+  padding: calc(var(--band-h) + var(--card-pad)) var(--card-pad) var(--card-pad);
+  overflow: hidden;
+  background: var(--lt-surface-2);
+  color: var(--lt-text);
+  border: var(--lt-rule) solid var(--lt-border);
+  border-radius: 0;
+}
+.lt-card[data-status='inspected'] {
+  --band-bg: var(--lt-fill-inspected);
+}
+
+/* Banda superior de estado: gris (transito), verde macizo (inspeccionado), franjas de peligro (rechazado).
+   Es decorativa: el texto del estado va siempre en la etiqueta sobre fondo solido. */
 .lt-card::before {
   content: '';
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 8px;
-  background: var(--lt-status-color);
+  inset: 0 0 auto 0;
+  height: var(--band-h);
+  background: var(--band-bg);
 }
-.lt-card[data-status='transit'] {
-  --lt-status-color: var(--lt-status-transit);
-}
-.lt-card[data-status='inspected'] {
-  --lt-status-color: var(--lt-status-inspected);
-}
-.lt-card[data-status='rejected'] {
-  --lt-status-color: var(--lt-status-rejected);
+.lt-card[data-status='rejected']::before {
+  inset-inline: -28px 0;
+  background: repeating-linear-gradient(-45deg, var(--lt-ink) 0 14px, var(--lt-stop) 14px 28px);
 }
 
 .lt-card__head {
@@ -42,100 +49,105 @@
   margin: 0;
   font-family: var(--lt-font-mono);
   font-variant-numeric: tabular-nums slashed-zero;
-  font-size: 1.5rem; /* 24 px: legible a un brazo de distancia */
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.04em;
-  color: var(--lt-accent);
+  font-size: clamp(1.125rem, 6cqi, 1.75rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0;
+  color: var(--lt-text);
   overflow-wrap: anywhere;
 }
 
+/* Placa de datos: celdas separadas por reglas; destino a todo el ancho, luego peso, fecha y prioridad */
 .lt-card__meta {
-  list-style: none;
-  margin: var(--lt-space-3) 0 0;
-  padding: 0;
   display: grid;
-  gap: var(--lt-space-2);
-  color: var(--lt-text-muted);
-  font-size: 1rem;
-}
-.lt-card__meta li {
-  display: flex;
-  align-items: center;
-  gap: var(--lt-space-2);
-}
-.lt-card__meta ion-icon {
-  flex: none;
-  font-size: 22px;
-  color: var(--lt-text);
-}
-.lt-card__meta strong {
-  color: var(--lt-text);
-  font-weight: 600;
-}
-
-/* Chips (ion-chip o span): icono + texto + color. Nunca solo color. */
-.lt-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--lt-space-2);
-  margin-top: var(--lt-space-3);
-}
-
-.lt-chip {
-  --chip-color: var(--lt-text);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
-  padding: 0 var(--lt-space-3);
-  background: var(--lt-surface-3);
-  color: var(--chip-color);
-  border: 1.5px solid var(--chip-color);
-  border-radius: var(--lt-radius-pill);
+  border-top: var(--lt-rule-thin) solid var(--lt-border);
+}
+.lt-card__meta > div {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--lt-space-2) var(--lt-space-2) var(--lt-space-2) 0;
+}
+.lt-card__meta > div:first-child {
+  grid-column: 1 / -1;
+  border-bottom: var(--lt-rule-thin) solid var(--lt-border-soft);
+}
+.lt-card__meta > div + div + div {
+  padding-inline-start: var(--lt-space-2);
+  border-inline-start: var(--lt-rule-thin) solid var(--lt-border-soft);
+}
+.lt-card__meta dt {
   font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--lt-text-muted);
+}
+.lt-card__meta dd {
+  margin: 0;
+  font-stretch: 75%;
+  font-size: 1.25rem;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.02em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  color: var(--lt-text);
+  overflow-wrap: anywhere;
 }
-.lt-chip ion-icon {
-  font-size: 18px;
-  color: var(--chip-color);
-}
-
-.lt-chip--priority-high {
-  --chip-color: var(--lt-priority-high);
-}
-.lt-chip--priority-medium {
-  --chip-color: var(--lt-priority-medium);
-}
-.lt-chip--priority-low {
-  --chip-color: var(--lt-priority-low);
-}
-.lt-chip--status-transit {
-  --chip-color: var(--lt-status-transit);
-}
-.lt-chip--status-inspected {
-  --chip-color: var(--lt-status-inspected);
-}
-.lt-chip--status-rejected {
-  --chip-color: var(--lt-status-rejected);
+.lt-card__meta > div:first-child dd {
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
-/* Acciones: dos botones grandes, ancho 50/50, 56 px de alto */
+/* Prioridad con flecha de senal: ALTA en naranja */
+.lt-priority::before {
+  content: '▬ ' / '';
+  font-weight: 800;
+}
+.lt-priority--high {
+  color: var(--lt-priority-high);
+  font-weight: 800;
+}
+.lt-priority--high::before {
+  content: '▲ ' / '';
+}
+.lt-priority--medium::before {
+  content: '▶ ' / '';
+}
+.lt-priority--low {
+  color: var(--lt-priority-low);
+}
+.lt-priority--low::before {
+  content: '▼ ' / '';
+}
+
+/* Enlace del codigo: subrayado grueso naranja */
+.lt-card__code .lt-pkg-link {
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--lt-signal);
+  text-underline-offset: 6px;
+}
+
+/* Acciones: rectangulares, altas; primario naranja con texto negro, secundario con contorno grueso */
 .lt-card__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--lt-space-3);
-  margin-top: var(--lt-space-4);
 }
 .lt-btn-inspect,
 .lt-btn-reject {
-  --border-radius: var(--lt-radius-md);
+  --border-radius: 0;
+  --padding-start: var(--lt-space-2);
+  --padding-end: var(--lt-space-2);
+  --border-style: solid;
+  --border-width: var(--lt-rule);
   min-height: 56px;
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 .lt-btn-inspect {
   --background: var(--lt-action-ok-bg);
@@ -143,51 +155,95 @@
   --background-activated: var(--lt-action-ok-bg);
   --color: var(--lt-action-ok-fg);
   --color-hover: var(--lt-action-ok-fg);
+  --border-color: var(--lt-ink);
 }
 .lt-btn-reject {
   --background: transparent;
   --background-hover: transparent;
-  --color: var(--lt-action-ko-fg);
-  --color-hover: var(--lt-action-ko-fg);
-  --border-color: var(--lt-action-ko-fg);
-  --border-style: solid;
-  --border-width: 2px;
-}
-.lt-btn-inspect:active,
-.lt-btn-reject:active {
-  transform: scale(0.98);
-}
-.lt-btn-inspect[aria-disabled='true'],
-.lt-btn-reject[aria-disabled='true'] {
-  cursor: default;
-  opacity: 1;
-  filter: saturate(0.4) brightness(0.8);
+  --background-activated: transparent;
+  --color: var(--lt-text);
+  --color-hover: var(--lt-text);
+  --border-color: var(--lt-border-control);
 }
 
-/* Estado resuelto: feedback visual sin depender del color */
-.lt-card[data-status='inspected'] .lt-card__actions,
-.lt-card[data-status='rejected'] .lt-card__actions {
-  opacity: 0.9;
+/* Estado actual: boton inactivo, atenuado, rayado y tachado (aria-disabled va en el boton nativo) */
+.lt-btn-inspect.is-inactive,
+.lt-btn-reject.is-inactive {
+  --background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 6px,
+      light-dark(rgb(0 0 0 / 0.16), rgb(255 255 255 / 0.16)) 6px 8px
+    ),
+    var(--lt-surface-3);
+  --background-hover: var(--lt-surface-3);
+  --background-activated: var(--lt-surface-3);
+  --color: var(--lt-text-muted);
+  --color-hover: var(--lt-text-muted);
+  --border-color: var(--lt-border-soft);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.lt-btn-inspect.is-inactive::part(native),
+.lt-btn-reject.is-inactive::part(native) {
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Contenedor ancho (>= 520 px): datos a la izquierda, acciones a la derecha */
+@container lt-card (min-width: 32.5rem) {
   .lt-card {
-    transition:
-      border-color 160ms ease,
-      transform 160ms ease;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head actions'
+      'meta actions';
+    column-gap: var(--lt-space-5);
+    align-items: start;
   }
-  .lt-card:hover {
-    border-color: var(--lt-border-control);
+  .lt-card__head {
+    grid-area: head;
+    justify-content: flex-start;
   }
-  .lt-btn-inspect,
-  .lt-btn-reject {
-    transition: transform 80ms ease;
+  .lt-card__meta {
+    grid-area: meta;
+  }
+  .lt-card__actions {
+    grid-area: actions;
+    grid-template-columns: minmax(11rem, 1fr);
+    align-self: center;
   }
 }
 
-/* Movil estrecho: botones apilados */
-@media (max-width: 359px) {
+/* Contenedor estrecho (movil pequeno): botones apilados para que el texto quepa */
+@container lt-card (max-width: 22.5rem) {
   .lt-card__actions {
     grid-template-columns: 1fr;
   }
+}
+
+/* Movimiento: sello y franjas al cambiar de estado; pulsacion mecanica de botones */
+.lt-card.is-stamping .lt-tag,
+.lt-card.is-stamping:not([data-status='rejected'])::before {
+  animation: lt-stamp var(--lt-dur-2) var(--lt-ease-out) both;
+}
+.lt-card.is-stamping[data-status='rejected']::before {
+  animation: lt-slide var(--lt-dur-2) var(--lt-ease-out) both;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lt-btn-inspect,
+  .lt-btn-reject {
+    transition:
+      transform var(--lt-dur-1) var(--lt-ease-out),
+      opacity var(--lt-dur-1) var(--lt-ease-out);
+  }
+}
+@media (hover: hover) {
+  .lt-btn-inspect:not(.is-inactive):hover,
+  .lt-btn-reject:not(.is-inactive):hover {
+    opacity: 0.88;
+  }
+}
+.lt-btn-inspect:not(.is-inactive):active,
+.lt-btn-reject:not(.is-inactive):active {
+  transform: translateY(1px);
 }

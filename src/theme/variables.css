@@ -1,124 +1,68 @@
 /* ==========================================================================
    LogiTrack Express - variables.css
-   Tema industrial grafito (por defecto) + acento ambar logistico.
-   Variante clara bajo prefers-color-scheme: light.
-   Todos los pares estan validados en contraste.mjs (WCAG 2.1 AA).
+   Senaletica industrial de almacen: naranja seguridad, negro carbon, hormigon y blanco hueso.
+   Cada token se define UNA vez con light-dark(claro, oscuro). La rama la decide color-scheme:
+   el sistema (prefers-color-scheme) o el selector manual html[data-theme].
+   Regla de oro: el naranja (relleno) siempre lleva texto negro encima.
    ========================================================================== */
 
 :root {
-  /* ---- Colores Ionic (tema oscuro, por defecto) ---- */
-  --ion-color-primary: #ffb020;
-  --ion-color-primary-rgb: 255, 176, 32;
-  --ion-color-primary-contrast: #14100a;
-  --ion-color-primary-contrast-rgb: 20, 16, 10;
-  --ion-color-primary-shade: #e09b1c;
-  --ion-color-primary-tint: #ffb836;
+  color-scheme: light dark;
 
-  --ion-color-secondary: #7fb0ff;
-  --ion-color-secondary-rgb: 127, 176, 255;
-  --ion-color-secondary-contrast: #0b0d11;
-  --ion-color-secondary-contrast-rgb: 11, 13, 17;
-  --ion-color-secondary-shade: #709be0;
-  --ion-color-secondary-tint: #8cb8ff;
+  /* ---- Paleta de senalizacion (constante en ambos temas) ---- */
+  --lt-ink: #0e0e0e; /* negro carbon */
+  --lt-bone: #f2efe6; /* blanco hueso */
+  --lt-signal: #ff5f15; /* naranja seguridad (RAL 2004 aprox.) */
+  --lt-go: #1e9e4a; /* verde senal */
+  --lt-stop: #d62718; /* rojo peligro */
 
-  --ion-color-tertiary: #4fd8c8;
-  --ion-color-tertiary-rgb: 79, 216, 200;
-  --ion-color-tertiary-contrast: #0b0d11;
-  --ion-color-tertiary-contrast-rgb: 11, 13, 17;
-  --ion-color-tertiary-shade: #46beb0;
-  --ion-color-tertiary-tint: #61dcce;
+  /* ---- Superficies: hormigon claro / nave de noche ---- */
+  --lt-bg: light-dark(oklch(0.89 0.008 95), oklch(0.17 0.003 95));
+  --lt-surface-1: light-dark(oklch(0.96 0.006 95), oklch(0.12 0.002 95));
+  --lt-surface-2: light-dark(oklch(0.96 0.006 95), oklch(0.22 0.004 95)); /* placas */
+  --lt-surface-3: light-dark(oklch(0.84 0.01 95), oklch(0.29 0.005 95)); /* pistas, campos */
+  --lt-border: light-dark(oklch(0.14 0 0), oklch(0.52 0.005 95)); /* regla gruesa */
+  --lt-border-soft: light-dark(oklch(0.7 0.008 95), oklch(0.34 0.004 95)); /* regla fina */
+  --lt-border-control: light-dark(oklch(0.14 0 0), oklch(0.72 0.005 95)); /* contorno de controles (>= 3:1) */
+  --lt-text: light-dark(oklch(0.14 0 0), oklch(0.96 0.01 95));
+  --lt-text-muted: light-dark(oklch(0.38 0.01 95), oklch(0.78 0.01 95));
 
-  --ion-color-success: #3ddc84;
-  --ion-color-success-rgb: 61, 220, 132;
-  --ion-color-success-contrast: #0b0d11;
-  --ion-color-success-contrast-rgb: 11, 13, 17;
-  --ion-color-success-shade: #36c274;
-  --ion-color-success-tint: #50e090;
+  /* ---- Barra superior e inferior: siempre negras ---- */
+  --lt-bar-bg: var(--lt-ink);
+  --lt-bar-text: var(--lt-bone);
+  --lt-bar-muted: oklch(0.78 0.01 95);
 
-  --ion-color-warning: #ffd23f;
-  --ion-color-warning-rgb: 255, 210, 63;
-  --ion-color-warning-contrast: #0b0d11;
-  --ion-color-warning-contrast-rgb: 11, 13, 17;
-  --ion-color-warning-shade: #e0b937;
-  --ion-color-warning-tint: #ffd752;
+  /* ---- Acento ---- */
+  --lt-accent-fill: var(--lt-signal);
+  --lt-on-accent: var(--lt-ink);
+  --lt-accent-text: light-dark(oklch(0.46 0.16 45), var(--lt-signal)); /* texto sobre placa */
+  --lt-focus: light-dark(var(--lt-ink), var(--lt-signal));
 
-  --ion-color-danger: #ff7070;
-  --ion-color-danger-rgb: 255, 112, 112;
-  --ion-color-danger-contrast: #0b0d11;
-  --ion-color-danger-contrast-rgb: 11, 13, 17;
-  --ion-color-danger-shade: #e06363;
-  --ion-color-danger-tint: #ff7e7e;
-
-  --ion-color-medium: #a3acbd;
-  --ion-color-medium-rgb: 163, 172, 189;
-  --ion-color-medium-contrast: #0b0d11;
-  --ion-color-medium-contrast-rgb: 11, 13, 17;
-  --ion-color-medium-shade: #8f97a6;
-  --ion-color-medium-tint: #acb4c4;
-
-  --ion-color-light: #f2f4f7;
-  --ion-color-light-rgb: 242, 244, 247;
-  --ion-color-light-contrast: #0b0d11;
-  --ion-color-light-contrast-rgb: 11, 13, 17;
-  --ion-color-light-shade: #d5d7d9;
-  --ion-color-light-tint: #f3f5f8;
-
-  --ion-color-dark: #2b303c;
-  --ion-color-dark-rgb: 43, 48, 60;
-  --ion-color-dark-contrast: #f2f4f7;
-  --ion-color-dark-contrast-rgb: 242, 244, 247;
-  --ion-color-dark-shade: #262a35;
-  --ion-color-dark-tint: #404550;
-
-  /* ---- Superficies Ionic ---- */
-  --ion-background-color: #12141a;
-  --ion-background-color-rgb: 18, 20, 26;
-  --ion-text-color: #f2f4f7;
-  --ion-text-color-rgb: 242, 244, 247;
-  --ion-item-background: #1a1d24;
-  --ion-toolbar-background: #1a1d24;
-  --ion-toolbar-color: #f2f4f7;
-  --ion-toolbar-border-color: #3a4150;
-  --ion-card-background: #222630;
-  --ion-card-color: #f2f4f7;
-  --ion-border-color: #3a4150;
-  --ion-placeholder-color: #b4bccb;
-  --ion-placeholder-opacity: 1;
-  --ion-tab-bar-background: #1a1d24;
-
-  /* ---- Tokens propios: superficies ---- */
-  --lt-bg: #12141a;
-  --lt-surface-1: #1a1d24; /* cabecera, barra de busqueda */
-  --lt-surface-2: #222630; /* tarjetas */
-  --lt-surface-3: #2b303c; /* chips, inputs, segment */
-  --lt-border: #3a4150; /* separadores decorativos */
-  --lt-border-control: #8791a5; /* borde de controles (>= 3:1) */
-  --lt-text: #f2f4f7;
-  --lt-text-muted: #b4bccb;
-  --lt-accent: #ffb020;
-  --lt-on-accent: #14100a;
-  --lt-focus: #ffd23f;
-
-  /* ---- Estado del paquete (indicador, chip, KPI) ---- */
-  --lt-status-transit: #7fb0ff;
-  --lt-status-inspected: #3ddc84;
-  --lt-status-rejected: #ff7070;
+  /* ---- Estado del paquete: texto sobre placa y relleno de marca ---- */
+  --lt-status-transit: light-dark(oklch(0.35 0.01 95), oklch(0.9 0.005 95));
+  --lt-status-inspected: light-dark(oklch(0.45 0.12 150), oklch(0.78 0.17 150));
+  --lt-status-rejected: light-dark(oklch(0.5 0.2 27), oklch(0.72 0.18 27));
+  --lt-fill-transit: light-dark(oklch(0.72 0.008 95), oklch(0.5 0.005 95));
+  --lt-fill-inspected: var(--lt-go); /* con texto negro */
+  --lt-fill-rejected: var(--lt-stop); /* con texto blanco */
 
   /* ---- Prioridad ---- */
-  --lt-priority-high: #ff9ec4;
-  --lt-priority-medium: #ffd23f;
-  --lt-priority-low: #b4bccb;
+  --lt-priority-high: var(--lt-accent-text);
+  --lt-priority-medium: var(--lt-text);
+  --lt-priority-low: var(--lt-text-muted);
 
-  /* ---- Botones de accion ---- */
-  --lt-action-ok-bg: #3ddc84;
-  --lt-action-ok-fg: #0b0d11;
-  --lt-action-ko-fg: #ff7070;
+  /* ---- Acciones ---- */
+  --lt-action-ok-bg: var(--lt-accent-fill);
+  --lt-action-ok-fg: var(--lt-on-accent);
+  --lt-action-ko-fg: var(--lt-text);
 
-  /* ---- Radios ---- */
-  --lt-radius-sm: 6px;
-  --lt-radius-md: 10px;
-  --lt-radius-lg: 14px;
-  --lt-radius-pill: 999px;
+  /* ---- Formas: esquinas rectas y reglas gruesas ---- */
+  --lt-radius-sm: 0;
+  --lt-radius-md: 2px;
+  --lt-radius-lg: 2px;
+  --lt-radius-pill: 0;
+  --lt-rule: 3px;
+  --lt-rule-thin: 2px;
 
   /* ---- Espaciado (escala 4 px) ---- */
   --lt-space-1: 4px;
@@ -127,128 +71,137 @@
   --lt-space-4: 16px;
   --lt-space-5: 24px;
   --lt-space-6: 32px;
+  --lt-space-7: 48px;
 
-  /* ---- Tipografia ---- */
-  --lt-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* ---- Tipografia: Archivo con eje de anchura + JetBrains Mono solo para codigos ---- */
+  --lt-font-sans: 'Archivo Variable', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --lt-font-mono:
-    ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    'JetBrains Mono Variable', ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+  --lt-display-stretch: 68%; /* condensada de rotulo */
+  --lt-display-tracking: 0.02em;
+  --lt-fs-brand: clamp(1.25rem, 1.1rem + 0.8vw, 1.625rem);
+  --lt-fs-kpi: clamp(2rem, 1.5rem + 2.6vw, 3rem);
+  --lt-fs-kpi-hero: clamp(3.5rem, 2.2rem + 7vw, 5.5rem);
+  --lt-fs-code: clamp(1.25rem, 1.05rem + 1vw, 1.75rem);
+
+  /* Movimiento mecanico (preciso, sin rebotes ni elastic): solo transform, opacity y clip-path */
+  --lt-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --lt-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --lt-dur-1: 120ms; /* pulsacion, color */
+  --lt-dur-2: 200ms; /* sello, cifra, entrada */
+  --lt-dur-3: 320ms; /* barras, paginas */
+  --lt-dur: var(--lt-dur-1);
+  --lt-ease: var(--lt-ease-out);
 
   /* ---- Tamano tactil y ancho ---- */
   --lt-touch-min: 48px;
-  --lt-content-max: 960px;
+  --lt-content-max: 1120px;
   --lt-focus-width: 3px;
-  --lt-focus-offset: 2px;
+  --lt-focus-offset: 3px;
+  --lt-header-h: calc(3.5rem + var(--ion-safe-area-top, 0px));
 
+  /* ---- Colores Ionic (mapeados a la paleta) ---- */
+  --ion-color-primary: #ff5f15;
+  --ion-color-primary-rgb: 255, 95, 21;
+  --ion-color-primary-contrast: #0e0e0e;
+  --ion-color-primary-contrast-rgb: 14, 14, 14;
+  --ion-color-primary-shade: #e0540f;
+  --ion-color-primary-tint: #ff7029;
+
+  --ion-color-secondary: light-dark(#0e0e0e, #f2efe6);
+  --ion-color-secondary-rgb: 14, 14, 14;
+  --ion-color-secondary-contrast: light-dark(#f2efe6, #0e0e0e);
+  --ion-color-secondary-contrast-rgb: 242, 239, 230;
+  --ion-color-secondary-shade: light-dark(#000000, #d5d2ca);
+  --ion-color-secondary-tint: light-dark(#262626, #f4f1e9);
+
+  --ion-color-tertiary: #ff5f15;
+  --ion-color-tertiary-rgb: 255, 95, 21;
+  --ion-color-tertiary-contrast: #0e0e0e;
+  --ion-color-tertiary-contrast-rgb: 14, 14, 14;
+  --ion-color-tertiary-shade: #e0540f;
+  --ion-color-tertiary-tint: #ff7029;
+
+  --ion-color-success: #1e9e4a;
+  --ion-color-success-rgb: 30, 158, 74;
+  --ion-color-success-contrast: #0e0e0e;
+  --ion-color-success-contrast-rgb: 14, 14, 14;
+  --ion-color-success-shade: #1a8b41;
+  --ion-color-success-tint: #35a85c;
+
+  --ion-color-warning: #ff5f15;
+  --ion-color-warning-rgb: 255, 95, 21;
+  --ion-color-warning-contrast: #0e0e0e;
+  --ion-color-warning-contrast-rgb: 14, 14, 14;
+  --ion-color-warning-shade: #e0540f;
+  --ion-color-warning-tint: #ff7029;
+
+  --ion-color-danger: #d62718;
+  --ion-color-danger-rgb: 214, 39, 24;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #bc2315;
+  --ion-color-danger-tint: #da3d2f;
+
+  --ion-color-medium: light-dark(#5b5b55, #b5b2a8);
+  --ion-color-medium-rgb: 91, 91, 85;
+  --ion-color-medium-contrast: light-dark(#ffffff, #0e0e0e);
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: light-dark(#4f4f4a, #9f9c93);
+  --ion-color-medium-tint: light-dark(#6b6b65, #bbb8af);
+
+  --ion-color-light: #f2efe6;
+  --ion-color-light-rgb: 242, 239, 230;
+  --ion-color-light-contrast: #0e0e0e;
+  --ion-color-light-contrast-rgb: 14, 14, 14;
+  --ion-color-light-shade: #d5d2ca;
+  --ion-color-light-tint: #f4f1e9;
+
+  --ion-color-dark: #0e0e0e;
+  --ion-color-dark-rgb: 14, 14, 14;
+  --ion-color-dark-contrast: #f2efe6;
+  --ion-color-dark-contrast-rgb: 242, 239, 230;
+  --ion-color-dark-shade: #000000;
+  --ion-color-dark-tint: #262626;
+
+  /* ---- Superficies Ionic ---- */
+  --ion-background-color: var(--lt-bg);
+  --ion-text-color: var(--lt-text);
+  --ion-item-background: var(--lt-surface-1);
+  --ion-toolbar-background: var(--lt-bar-bg);
+  --ion-toolbar-color: var(--lt-bar-text);
+  --ion-toolbar-border-color: var(--lt-signal);
+  --ion-card-background: var(--lt-surface-2);
+  --ion-card-color: var(--lt-text);
+  --ion-border-color: var(--lt-border);
+  --ion-placeholder-color: var(--lt-text-muted);
+  --ion-placeholder-opacity: 1;
+  --ion-tab-bar-background: var(--lt-bar-bg);
   --ion-font-family: var(--lt-font-sans);
-  color-scheme: dark;
 }
 
-/* ==========================================================================
-   Variante clara (AA validada). Se activa solo si el sistema la pide.
-   ========================================================================== */
+/* Tripletes RGB de fondo/texto que Ionic usa para efectos con transparencia: no admiten
+   light-dark(), asi que se declaran por tema (solo estas dos lineas se repiten). */
+:root,
+:root[data-theme='dark'] {
+  --ion-background-color-rgb: 20, 20, 19;
+  --ion-text-color-rgb: 242, 239, 230;
+}
 @media (prefers-color-scheme: light) {
-  :root {
-    --ion-color-primary: #9a4a00;
-    --ion-color-primary-rgb: 154, 74, 0;
-    --ion-color-primary-contrast: #ffffff;
-    --ion-color-primary-contrast-rgb: 255, 255, 255;
-    --ion-color-primary-shade: #884100;
-    --ion-color-primary-tint: #a45c1a;
-
-    --ion-color-secondary: #1f55c0;
-    --ion-color-secondary-rgb: 31, 85, 192;
-    --ion-color-secondary-contrast: #ffffff;
-    --ion-color-secondary-contrast-rgb: 255, 255, 255;
-    --ion-color-secondary-shade: #1b4ba9;
-    --ion-color-secondary-tint: #3566c6;
-
-    --ion-color-tertiary: #0b6b63;
-    --ion-color-tertiary-rgb: 11, 107, 99;
-    --ion-color-tertiary-contrast: #ffffff;
-    --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-    --ion-color-tertiary-shade: #0a5e57;
-    --ion-color-tertiary-tint: #237a73;
-
-    --ion-color-success: #17693a;
-    --ion-color-success-rgb: 23, 105, 58;
-    --ion-color-success-contrast: #ffffff;
-    --ion-color-success-contrast-rgb: 255, 255, 255;
-    --ion-color-success-shade: #145c33;
-    --ion-color-success-tint: #2e784e;
-
-    --ion-color-warning: #8a5a00;
-    --ion-color-warning-rgb: 138, 90, 0;
-    --ion-color-warning-contrast: #ffffff;
-    --ion-color-warning-contrast-rgb: 255, 255, 255;
-    --ion-color-warning-shade: #794f00;
-    --ion-color-warning-tint: #966b1a;
-
-    --ion-color-danger: #b3261e;
-    --ion-color-danger-rgb: 179, 38, 30;
-    --ion-color-danger-contrast: #ffffff;
-    --ion-color-danger-contrast-rgb: 255, 255, 255;
-    --ion-color-danger-shade: #9e211a;
-    --ion-color-danger-tint: #bb3c35;
-
-    --ion-color-medium: #5b6475;
-    --ion-color-medium-rgb: 91, 100, 117;
-    --ion-color-medium-contrast: #ffffff;
-    --ion-color-medium-contrast-rgb: 255, 255, 255;
-    --ion-color-medium-shade: #505867;
-    --ion-color-medium-tint: #6b7483;
-
-    --ion-color-light: #e6e9ef;
-    --ion-color-light-rgb: 230, 233, 239;
-    --ion-color-light-contrast: #14161a;
-    --ion-color-light-contrast-rgb: 20, 22, 26;
-    --ion-color-light-shade: #cacdd2;
-    --ion-color-light-tint: #e9ebf1;
-
-    --ion-color-dark: #14161a;
-    --ion-color-dark-rgb: 20, 22, 26;
-    --ion-color-dark-contrast: #ffffff;
-    --ion-color-dark-contrast-rgb: 255, 255, 255;
-    --ion-color-dark-shade: #121317;
-    --ion-color-dark-tint: #2c2d31;
-
-    --ion-background-color: #f1f3f6;
-    --ion-background-color-rgb: 241, 243, 246;
-    --ion-text-color: #14161a;
-    --ion-text-color-rgb: 20, 22, 26;
-    --ion-item-background: #ffffff;
-    --ion-toolbar-background: #ffffff;
-    --ion-toolbar-color: #14161a;
-    --ion-toolbar-border-color: #c9cfda;
-    --ion-card-background: #ffffff;
-    --ion-card-color: #14161a;
-    --ion-border-color: #c9cfda;
-    --ion-placeholder-color: #4a5365;
-    --ion-tab-bar-background: #ffffff;
-
-    --lt-bg: #f1f3f6;
-    --lt-surface-1: #ffffff;
-    --lt-surface-2: #ffffff;
-    --lt-surface-3: #e6e9ef;
-    --lt-border: #c9cfda;
-    --lt-border-control: #6b7588;
-    --lt-text: #14161a;
-    --lt-text-muted: #4a5365;
-    --lt-accent: #9a4a00;
-    --lt-on-accent: #ffffff;
-    --lt-focus: #1f55c0;
-
-    --lt-status-transit: #1f55c0;
-    --lt-status-inspected: #17693a;
-    --lt-status-rejected: #b3261e;
-
-    --lt-priority-high: #a3195b;
-    --lt-priority-medium: #8a5a00;
-    --lt-priority-low: #4a5365;
-
-    --lt-action-ok-bg: #17693a;
-    --lt-action-ok-fg: #ffffff;
-    --lt-action-ko-fg: #b3261e;
-
-    color-scheme: light;
+  :root:not([data-theme='dark']) {
+    --ion-background-color-rgb: 227, 225, 218;
+    --ion-text-color-rgb: 14, 14, 14;
   }
+}
+:root[data-theme='light'] {
+  --ion-background-color-rgb: 227, 225, 218;
+  --ion-text-color-rgb: 14, 14, 14;
+}
+
+/* Selector manual de tema (Ajustes): fuerza la rama clara u oscura de light-dark() */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }

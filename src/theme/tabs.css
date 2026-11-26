@@ -1,0 +1,36 @@
+/* Barra de pestanas inferior: barra negra a ras, rotulos en mayusculas condensadas y bloque naranja en la activa */
+ion-tab-bar {
+  --background: var(--lt-bar-bg);
+  --border: var(--lt-rule) solid var(--lt-signal);
+  --color: var(--lt-bar-text);
+  --color-selected: var(--lt-on-accent);
+  min-height: 4rem;
+  padding: 0;
+  background: var(--lt-bar-bg);
+  border-top: var(--lt-rule) solid var(--lt-signal);
+  contain: none;
+}
+ion-tab-button {
+  --color: var(--lt-bar-text);
+  --color-selected: var(--lt-on-accent);
+  --background-focused: transparent;
+  --ripple-color: transparent;
+  flex: 1 1 0;
+  max-width: none;
+  min-height: 4rem;
+  margin: 0;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+ion-tab-button + ion-tab-button {
+  border-inline-start: var(--lt-rule-thin) solid oklch(0.3 0.003 95);
+}
+ion-tab-button.tab-selected {
+  background: var(--lt-signal);
+  color: var(--lt-on-accent);
+}
+ion-tab-button ion-icon {
+  font-size: 1.5rem;
+}

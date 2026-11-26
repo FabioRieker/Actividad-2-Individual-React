@@ -1,31 +1,71 @@
 /* ==========================================================================
-   LogiTrack Express - global.css
+   LogiTrack Express - global.css (senaletica industrial)
    Importar DESPUES de variables.css. Sin fuentes remotas (funciona offline).
    ========================================================================== */
 
 html {
   font-family: var(--lt-font-sans);
   -webkit-text-size-adjust: 100%;
+  block-size: 100dvh; /* altura dinamica: la barra del navegador no recorta ni salta */
+  background: var(--lt-bg);
 }
 
 body {
+  block-size: 100dvh;
+  background: var(--lt-bg);
+  color: var(--lt-text);
   font-size: 1rem; /* 16 px base, respeta zoom del usuario */
   line-height: 1.5;
-  letter-spacing: 0.005em;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
 
 h1,
 h2,
 h3 {
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  font-weight: 700;
+  line-height: 1.1;
+  font-weight: 800;
 }
 
-.lt-mono {
-  font-family: var(--lt-font-mono);
-  font-variant-numeric: tabular-nums slashed-zero; /* 0 distinguible de O en codigos */
+ion-app,
+ion-router-outlet,
+.ion-page {
+  background: transparent;
+}
+
+/* Rotulo: grotesca condensada en mayusculas (eje de anchura de Archivo). El DOM conserva el texto normal. */
+.lt-sign,
+.lt-tag,
+.lt-btn,
+.lt-card__meta dt,
+.lt-kpi__label,
+.lt-sum-kpi__label,
+.lt-panel__title,
+.lt-page__title,
+.lt-brand__name,
+.lt-result-count,
+ion-segment-button,
+ion-tab-button,
+ion-back-button,
+ion-button {
+  font-stretch: var(--lt-display-stretch);
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
+}
+
+/* El boton nativo dentro del shadow DOM restablece font-stretch: se reaplica el rotulo condensado */
+ion-button::part(native),
+ion-segment-button::part(native),
+ion-tab-button::part(native),
+ion-back-button::part(native) {
+  font-stretch: var(--lt-display-stretch);
+  letter-spacing: inherit;
+  text-transform: uppercase;
+}
+ion-tab-button ion-label {
+  font-stretch: var(--lt-display-stretch);
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
 }
 
 /* Texto solo para lectores de pantalla */
@@ -41,35 +81,85 @@ h3 {
   border: 0;
 }
 
+.lt-mono {
+  font-family: var(--lt-font-mono);
+  font-variant-numeric: tabular-nums slashed-zero; /* 0 distinguible de O en codigos */
+}
+
+/* Margen lateral comun de las pantallas */
+:root {
+  --lt-gutter: var(--lt-space-3);
+}
+@media (min-width: 768px) {
+  :root {
+    --lt-gutter: var(--lt-space-5);
+  }
+}
+
+/* Etiqueta de estado: bloque rectangular macizo con texto sobre fondo solido (nunca sobre franjas) */
+.lt-tag {
+  --tag-bg: var(--lt-fill-transit);
+  --tag-fg: light-dark(var(--lt-ink), var(--lt-bone));
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--lt-space-3);
+  background: var(--tag-bg);
+  color: var(--tag-fg);
+  border: var(--lt-rule-thin) solid var(--lt-ink);
+  border-radius: 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.lt-tag--status-inspected {
+  --tag-bg: var(--lt-fill-inspected);
+  --tag-fg: var(--lt-ink);
+}
+.lt-tag--status-rejected {
+  --tag-bg: var(--lt-fill-rejected);
+  --tag-fg: #ffffff;
+}
+.lt-tag--plain {
+  --tag-bg: transparent;
+  --tag-fg: var(--lt-text);
+  border-color: var(--lt-border);
+}
+
+/* Franjas de peligro (decorativas): negro/rojo en diagonal */
+.lt-hazard {
+  background: repeating-linear-gradient(-45deg, var(--lt-ink) 0 14px, var(--lt-stop) 14px 28px);
+}
+
 /* --------------------------------------------------------------------------
-   Foco visible fuerte (WCAG 2.4.7). Anillo de 3 px con offset: va sobre la
-   superficie contigua, no sobre el relleno del control, asi mantiene >= 3:1.
+   Foco visible fuerte (WCAG 2.4.7): contorno grueso con separacion; no se anima.
    -------------------------------------------------------------------------- */
 :focus-visible {
   outline: var(--lt-focus-width) solid var(--lt-focus);
   outline-offset: var(--lt-focus-offset);
 }
-
-/* Componentes Ionic con shadow DOM: la clase la anade Ionic al host */
 ion-button.ion-focused,
 ion-segment-button.ion-focused,
 ion-searchbar.ion-focused,
 ion-item.ion-focused,
-ion-card.ion-focused,
-ion-chip.ion-focused {
+ion-tab-button.ion-focused {
   outline: var(--lt-focus-width) solid var(--lt-focus);
   outline-offset: var(--lt-focus-offset);
 }
-
-/* Parte nativa interna (boton/input real dentro del shadow DOM) */
 ion-button::part(native):focus-visible,
 ion-segment-button::part(native):focus-visible,
-ion-searchbar::part(native):focus-visible {
+ion-searchbar::part(native):focus-visible,
+ion-tab-button::part(native):focus-visible {
   outline: var(--lt-focus-width) solid var(--lt-focus);
   outline-offset: var(--lt-focus-offset);
 }
+/* Sobre la barra negra el foco claro es siempre el naranja */
+ion-tab-button.ion-focused {
+  outline-color: var(--lt-signal);
+}
 
-/* Evita el halo difuso de Ionic: el anillo solido ya lo sustituye */
 ion-button {
   --box-shadow: none;
 }
@@ -78,59 +168,73 @@ ion-button.ion-focused {
   --background-focused-opacity: 0;
 }
 
-/* Searchbar: el input recibe el foco, se resalta el contenedor */
+/* Buscador: caja recta con contorno grueso */
 ion-searchbar {
-  --background: var(--lt-surface-3);
+  --background: var(--lt-surface-1);
   --color: var(--lt-text);
-  --icon-color: var(--lt-text-muted);
+  --icon-color: var(--lt-text);
   --clear-button-color: var(--lt-text);
-  --border-radius: var(--lt-radius-md);
-  --box-shadow: inset 0 0 0 1px var(--lt-border-control); /* borde 3:1 */
+  --border-radius: 0;
+  --box-shadow: none;
   --cancel-button-color: var(--lt-text);
   min-height: var(--lt-touch-min);
 }
 /* Mayor especificidad que el valor por defecto del host (.sc-ion-searchbar-md-h) */
 ion-searchbar.hydrated {
+  --background: var(--lt-surface-1);
+  --box-shadow: inset 0 0 0 var(--lt-rule) var(--lt-border-control);
   --placeholder-color: var(--lt-text-muted);
   --placeholder-opacity: 1;
 }
 ion-searchbar.ion-focused {
-  --box-shadow: inset 0 0 0 2px var(--lt-focus);
+  --box-shadow: inset 0 0 0 var(--lt-rule) var(--lt-focus);
 }
 
 /* --------------------------------------------------------------------------
-   Tamanos tactiles minimos (uso con guantes): 48 px
+   Botones y selectores: rectangulares, altos, tactiles con guantes (>= 48 px)
    -------------------------------------------------------------------------- */
 ion-button {
   --padding-top: var(--lt-space-3);
   --padding-bottom: var(--lt-space-3);
   --padding-start: var(--lt-space-4);
   --padding-end: var(--lt-space-4);
-  --border-radius: var(--lt-radius-md);
+  --border-radius: 0;
   min-height: var(--lt-touch-min);
   min-width: var(--lt-touch-min);
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.01em;
-  text-transform: none;
+  font-weight: 800;
+  font-size: 1.125rem;
 }
 ion-button[size='large'] {
   min-height: 56px;
 }
 
-ion-segment-button {
-  min-height: var(--lt-touch-min);
-  --color: var(--lt-text);
-  --color-checked: var(--ion-color-primary-contrast);
-  --indicator-color: transparent;
-  --background-checked: var(--ion-color-primary);
-  font-weight: 600;
-  text-transform: none;
-}
+/* Segment = conmutador industrial: pastillas rectas, la activa en naranja con texto negro */
 ion-segment {
-  --background: var(--lt-surface-3);
-  border: 1px solid var(--lt-border-control);
-  border-radius: var(--lt-radius-md);
+  --background: var(--lt-surface-1);
+  min-height: var(--lt-touch-min);
+  padding: 0;
+  border: var(--lt-rule) solid var(--lt-border-control);
+  border-radius: 0;
+}
+ion-segment-button {
+  min-height: calc(var(--lt-touch-min) - 2 * var(--lt-rule));
+  min-width: 0;
+  margin: 0;
+  --color: var(--lt-text);
+  --color-checked: var(--lt-on-accent);
+  --indicator-color: transparent;
+  --background-checked: var(--lt-accent-fill);
+  --border-radius: 0;
+  --border-color: var(--lt-border-control);
+  --border-style: solid;
+  --border-width: 0 var(--lt-rule-thin) 0 0;
+  --padding-start: var(--lt-space-1);
+  --padding-end: var(--lt-space-1);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+ion-segment-button:last-of-type {
+  --border-width: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -140,11 +244,69 @@ ion-segment {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* View Transition al cambiar el estado de un paquete: fundido corto */
+::view-transition-group(root) {
+  animation-duration: var(--lt-dur-1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--lt-dur-1);
+  animation-timing-function: var(--lt-ease-out);
+}
+
+/* --------------------------------------------------------------------------
+   Sistema de movimiento (solo transform / opacity / clip-path)
+   -------------------------------------------------------------------------- */
+@keyframes lt-enter {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+@keyframes lt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes lt-stamp {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes lt-tick {
+  from {
+    opacity: 0;
+    transform: translateY(45%);
+  }
+}
+@keyframes lt-slide {
+  from {
+    transform: translateX(-28px);
+  }
+}
+@keyframes lt-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+/* Entrada de pantalla: deslizamiento corto + fundido; la barra superior no se mueve */
+.lt-enter {
+  animation: lt-enter var(--lt-dur-3) var(--lt-ease-out) both;
 }
 
 /* Alto contraste forzado de Windows / Android */

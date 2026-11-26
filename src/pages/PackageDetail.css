@@ -1,0 +1,109 @@
+/* Detalle: ficha de paquete con datos a reglas, acciones de senal y linea de tiempo de marcas */
+.lt-det-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lt-space-2);
+  margin-bottom: var(--lt-space-4);
+}
+.lt-det-fields {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  margin: 0;
+}
+.lt-det-fields dt,
+.lt-det-fields dd {
+  margin: 0;
+  padding: var(--lt-space-2) 0;
+  border-bottom: var(--lt-rule-thin) solid var(--lt-border-soft);
+}
+.lt-det-fields dt {
+  padding-inline-end: var(--lt-space-5);
+  font-stretch: var(--lt-display-stretch);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
+  color: var(--lt-text-muted);
+}
+.lt-det-fields dd {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.lt-det-fields dt:last-of-type,
+.lt-det-fields dd:last-of-type {
+  border-bottom: 0;
+}
+.lt-det-fields__mono {
+  font-family: var(--lt-font-mono);
+  font-size: 0.8125rem;
+}
+.lt-det-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--lt-space-3);
+}
+.lt-timeline {
+  --dot-color: var(--lt-fill-transit);
+  position: relative;
+  display: grid;
+  gap: var(--lt-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lt-timeline::before {
+  content: '';
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-start: 6px;
+  width: var(--lt-rule);
+  background: var(--lt-border);
+}
+.lt-timeline__item {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding-inline-start: var(--lt-space-6);
+}
+.lt-timeline__item::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0.25rem;
+  inset-inline-start: 0;
+  width: 15px;
+  height: 15px;
+  background: var(--dot-color);
+  border: var(--lt-rule-thin) solid var(--lt-border);
+}
+.lt-timeline__item[data-status='IN_TRANSIT'] {
+  --dot-color: var(--lt-fill-transit);
+}
+.lt-timeline__item[data-status='INSPECTED'] {
+  --dot-color: var(--lt-fill-inspected);
+}
+.lt-timeline__item[data-status='REJECTED'] {
+  --dot-color: var(--lt-fill-rejected);
+}
+.lt-timeline__time {
+  display: block;
+  font-family: var(--lt-font-mono);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--lt-text-muted);
+}
+.lt-det-missing {
+  display: grid;
+  justify-items: start;
+  gap: var(--lt-space-3);
+  padding: var(--lt-space-5) var(--lt-space-4);
+  background: var(--lt-surface-2);
+  border: var(--lt-rule) solid var(--lt-border);
+}
+.lt-det-missing .lt-panel__title {
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 2rem;
+  color: var(--lt-text);
+}

@@ -1,17 +1,9 @@
-import { IonButton, IonIcon } from '@ionic/react';
-import {
-  arrowDownCircleOutline,
-  arrowUpCircleOutline,
-  checkmarkCircleOutline,
-  closeCircleOutline,
-  locationOutline,
-  removeCircleOutline,
-  scaleOutline,
-  timeOutline,
-} from 'ionicons/icons';
-import { memo, useEffect, useRef } from 'react';
+import { IonButton } from '@ionic/react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import type { PackagePriority, PackageStatus, StatusChangeEvent, WarehousePackage } from '../models/package.model';
+
+import { PackageLink } from './PackageLink';
 import './PackageCard.css';
 
 interface PackageCardProps {
@@ -21,24 +13,28 @@ interface PackageCardProps {
 
 interface BadgeInfo {
   readonly label: string;
-  readonly icon: string;
   readonly modifier: string;
 }
 
 const STATUS_INFO: Record<PackageStatus, BadgeInfo & { readonly dataStatus: string }> = {
-  IN_TRANSIT: { label: 'En tránsito', icon: timeOutline, modifier: 'transit', dataStatus: 'transit' },
-  INSPECTED: { label: 'Inspeccionado', icon: checkmarkCircleOutline, modifier: 'inspected', dataStatus: 'inspected' },
-  REJECTED: { label: 'Rechazado', icon: closeCircleOutline, modifier: 'rejected', dataStatus: 'rejected' },
+  IN_TRANSIT: { label: 'En tránsito', modifier: 'transit', dataStatus: 'transit' },
+  INSPECTED: { label: 'Inspeccionado', modifier: 'inspected', dataStatus: 'inspected' },
+  REJECTED: { label: 'Rechazado', modifier: 'rejected', dataStatus: 'rejected' },
 };
 
 const PRIORITY_INFO: Record<PackagePriority, BadgeInfo> = {
-  CRITICAL: { label: 'Prioridad alta', icon: arrowUpCircleOutline, modifier: 'high' },
-  STANDARD: { label: 'Prioridad media', icon: removeCircleOutline, modifier: 'medium' },
-  LOW: { label: 'Prioridad baja', icon: arrowDownCircleOutline, modifier: 'low' },
+  CRITICAL: { label: 'Alta', modifier: 'high' },
+  STANDARD: { label: 'Media', modifier: 'medium' },
+  LOW: { label: 'Baja', modifier: 'low' },
 };
 
 const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
-const dateFormat = new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+const dateFormat = new Intl.DateTimeFormat('es-ES', {
+  day: 'numeric',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+});
 
 /**
  * ion-button copia los atributos aria-* al botón nativo solo al cargar y su render los restablece al cambiar
@@ -77,6 +73,13 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
   const rejected = pkg.status === 'REJECTED';
   useEffect(() => syncAriaDisabled(inspectRef.current, inspected), [inspected]);
   useEffect(() => syncAriaDisabled(rejectRef.current, rejected), [rejected]);
+  // Al cambiar el estado se «estampa» la etiqueta (barrido) y, si es un rechazo, entran las franjas.
+  const [shownStatus, setShownStatus] = useState(pkg.status);
+  const [stamping, setStamping] = useState(false);
+  if (shownStatus !== pkg.status) {
+    setShownStatus(pkg.status);
+    setStamping(true);
+  }
   const status = STATUS_INFO[pkg.status];
   const priority = PRIORITY_INFO[pkg.priority];
   const emit = (newStatus: PackageStatus): void => {
@@ -85,68 +88,62 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
   const titleId = `code-${pkg.id}`;
 
   return (
-    <article
-      className={`lt-card lt-card--${status.modifier}`}
-      data-status={status.dataStatus}
-      aria-labelledby={titleId}
-    >
-      <header className="lt-card__head">
-        <h2 className="lt-card__code" id={titleId}>
-          {pkg.trackingCode}
-        </h2>
-        <span className={`lt-chip lt-chip--status-${status.modifier}`}>
-          <IonIcon icon={status.icon} aria-hidden="true" />
-          {status.label}
-        </span>
-      </header>
-      <ul className="lt-card__meta">
-        <li>
-          <IonIcon icon={locationOutline} aria-hidden="true" />
-          <span>
-            Destino: <strong>{pkg.destinationHub}</strong>
-          </span>
-        </li>
-        <li>
-          <IonIcon icon={scaleOutline} aria-hidden="true" />
-          <span>
-            Peso: <strong>{weightFormat.format(pkg.weightKg)} kg</strong>
-          </span>
-        </li>
-        <li>
-          <IonIcon icon={timeOutline} aria-hidden="true" />
-          <span>
-            Registrado: <time dateTime={pkg.timestamp.toISOString()}>{dateFormat.format(pkg.timestamp)}</time>
-          </span>
-        </li>
-      </ul>
-      <div className="lt-chips">
-        <span className={`lt-chip lt-chip--priority-${priority.modifier}`}>
-          <IonIcon icon={priority.icon} aria-hidden="true" />
-          {priority.label}
-        </span>
-      </div>
-      <div className="lt-card__actions">
-        <IonButton
-          ref={inspectRef}
-          className="lt-btn-inspect"
-          aria-label={`Marcar ${pkg.trackingCode} como inspeccionado`}
-          aria-disabled={inspected}
-          onClick={() => emit('INSPECTED')}
-        >
-          <IonIcon slot="icon-only" icon={checkmarkCircleOutline} aria-hidden="true" />
-        </IonButton>
-        <IonButton
-          ref={rejectRef}
-          className="lt-btn-reject"
-          fill="outline"
-          aria-label={`Marcar ${pkg.trackingCode} como rechazado`}
-          aria-disabled={rejected}
-          onClick={() => emit('REJECTED')}
-        >
-          <IonIcon slot="icon-only" icon={closeCircleOutline} aria-hidden="true" />
-        </IonButton>
-      </div>
-    </article>
+    <div className="lt-card-host">
+      <article
+        className={`lt-card lt-card--${status.modifier}${stamping ? ' is-stamping' : ''}`}
+        onAnimationEnd={() => setStamping(false)}
+        data-status={status.dataStatus}
+        aria-labelledby={titleId}
+      >
+        <header className="lt-card__head">
+          <h2 className="lt-card__code" id={titleId}>
+            <PackageLink id={pkg.id} trackingCode={pkg.trackingCode} />
+          </h2>
+          <span className={`lt-tag lt-tag--status-${status.modifier}`}>{status.label}</span>
+        </header>
+        <dl className="lt-card__meta">
+          <div>
+            <dt>Destino</dt>
+            <dd>{pkg.destinationHub}</dd>
+          </div>
+          <div>
+            <dt>Peso</dt>
+            <dd>{weightFormat.format(pkg.weightKg)} kg</dd>
+          </div>
+          <div>
+            <dt>Registrado</dt>
+            <dd>
+              <time dateTime={pkg.timestamp.toISOString()}>{dateFormat.format(pkg.timestamp)}</time>
+            </dd>
+          </div>
+          <div>
+            <dt>Prioridad</dt>
+            <dd className={`lt-priority lt-priority--${priority.modifier}`}>{priority.label}</dd>
+          </div>
+        </dl>
+        <div className="lt-card__actions">
+          <IonButton
+            ref={inspectRef}
+            className={`lt-btn-inspect${inspected ? ' is-inactive' : ''}`}
+            aria-label={`Inspeccionar ${pkg.trackingCode}`}
+            aria-disabled={inspected ? 'true' : 'false'}
+            onClick={() => emit('INSPECTED')}
+          >
+            Inspeccionar
+          </IonButton>
+          <IonButton
+            ref={rejectRef}
+            className={`lt-btn-reject${rejected ? ' is-inactive' : ''}`}
+            fill="outline"
+            aria-label={`Rechazar ${pkg.trackingCode}`}
+            aria-disabled={rejected ? 'true' : 'false'}
+            onClick={() => emit('REJECTED')}
+          >
+            Rechazar
+          </IonButton>
+        </div>
+      </article>
+    </div>
   );
 }
 

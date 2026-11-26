@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import type { PackageStatus, WarehousePackage } from '../models/package.model';
+import type { ActivityEntry, PackageStatus, WarehousePackage } from '../models/package.model';
 
 function createMock(): readonly WarehousePackage[] {
   const packages: readonly WarehousePackage[] = [
@@ -81,11 +81,21 @@ function createMock(): readonly WarehousePackage[] {
 }
 
 /**
- * Estado privado del módulo; el array nunca se muta, solo se reemplaza por una
- * copia nueva en `updateStatus`.
+ * Estado privado del módulo; los arrays nunca se mutan, solo se reemplazan por una
+ * copia nueva en `updateStatus` y `undoLast`.
  */
 let state: readonly WarehousePackage[] = createMock();
+let history: readonly ActivityEntry[] = Object.freeze([]);
+let entrySeq = 0;
 const listeners = new Set<() => void>();
+
+function notify(): void {
+  listeners.forEach((listener) => listener());
+}
+
+function setStatus(id: string, status: PackageStatus): void {
+  state = Object.freeze(state.map((p) => (p.id === id ? Object.freeze({ ...p, status }) : p)));
+}
 
 export function subscribe(listener: () => void): () => void {
   listeners.add(listener);
@@ -98,22 +108,60 @@ export function getSnapshot(): readonly WarehousePackage[] {
   return state;
 }
 
-/** Cambia el estado de un paquete sin mutar; un id inexistente no hace nada. */
-export function updateStatus(id: string, newStatus: PackageStatus): void {
-  if (!state.some((p) => p.id === id)) {
-    return;
-  }
-  state = Object.freeze(state.map((p) => (p.id === id ? Object.freeze({ ...p, status: newStatus }) : p)));
-  listeners.forEach((listener) => listener());
+/** Historial cronológico (el más antiguo primero) de cambios de estado. */
+export function getActivitySnapshot(): readonly ActivityEntry[] {
+  return history;
 }
 
-/** Restablece el mock inicial (uso en tests). */
+/**
+ * Cambia el estado de un paquete sin mutar y lo registra en el historial.
+ * Un id inexistente o un estado idéntico al actual no hacen nada.
+ */
+export function updateStatus(id: string, newStatus: PackageStatus): void {
+  const current = state.find((p) => p.id === id);
+  if (!current || current.status === newStatus) {
+    return;
+  }
+  entrySeq += 1;
+  const entry: ActivityEntry = Object.freeze({
+    id: `act-${entrySeq}`,
+    packageId: current.id,
+    trackingCode: current.trackingCode,
+    from: current.status,
+    to: newStatus,
+    at: new Date(),
+  });
+  setStatus(id, newStatus);
+  history = Object.freeze([...history, entry]);
+  notify();
+}
+
+/** Revierte el último cambio registrado y lo retira del historial. Devuelve la entrada revertida. */
+export function undoLast(): ActivityEntry | undefined {
+  const last = history[history.length - 1];
+  if (!last) {
+    return undefined;
+  }
+  setStatus(last.packageId, last.from);
+  history = Object.freeze(history.slice(0, -1));
+  notify();
+  return last;
+}
+
+/** Restablece el mock inicial y vacía el historial (uso en tests). */
 export function resetStore(): void {
   state = createMock();
-  listeners.forEach((listener) => listener());
+  history = Object.freeze([]);
+  entrySeq = 0;
+  notify();
 }
 
 /** Hook de lectura reactiva de los paquetes. */
 export function usePackages(): readonly WarehousePackage[] {
   return useSyncExternalStore(subscribe, getSnapshot);
+}
+
+/** Hook de lectura reactiva del historial de cambios. */
+export function useActivity(): readonly ActivityEntry[] {
+  return useSyncExternalStore(subscribe, getActivitySnapshot);
 }

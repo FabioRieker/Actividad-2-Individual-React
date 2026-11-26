@@ -1,0 +1,419 @@
+/* Red: mapa esquematico simulado, hubs como botones, ficha lateral y tabla de estado */
+.lt-red__status {
+  display: flex;
+  align-items: center;
+  gap: var(--lt-space-3);
+  padding-inline: var(--lt-space-2);
+}
+.lt-red__status .lt-red__sim {
+  --tag-fg: var(--lt-bar-text);
+  min-height: 28px;
+  border-color: var(--lt-signal);
+  font-size: 1rem;
+}
+.lt-red__clock {
+  font-family: var(--lt-font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--lt-bar-text);
+}
+
+.lt-red-wrap {
+  container: lt-red / inline-size;
+}
+.lt-red {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--lt-space-4);
+}
+@container lt-red (min-width: 56rem) {
+  .lt-red {
+    grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 1fr);
+    align-items: start;
+  }
+  .lt-red__table-block {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- Mapa ---------- */
+.lt-red__stage {
+  position: relative;
+  aspect-ratio: 650 / 440;
+  background: var(--lt-surface-1);
+  border: var(--lt-rule) solid var(--lt-border);
+}
+.lt-red__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  --map-line: light-dark(oklch(0.45 0.01 95), oklch(0.72 0.005 95));
+  --map-land: var(--lt-surface-3);
+  --map-outline: light-dark(oklch(0.5 0.01 95), oklch(0.62 0.005 95));
+}
+.lt-red__land {
+  fill: var(--map-land);
+  stroke: var(--map-outline);
+  stroke-width: 5;
+  stroke-linejoin: miter;
+}
+.lt-red__route {
+  fill: none;
+  stroke: var(--map-line);
+  stroke-width: 5;
+  stroke-linejoin: miter;
+  stroke-linecap: butt;
+}
+.lt-red__active-casing,
+.lt-red__active-line {
+  fill: none;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.lt-red__active-casing {
+  stroke: var(--lt-ink);
+  stroke-width: 12;
+}
+.lt-red__active-line {
+  stroke: var(--lt-signal);
+  stroke-width: 6;
+}
+.lt-red__mark {
+  fill: var(--lt-ink);
+  stroke: var(--lt-bone);
+  stroke-width: 3;
+}
+.lt-red__mark--center {
+  fill: var(--lt-signal);
+  stroke: var(--lt-ink);
+  stroke-width: 5;
+}
+.lt-red__center-text,
+.lt-red__center-no,
+.lt-red__label {
+  font-family: var(--lt-font-sans);
+  font-stretch: var(--lt-display-stretch);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.lt-red__center-text {
+  fill: var(--lt-ink);
+  font-size: 19px;
+}
+.lt-red__center-no {
+  fill: var(--lt-ink);
+  font-size: 34px;
+}
+.lt-red__label {
+  fill: var(--lt-text);
+  font-size: 21px;
+  paint-order: stroke;
+  stroke: var(--map-land);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+}
+.lt-red__label--short {
+  display: none;
+}
+@container lt-red (max-width: 36rem) {
+  .lt-red__label--full {
+    display: none;
+  }
+  .lt-red__label--short {
+    display: block;
+    font-size: 24px;
+  }
+}
+
+/* Marcas de paquetes: rectangulos con el color de estado y estela corta */
+.lt-red__pkg-mark {
+  fill: var(--lt-fill-transit);
+  stroke: var(--lt-ink);
+  stroke-width: 2.5;
+}
+.lt-red__pkg--inspected .lt-red__pkg-mark {
+  fill: var(--lt-fill-inspected);
+}
+.lt-red__pkg--rejected .lt-red__pkg-mark {
+  fill: var(--lt-fill-rejected);
+}
+.lt-red__pkg--transit .lt-red__pkg-mark {
+  fill: var(--lt-bone);
+}
+.lt-red__trail {
+  stroke: light-dark(var(--lt-ink), var(--lt-bone));
+  stroke-width: 4;
+  stroke-linecap: butt;
+  opacity: 0.45;
+}
+.lt-red__pkg.is-parked .lt-red__trail {
+  display: none;
+}
+
+/* Hubs como botones HTML superpuestos: area tactil de 44 px, foco visible */
+.lt-red__hit {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+.lt-red__hit.is-center {
+  width: 84px;
+  height: 84px;
+}
+.lt-red__hit:focus-visible {
+  outline: var(--lt-focus-width) solid var(--lt-focus);
+  outline-offset: 2px;
+}
+.lt-red__hit[aria-pressed='true'] {
+  outline: var(--lt-focus-width) solid var(--lt-signal);
+  outline-offset: 2px;
+}
+
+.lt-red__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lt-space-2) var(--lt-space-4);
+  margin: var(--lt-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-stretch: var(--lt-display-stretch);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
+}
+.lt-red__legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--lt-space-2);
+}
+.lt-red__swatch {
+  width: 18px;
+  height: 12px;
+  border: var(--lt-rule-thin) solid var(--lt-ink);
+}
+.lt-red__swatch--transit {
+  background: var(--lt-bone);
+}
+.lt-red__swatch--inspected {
+  background: var(--lt-fill-inspected);
+}
+.lt-red__swatch--rejected {
+  background: var(--lt-fill-rejected);
+}
+
+/* ---------- Ficha del hub ---------- */
+.lt-red__panel {
+  background: var(--lt-surface-2);
+  border: var(--lt-rule) solid var(--lt-border);
+}
+.lt-red__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lt-space-3);
+  padding: var(--lt-space-2) var(--lt-space-3);
+  background: var(--lt-bar-bg);
+  color: var(--lt-bar-text);
+}
+.lt-red__panel-title {
+  margin: 0;
+  font-stretch: var(--lt-display-stretch);
+  font-size: 1.375rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.lt-red__panel-head .lt-btn {
+  min-height: 44px;
+  padding-inline: var(--lt-space-3);
+  font-size: 1.125rem;
+  color: var(--lt-bar-text);
+  border-color: var(--lt-bar-text);
+}
+.lt-red__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lt-red__item {
+  --dot-color: var(--lt-fill-transit);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--lt-space-1) var(--lt-space-3);
+  align-items: center;
+  padding: var(--lt-space-3);
+  border-inline-start: 10px solid var(--dot-color);
+}
+.lt-red__item + .lt-red__item {
+  border-top: var(--lt-rule-thin) dashed var(--lt-border-soft);
+}
+.lt-red__item[data-status='INSPECTED'] {
+  --dot-color: var(--lt-fill-inspected);
+}
+.lt-red__item[data-status='REJECTED'] {
+  --dot-color: var(--lt-fill-rejected);
+}
+.lt-red__item-code {
+  font-family: var(--lt-font-mono);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+.lt-red__item-weight {
+  grid-column: 1 / -1;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--lt-text-muted);
+}
+.lt-red__empty,
+.lt-red__hint {
+  margin: 0;
+  padding: var(--lt-space-3);
+}
+.lt-red__hint {
+  padding: 0;
+  text-wrap: pretty;
+}
+
+/* ---------- Tabla de estado ---------- */
+.lt-red__short {
+  display: none;
+}
+@container lt-red (max-width: 36rem) {
+  .lt-red__full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .lt-red__short {
+    display: inline;
+  }
+  .lt-red__table th,
+  .lt-red__table td {
+    padding-inline: var(--lt-space-2);
+  }
+}
+.lt-red__table-title {
+  margin: 0 0 var(--lt-space-2);
+  font-stretch: var(--lt-display-stretch);
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.lt-red__table-wrap {
+  overflow-x: auto;
+  border: var(--lt-rule) solid var(--lt-border);
+  background: var(--lt-surface-2);
+}
+.lt-red__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.lt-red__table th,
+.lt-red__table td {
+  padding: var(--lt-space-2) var(--lt-space-3);
+  text-align: start;
+  border-bottom: var(--lt-rule-thin) solid var(--lt-border-soft);
+}
+.lt-red__table thead th {
+  background: var(--lt-bar-bg);
+  color: var(--lt-bar-text);
+  font-stretch: var(--lt-display-stretch);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
+}
+.lt-red__table tbody th {
+  font-weight: 700;
+}
+.lt-red__table td {
+  font-family: var(--lt-font-mono);
+  font-weight: 700;
+}
+.lt-red__table tr.is-selected th,
+.lt-red__table tr.is-selected td {
+  background: color-mix(in oklch, var(--lt-signal) 22%, transparent);
+}
+
+/* ---------- Movimiento: solo transform, opacity y stroke-dashoffset ---------- */
+.lt-red__pkg {
+  will-change: transform;
+}
+.lt-red__pkg.is-parked {
+  transition: transform var(--lt-dur-3) var(--lt-ease-out);
+}
+.lt-red__pkg-mark {
+  transition: opacity var(--lt-dur-2) var(--lt-ease-out);
+}
+.lt-red__mark,
+.lt-red__route {
+  transition: opacity var(--lt-dur-2) var(--lt-ease-out);
+}
+.lt-red__stage[data-selected='true'] .lt-red__hub:not(.is-selected) .lt-red__mark,
+.lt-red__stage[data-selected='true'] .lt-red__route:not(.is-selected) {
+  opacity: 0.3;
+}
+.lt-red__active-casing,
+.lt-red__active-line {
+  animation: lt-draw var(--lt-dur-3) var(--lt-ease-out) both;
+}
+.lt-red__panel {
+  animation: lt-enter var(--lt-dur-2) var(--lt-ease-out) both;
+}
+@keyframes lt-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes lt-fade {
+  from {
+    opacity: 0;
+  }
+}
+/* Al entrar en la pantalla: las rutas se dibujan escalonadas y los hubs se estampan */
+.lt-enter .lt-red__route {
+  stroke-dasharray: 1;
+  animation: lt-draw var(--lt-dur-3) var(--lt-ease-out) both;
+}
+.lt-enter .lt-red__route:nth-of-type(2) {
+  animation-delay: 40ms;
+}
+.lt-enter .lt-red__route:nth-of-type(3) {
+  animation-delay: 80ms;
+}
+.lt-enter .lt-red__route:nth-of-type(4) {
+  animation-delay: 120ms;
+}
+.lt-enter .lt-red__route:nth-of-type(5) {
+  animation-delay: 160ms;
+}
+.lt-enter .lt-red__route:nth-of-type(6) {
+  animation-delay: 200ms;
+}
+.lt-enter .lt-red__route:nth-of-type(7) {
+  animation-delay: 240ms;
+}
+.lt-enter .lt-red__hub {
+  transform-box: fill-box;
+  animation: lt-stamp var(--lt-dur-2) var(--lt-ease-out) 200ms both;
+}
+.lt-enter .lt-red__pkg-mark {
+  animation: lt-fade var(--lt-dur-2) var(--lt-ease-out) 320ms both;
+}

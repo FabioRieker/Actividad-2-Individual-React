@@ -37,7 +37,7 @@ try {
   const context = await browser.newContext({ ...descriptor });
   const page = await context.newPage();
   await page.goto(APP_URL);
-  await page.getByText('Recepción, inspección y clasificación de paquetes.').waitFor();
+  await page.getByRole('searchbox', { name: 'Buscar código o destino' }).waitFor();
   await page.waitForTimeout(500);
   await page.screenshot({ path: OUT });
   await browser.close();

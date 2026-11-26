@@ -1,151 +1,228 @@
-/* Home.css - cabecera, KPIs, controles fijos, rejilla y estado vacio */
+/* Home.css - barra superior, controles, tablero de indicadores, rejilla y estado vacio */
 
-/* ---------- Cabecera ---------- */
-.lt-header ion-toolbar {
-  --background: var(--lt-surface-1);
-  --color: var(--lt-text);
-  --border-width: 0;
+.lt-content {
+  --background: var(--lt-bg);
 }
-.lt-brand {
+
+/* ---------- Barra superior negra: rotulo + numero de muelle ---------- */
+.lt-topbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--lt-space-3);
-  padding: var(--lt-space-2) var(--lt-space-4);
-  max-width: var(--lt-content-max);
-  margin-inline: auto;
-}
-.lt-brand__mark {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 44px;
-  height: 44px;
-  background: var(--lt-accent);
-  color: var(--lt-on-accent);
-  border-radius: var(--lt-radius-md);
-  font-size: 26px;
+  min-height: 3.5rem;
+  padding-block: var(--lt-space-2);
+  padding-top: calc(var(--lt-space-2) + var(--ion-safe-area-top, 0px));
+  padding-inline: max(var(--lt-gutter), calc((100% - var(--lt-content-max)) / 2 + var(--lt-gutter)));
+  background: var(--lt-bar-bg);
+  color: var(--lt-bar-text);
+  border-bottom: var(--lt-rule) solid var(--lt-signal);
 }
 .lt-brand__name {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-.lt-brand__name span {
-  color: var(--lt-accent);
-}
-.lt-brand__tag {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--lt-text-muted);
-}
-
-/* ---------- Franja de KPIs ---------- */
-.lt-kpis {
-  list-style: none;
-  margin: 0;
-  padding: 0 var(--lt-space-4) var(--lt-space-3);
-  max-width: var(--lt-content-max);
-  margin-inline: auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--lt-space-2);
-  background: var(--lt-surface-1);
-}
-.lt-kpi {
-  --kpi-color: var(--lt-text);
-  background: var(--lt-surface-3);
-  border-radius: var(--lt-radius-md);
-  border-top: 4px solid var(--kpi-color);
-  padding: var(--lt-space-2) var(--lt-space-3);
-  min-height: 64px;
-  display: grid;
-  align-content: center;
-  gap: 2px;
-}
-.lt-kpi__value {
-  font-family: var(--lt-font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 1.75rem;
-  font-weight: 800;
+  font-size: var(--lt-fs-brand);
+  font-weight: 900;
   line-height: 1;
-  color: var(--kpi-color);
+  letter-spacing: 0.06em;
 }
-.lt-kpi__label {
+.lt-topbar__dock {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--lt-text-muted);
+  gap: var(--lt-space-2);
+  margin: 0;
+  font-stretch: var(--lt-display-stretch);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lt-bar-muted);
 }
-.lt-kpi__label ion-icon {
-  font-size: 16px;
-  color: var(--kpi-color);
-}
-.lt-kpi--transit {
-  --kpi-color: var(--lt-status-transit);
-}
-.lt-kpi--inspected {
-  --kpi-color: var(--lt-status-inspected);
-}
-.lt-kpi--rejected {
-  --kpi-color: var(--lt-status-rejected);
+.lt-topbar__dock-no {
+  display: grid;
+  place-items: center;
+  min-width: 2.5rem;
+  height: 2.25rem;
+  padding-inline: var(--lt-space-2);
+  background: var(--lt-signal);
+  color: var(--lt-ink);
+  font-size: 1.625rem;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Controles fijos (busqueda + prioridad) ---------- */
+/* ---------- Controles fijos: busqueda + prioridad ---------- */
 .lt-controls {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--lt-surface-1);
-  border-bottom: 1px solid var(--lt-border);
-  padding: var(--lt-space-2) var(--lt-space-4) var(--lt-space-3);
-}
-.lt-controls__inner {
-  max-width: var(--lt-content-max);
-  margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--lt-space-2);
+  padding: var(--lt-space-2) max(var(--lt-gutter), calc((100% - var(--lt-content-max)) / 2 + var(--lt-gutter)));
+  background: var(--lt-bg);
+  border-bottom: var(--lt-rule) solid var(--lt-border);
 }
 .lt-controls ion-searchbar,
 .lt-controls ion-segment {
   min-width: 0;
   max-width: 100%;
 }
-.lt-controls ion-segment-button {
-  min-width: 0;
-  --padding-start: var(--lt-space-1);
-  --padding-end: var(--lt-space-1);
-}
 .lt-controls ion-searchbar {
   padding: 0;
 }
-
-/* ---------- Contenido y rejilla ---------- */
-.lt-content {
-  --background: var(--lt-bg);
+@media (min-width: 768px) {
+  .lt-controls {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    gap: var(--lt-space-3);
+  }
 }
+
+/* ---------- Contenido ---------- */
 .lt-main {
   max-width: var(--lt-content-max);
   margin-inline: auto;
-  padding: var(--lt-space-4);
-  padding-bottom: calc(var(--lt-space-6) + env(safe-area-inset-bottom));
-}
-.lt-result-count {
-  margin: 0 0 var(--lt-space-3);
-  color: var(--lt-text-muted);
-  font-size: 0.9375rem;
+  /* hueco inferior para que el ultimo bloque quede por encima de la barra de pestanas */
+  padding: var(--lt-space-4) var(--lt-gutter) calc(var(--lt-space-5) + 4.5rem + env(safe-area-inset-bottom));
 }
 
+/* ---------- Tablero de indicadores: rotulo grande + desglose en fila ---------- */
+.lt-overview {
+  container: lt-overview / inline-size;
+  background: var(--lt-surface-2);
+  border: var(--lt-rule) solid var(--lt-border);
+}
+.lt-kpis {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.lt-kpi {
+  display: grid;
+  align-content: end;
+  gap: var(--lt-space-1);
+  min-width: 0;
+  padding: var(--lt-space-3) var(--lt-space-2) var(--lt-space-2);
+}
+.lt-kpi + .lt-kpi:not(.lt-kpi--transit) {
+  border-inline-start: var(--lt-rule-thin) solid var(--lt-border);
+}
+.lt-kpi--total {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--lt-space-3);
+  padding-block: var(--lt-space-3) var(--lt-space-2);
+  border-bottom: var(--lt-rule-thin) solid var(--lt-border);
+}
+.lt-kpi__value {
+  display: block;
+  font-stretch: var(--lt-display-stretch);
+  font-size: var(--lt-fs-kpi);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--lt-text);
+}
+.lt-kpi--total .lt-kpi__value {
+  font-size: var(--lt-fs-kpi-hero);
+}
+.lt-kpi--transit .lt-kpi__value {
+  color: var(--lt-status-transit);
+}
+.lt-kpi--inspected .lt-kpi__value {
+  color: var(--lt-status-inspected);
+}
+.lt-kpi--rejected .lt-kpi__value {
+  color: var(--lt-status-rejected);
+}
+.lt-kpi__label {
+  font-size: clamp(0.8125rem, 3.2cqi, 1.125rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--lt-text-muted);
+  overflow-wrap: anywhere;
+}
+.lt-kpi--total .lt-kpi__label {
+  font-size: 1.5rem;
+  color: var(--lt-text);
+}
+@container lt-overview (min-width: 40rem) {
+  .lt-kpis {
+    grid-template-columns: 1.7fr repeat(3, minmax(0, 1fr));
+  }
+  .lt-kpi--total {
+    grid-column: auto;
+    border-bottom: 0;
+  }
+  .lt-kpi + .lt-kpi:not(.lt-kpi--transit) {
+    border-inline-start: var(--lt-rule-thin) solid var(--lt-border);
+  }
+  .lt-kpi--transit {
+    border-inline-start: var(--lt-rule-thin) solid var(--lt-border);
+  }
+}
+
+/* Cifra que cambia: «tick» de contador mecanico */
+.lt-kpi__value.is-tick {
+  animation: lt-tick var(--lt-dur-2) var(--lt-ease-out) both;
+}
+
+/* Barra apilada de proporcion: bloques macizos */
+.lt-meter {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  background: var(--lt-ink);
+  border-top: var(--lt-rule-thin) solid var(--lt-border);
+}
+.lt-meter__seg {
+  flex-basis: 0;
+  min-width: 6px;
+}
+.lt-meter__seg--transit {
+  background: var(--lt-fill-transit);
+}
+.lt-meter__seg--inspected {
+  background: var(--lt-fill-inspected);
+}
+.lt-meter__seg--rejected {
+  background: var(--lt-fill-rejected);
+}
+
+.lt-result-count {
+  display: flex;
+  align-items: center;
+  gap: var(--lt-space-3);
+  margin: var(--lt-space-5) 0 var(--lt-space-3);
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--lt-text);
+}
+.lt-result-count::after {
+  content: '';
+  flex: 1;
+  height: var(--lt-rule);
+  background: var(--lt-border);
+}
+
+/* ---------- Rejilla de paquetes (2 columnas en tablet) ---------- */
+ion-list.lt-grid {
+  --ion-item-background: transparent;
+  contain: none; /* ion-list recorta con contain: content */
+  overflow: visible;
+  background: transparent;
+}
 .lt-grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--lt-space-4);
 }
 @media (min-width: 768px) {
@@ -153,67 +230,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--lt-space-5);
   }
-  .lt-main,
-  .lt-controls,
-  .lt-kpis {
-    padding-inline: var(--lt-space-5);
-  }
-}
-
-/* ---------- Estado vacio ---------- */
-.lt-empty {
-  display: grid;
-  justify-items: center;
-  gap: var(--lt-space-3);
-  text-align: center;
-  padding: var(--lt-space-6) var(--lt-space-4);
-  border: 2px dashed var(--lt-border-control);
-  border-radius: var(--lt-radius-lg);
-  color: var(--lt-text-muted);
-}
-.lt-empty ion-icon {
-  font-size: 56px;
-  color: var(--ion-color-medium);
-}
-.lt-empty__title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--lt-text);
-}
-.lt-empty__text {
-  margin: 0;
-  max-width: 36ch;
-}
-
-/* ---------- Ajustes de la implementacion ---------- */
-.lt-brand__tag {
-  margin: 0;
-  padding: 0 var(--lt-space-4) var(--lt-space-2);
-  max-width: var(--lt-content-max);
-  margin-inline: auto;
-  background: var(--lt-surface-1);
-}
-.lt-kpis {
-  grid-template-columns: repeat(2, 1fr);
-}
-@media (min-width: 480px) {
-  .lt-kpis {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-.lt-kpi--total {
-  --kpi-color: var(--lt-text);
-}
-.lt-header ion-toolbar {
-  --min-height: 48px;
-}
-
-/* Cada paquete es un elemento deslizable sin cromo propio */
-.lt-grid {
-  background: transparent;
-  padding: 0;
 }
 .lt-grid ion-item-sliding {
+  overflow: visible;
+}
+ion-item.lt-item {
+  overflow: visible;
+}
+.lt-item::part(native) {
   overflow: visible;
 }
 .lt-item {
@@ -222,17 +246,81 @@
   --padding-end: 0;
   --inner-padding-end: 0;
   --inner-border-width: 0;
+  --border-width: 0;
 }
-.lt-item .lt-card {
+.lt-item .lt-card-host {
   width: 100%;
 }
 .lt-option-inspect {
   --background: var(--lt-action-ok-bg);
   --color: var(--lt-action-ok-fg);
-  font-weight: 700;
+  font-weight: 800;
 }
 .lt-option-reject {
-  --background: var(--lt-surface-3);
-  --color: var(--lt-action-ko-fg);
-  font-weight: 700;
+  --background: var(--lt-ink);
+  --color: var(--lt-bone);
+  font-weight: 800;
+}
+
+/* Entrada escalonada: solo en la primera carga y como maximo 8 elementos */
+.lt-grid--intro ion-item-sliding {
+  animation: lt-rise var(--lt-dur-2) var(--lt-ease-out) both;
+}
+.lt-grid--intro ion-item-sliding:nth-child(2) {
+  animation-delay: 30ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(3) {
+  animation-delay: 60ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(4) {
+  animation-delay: 90ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(5) {
+  animation-delay: 120ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(6) {
+  animation-delay: 150ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(7) {
+  animation-delay: 180ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(8) {
+  animation-delay: 210ms;
+}
+.lt-grid--intro ion-item-sliding:nth-child(n + 9) {
+  animation: none;
+}
+
+/* ---------- Estado vacio ---------- */
+.lt-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--lt-space-3);
+  min-height: min(18rem, 40dvh);
+  align-content: center;
+  padding: var(--lt-space-5) var(--lt-space-4);
+  background: var(--lt-surface-2);
+  border: var(--lt-rule) solid var(--lt-border);
+  color: var(--lt-text-muted);
+}
+.lt-empty__title {
+  margin: 0;
+  font-stretch: var(--lt-display-stretch);
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--lt-text);
+}
+.lt-empty__text {
+  margin: 0;
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+.lt-btn-outline {
+  --background: transparent;
+  --color: var(--lt-text);
+  --border-color: var(--lt-border-control);
+  --border-style: solid;
+  --border-width: var(--lt-rule);
+  min-height: 56px;
 }
