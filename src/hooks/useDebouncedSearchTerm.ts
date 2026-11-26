@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { Subject, debounce, distinctUntilChanged, map, timer } from 'rxjs';
 
 /** Espera, en milisegundos, antes de aplicar el texto escrito en la búsqueda. */
 export const SEARCH_DEBOUNCE_MS = 300;
@@ -20,7 +20,10 @@ export function useDebouncedSearchTerm(delayMs: number = SEARCH_DEBOUNCE_MS): re
     const subscription = input$
       .pipe(
         map((raw) => raw.trim().toLowerCase()),
-        debounceTime(delayMs),
+        // El término vacío (limpiar filtros, botón ×) se aplica sin esperar:
+        // así la lista no queda en blanco durante el retardo y sigue pasando
+        // por distinctUntilChanged.
+        debounce((term) => timer(term === '' ? 0 : delayMs)),
         distinctUntilChanged(),
       )
       .subscribe(setTerm);
