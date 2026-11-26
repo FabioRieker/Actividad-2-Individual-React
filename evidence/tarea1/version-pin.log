@@ -1,68 +1,39 @@
-# dist-tags @ionic/react (2026-11-26T13:05:28Z)
-{
-  "nextalpha": "5.0.7-nextjs-alpha.1",
-  "v4-lts": "4.11.13",
-  "v5-lts": "5.9.4",
-  "v6-lts": "6.7.5",
-  "next": "8.0.0-rc.2",
-  "v7-lts": "7.8.6",
-  "v8-lts": "8.8.21",
-  "nightly": "9.0.15-nightly.20261126",
-  "latest": "9.0.14",
-  "dev": "9.0.14-dev.11795666220.1ec8630c"
-}
+$ npm ls @ionic/react @ionic/react-router react react-dom ionicons
+logitrack-express@0.0.1 .
+├─┬ @ionic/react-router@8.8.21
+│ ├── @ionic/react@8.8.21 deduped
+│ ├── react-dom@19.0.0 deduped
+│ └── react@19.0.0 deduped
+├─┬ @ionic/react@8.8.21
+│ ├─┬ @ionic/core@8.8.21
+│ │ └── ionicons@8.1.1 deduped
+│ ├── ionicons@8.1.1 deduped
+│ ├── react-dom@19.0.0 deduped
+│ └── react@19.0.0 deduped
+├─┬ @testing-library/react@16.3.3
+│ ├── react-dom@19.0.0 deduped
+│ └── react@19.0.0 deduped
+├── ionicons@8.1.1
+├─┬ react-dom@19.0.0
+│ └── react@19.0.0 deduped
+├─┬ react-router-dom@5.3.4
+│ └── react@19.0.0 deduped
+├─┬ react-router@5.3.4
+│ └── react@19.0.0 deduped
+└── react@19.0.0
 
-# peerDependencies @ionic/react@8.8.21
-{
-  "react": ">=16.8.6",
-  "react-dom": ">=16.8.6"
-}
-# peerDependencies @ionic/react-router@8.8.21
-{
-  "react": ">=16.8.6",
-  "react-dom": ">=16.8.6",
-  "react-router": "^5.0.1",
-  "react-router-dom": "^5.0.1"
-}
+exit: 0
 
-# diff package.json (generado con Ionic 9 -> fijado a Ionic 8 LTS)
---- /tmp/work/package.generated.json	2026-11-26 14:05:02.679214586 +0100
-+++ package.json	2026-11-26 14:05:02.824201278 +0100
-@@ -23,13 +23,13 @@
-     "@capacitor/haptics": "8.0.2",
-     "@capacitor/keyboard": "8.0.6",
-     "@capacitor/status-bar": "8.0.4",
--    "@ionic/react": "^9.0.0",
--    "@ionic/react-router": "^9.0.0",
--    "ionicons": "^8.1.0",
-+    "@ionic/react": "8.8.21",
-+    "@ionic/react-router": "8.8.21",
-+    "ionicons": "8.1.1",
-     "react": "19.0.0",
-     "react-dom": "19.0.0",
--    "react-router": "^6.30.0",
--    "react-router-dom": "^6.30.0"
-+    "react-router": "5.3.4",
-+    "react-router-dom": "5.3.4"
-   },
-   "devDependencies": {
-     "@capacitor/cli": "8.6.3",
-@@ -42,6 +42,8 @@
-     "@types/node": "^24.0.0",
-     "@types/react": "19.0.10",
-     "@types/react-dom": "19.0.4",
-+    "@types/react-router": "5.1.20",
-+    "@types/react-router-dom": "5.3.3",
-     "@vitejs/plugin-legacy": "^8.0.0",
-     "@vitejs/plugin-react": "^6.0.0",
-     "eslint": "^10.13.0",
-@@ -56,5 +58,8 @@
-     "vitest": "^5.1.0"
-   },
-   "prettier": "@ionic/prettier-config",
--  "description": "An Ionic project"
-+  "description": "An Ionic project",
-+  "engines": {
-+    "node": "24.21.0"
-+  }
- }
+$ npm view @ionic/react dist-tags
+{
+  nextalpha: '5.0.7-nextjs-alpha.1',
+  'v4-lts': '4.11.13',
+  'v5-lts': '5.9.4',
+  'v6-lts': '6.7.5',
+  next: '8.0.0-rc.2',
+  'v7-lts': '7.8.6',
+  'v8-lts': '8.8.21',
+  nightly: '9.0.15-nightly.20261126',
+  latest: '9.0.14',
+  dev: '9.0.14-dev.11795666220.1ec8630c'
+}
