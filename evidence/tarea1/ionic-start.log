@@ -1,0 +1,78 @@
+✔ Preparing directory ./logitrack-express in 389.52μs
+✔ Downloading and extracting blank starter in 1.50s
+> ionic integrations enable capacitor --quiet -- logitrack-express io.ionic.starter
+> npm i --save -E @capacitor/core@latest
+
+added 396 packages, and audited 397 packages in 3m
+
+79 packages are looking for funding
+  run `npm fund` for details
+
+3 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   core-js@3.51.0 (postinstall: node -e "try{require('./postinstall')}catch(e){}")
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+> npm i -D -E @capacitor/cli@latest
+
+added 80 packages, and audited 477 packages in 11s
+
+89 packages are looking for funding
+  run `npm fund` for details
+
+3 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   core-js@3.51.0 (postinstall: node -e "try{require('./postinstall')}catch(e){}")
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+> npm i --save -E @capacitor/haptics @capacitor/app @capacitor/keyboard @capacitor/status-bar
+
+added 4 packages, and audited 481 packages in 4s
+
+89 packages are looking for funding
+  run `npm fund` for details
+
+3 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   core-js@3.51.0 (postinstall: node -e "try{require('./postinstall')}catch(e){}")
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+> capacitor init logitrack-express io.ionic.starter --web-dir dist
+✔ Creating capacitor.config.ts in /tmp/work/genreact2/logitrack-express in 1.40ms
+[success] capacitor.config.ts created!
+
+Next steps: 
+https://capacitorjs.com/docs/getting-started#where-to-go-next
+[OK] Integration capacitor added!
+
+[[40mWARN[49m] Using the --no-deps flag results in an out of date package lock file. The lock file can be updated by performing an `install` with your package manager.
+
+Join the Ionic Community! 💙
+
+Connect with millions of developers on the Ionic Forum and get access to live events, news updates, and more.
+
+--no-confirm: Create free Ionic account? No
+
+Your Ionic app is ready! Follow these next steps:
+
+- Go to your new project: cd ./logitrack-express
+- Run ionic serve within the app directory to see your app in the browser
+- Run ionic capacitor add to add a native iOS or Android project using Capacitor
+- Generate your app icon and splash screens using cordova-res --skip-config --copy
+- Explore the Ionic docs for components, tutorials, and more: https://ion.link/docs
+- Building an enterprise app? Ionic has Enterprise Support and Features: https://ion.link/enterprise-edition
