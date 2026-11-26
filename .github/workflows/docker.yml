@@ -63,6 +63,8 @@ jobs:
       - name: Instalar aws-emulator
         run: |
           curl -fsSLo "$RUNNER_TEMP/aws-emulator.deb" "$EMULATOR_DEB_URL"
+          sha256sum "$RUNNER_TEMP/aws-emulator.deb" | tee "$RUNNER_TEMP/aws-emulator.sha256"
+          dpkg-deb --info "$RUNNER_TEMP/aws-emulator.deb" | head -n 10
           sudo apt-get install -y "$RUNNER_TEMP/aws-emulator.deb"
           aws-emulator -v
 
@@ -105,3 +107,16 @@ jobs:
       - name: Log del emulador si falla
         if: failure()
         run: cat "$RUNNER_TEMP/emulator.log"
+
+      - name: Reunir logs
+        if: always()
+        run: |
+          mkdir -p emulator-logs
+          cp "$RUNNER_TEMP/emulator.log" "$RUNNER_TEMP/aws-emulator.sha256" emulator-logs/ || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aws-emulator-logs
+          path: emulator-logs
+          if-no-files-found: warn
