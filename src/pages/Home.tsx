@@ -5,14 +5,20 @@ import {
   IonSearchbar,
   IonSegment,
   IonSegmentButton,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
+  IonList,
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import type { PriorityFilter } from '../models/package.model';
-import { usePackages } from '../services/packageStore';
+import { PackageCard } from '../components/PackageCard';
+import type { PriorityFilter, StatusChangeEvent } from '../models/package.model';
+import { updateStatus, usePackages } from '../services/packageStore';
 import './Home.css';
 
 const PRIORITY_OPTIONS: readonly { readonly value: PriorityFilter; readonly label: string }[] = [
@@ -39,6 +45,10 @@ const Home: React.FC = () => {
         (term === '' || p.trackingCode.toLowerCase().includes(term) || p.destinationHub.toLowerCase().includes(term)),
     );
   }, [packages, query, priority]);
+
+  const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
+    updateStatus(e.id, e.newStatus);
+  }, []);
 
   return (
     <IonPage>
@@ -75,7 +85,26 @@ const Home: React.FC = () => {
         <main className="lt-main">
           <h1 className="lt-sr-only">Listado de paquetes</h1>
           <p>Recepción, inspección y clasificación de paquetes.</p>
-          <p>{visible.length} paquetes registrados</p>
+          <p className="lt-result-count" role="status" aria-live="polite">
+            {visible.length} paquetes mostrados
+          </p>
+          <IonList className="lt-grid" lines="none" role="list" aria-label="Paquetes">
+            {visible.map((pkg) => (
+              <IonItemSliding key={pkg.id} role="listitem">
+                <IonItem lines="none" className="lt-item">
+                  <PackageCard pkg={pkg} onStatusChange={handleStatusChange} />
+                </IonItem>
+                <IonItemOptions side="end">
+                  <IonItemOption className="lt-option-inspect" onClick={() => updateStatus(pkg.id, 'INSPECTED')}>
+                    Inspeccionar
+                  </IonItemOption>
+                  <IonItemOption className="lt-option-reject" onClick={() => updateStatus(pkg.id, 'REJECTED')}>
+                    Rechazar
+                  </IonItemOption>
+                </IonItemOptions>
+              </IonItemSliding>
+            ))}
+          </IonList>
         </main>
       </IonContent>
     </IonPage>
