@@ -15,7 +15,7 @@ export default defineConfig({
   projects: [
     {
       name: 'Mobile Chrome',
-      use: { ...devices['Pixel 7'] },
+      use: { ...devices['Pixel 7'], channel: 'chrome' },
     },
   ],
   webServer: {

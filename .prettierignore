@@ -3,3 +3,7 @@
 # Gradle's build output.
 android/
 ios/
+evidence/
+src/theme/
+package-lock.json
+coverage/
