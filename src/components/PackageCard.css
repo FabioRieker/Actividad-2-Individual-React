@@ -157,8 +157,9 @@
 .lt-btn-reject:active {
   transform: scale(0.98);
 }
-.lt-btn-inspect[disabled],
-.lt-btn-reject[disabled] {
+.lt-btn-inspect[aria-disabled='true'],
+.lt-btn-reject[aria-disabled='true'] {
+  cursor: default;
   opacity: 1;
   filter: saturate(0.4) brightness(0.8);
 }

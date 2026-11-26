@@ -15,6 +15,12 @@ const basePkg: WarehousePackage = {
   timestamp: new Date('2026-03-15T10:30:00Z'),
 };
 
+// El wrapper de React serializa `true` como atributo vacío y `false` como "false".
+function isAriaDisabled(element: HTMLElement): boolean {
+  const value = element.getAttribute('aria-disabled');
+  return value !== null && value !== 'false';
+}
+
 describe('PackageCard', () => {
   test('muestra los datos del paquete y los badges con texto', () => {
     render(<PackageCard pkg={basePkg} onStatusChange={vi.fn()} />);
@@ -54,17 +60,18 @@ describe('PackageCard', () => {
     expect(onStatusChange).toHaveBeenCalledWith({ id: 'a1b2c3d4-0001', newStatus: 'REJECTED' });
   });
 
-  test('deshabilita el botón del estado actual', () => {
-    const { rerender } = render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={vi.fn()} />);
-    expect(screen.getByLabelText(/como inspeccionado/)).toHaveProperty('disabled', true);
-    expect(screen.getByLabelText(/como rechazado/)).toHaveProperty('disabled', false);
+  test('marca con aria-disabled el botón del estado actual', () => {
+    const { unmount } = render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={vi.fn()} />);
+    expect(isAriaDisabled(screen.getByLabelText(/como inspeccionado/))).toBe(true);
+    expect(isAriaDisabled(screen.getByLabelText(/como rechazado/))).toBe(false);
 
-    rerender(<PackageCard pkg={{ ...basePkg, status: 'REJECTED' }} onStatusChange={vi.fn()} />);
-    expect(screen.getByLabelText(/como rechazado/)).toHaveProperty('disabled', true);
-    expect(screen.getByLabelText(/como inspeccionado/)).toHaveProperty('disabled', false);
+    unmount();
+    render(<PackageCard pkg={{ ...basePkg, status: 'REJECTED' }} onStatusChange={vi.fn()} />);
+    expect(isAriaDisabled(screen.getByLabelText(/como rechazado/))).toBe(true);
+    expect(isAriaDisabled(screen.getByLabelText(/como inspeccionado/))).toBe(false);
   });
 
-  test('no emite eventos desde un botón deshabilitado', () => {
+  test('no emite eventos desde un botón con aria-disabled', () => {
     const onStatusChange = vi.fn();
     render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={onStatusChange} />);
     fireEvent.click(screen.getByLabelText(/como inspeccionado/));

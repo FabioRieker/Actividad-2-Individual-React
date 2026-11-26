@@ -1,0 +1,405 @@
+diff --git a/src/components/PackageCard.css b/src/components/PackageCard.css
+index d031d20..6efa04b 100644
+--- a/src/components/PackageCard.css
++++ b/src/components/PackageCard.css
+@@ -157,8 +157,9 @@
+ .lt-btn-reject:active {
+   transform: scale(0.98);
+ }
+-.lt-btn-inspect[disabled],
+-.lt-btn-reject[disabled] {
++.lt-btn-inspect[aria-disabled='true'],
++.lt-btn-reject[aria-disabled='true'] {
++  cursor: default;
+   opacity: 1;
+   filter: saturate(0.4) brightness(0.8);
+ }
+diff --git a/src/components/PackageCard.test.tsx b/src/components/PackageCard.test.tsx
+index 74ce218..7fa93e5 100644
+--- a/src/components/PackageCard.test.tsx
++++ b/src/components/PackageCard.test.tsx
+@@ -15,6 +15,12 @@ const basePkg: WarehousePackage = {
+   timestamp: new Date('2026-03-15T10:30:00Z'),
+ };
+ 
++// El wrapper de React serializa `true` como atributo vacío y `false` como "false".
++function isAriaDisabled(element: HTMLElement): boolean {
++  const value = element.getAttribute('aria-disabled');
++  return value !== null && value !== 'false';
++}
++
+ describe('PackageCard', () => {
+   test('muestra los datos del paquete y los badges con texto', () => {
+     render(<PackageCard pkg={basePkg} onStatusChange={vi.fn()} />);
+@@ -54,17 +60,18 @@ describe('PackageCard', () => {
+     expect(onStatusChange).toHaveBeenCalledWith({ id: 'a1b2c3d4-0001', newStatus: 'REJECTED' });
+   });
+ 
+-  test('deshabilita el botón del estado actual', () => {
+-    const { rerender } = render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={vi.fn()} />);
+-    expect(screen.getByLabelText(/como inspeccionado/)).toHaveProperty('disabled', true);
+-    expect(screen.getByLabelText(/como rechazado/)).toHaveProperty('disabled', false);
++  test('marca con aria-disabled el botón del estado actual', () => {
++    const { unmount } = render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={vi.fn()} />);
++    expect(isAriaDisabled(screen.getByLabelText(/como inspeccionado/))).toBe(true);
++    expect(isAriaDisabled(screen.getByLabelText(/como rechazado/))).toBe(false);
+ 
+-    rerender(<PackageCard pkg={{ ...basePkg, status: 'REJECTED' }} onStatusChange={vi.fn()} />);
+-    expect(screen.getByLabelText(/como rechazado/)).toHaveProperty('disabled', true);
+-    expect(screen.getByLabelText(/como inspeccionado/)).toHaveProperty('disabled', false);
++    unmount();
++    render(<PackageCard pkg={{ ...basePkg, status: 'REJECTED' }} onStatusChange={vi.fn()} />);
++    expect(isAriaDisabled(screen.getByLabelText(/como rechazado/))).toBe(true);
++    expect(isAriaDisabled(screen.getByLabelText(/como inspeccionado/))).toBe(false);
+   });
+ 
+-  test('no emite eventos desde un botón deshabilitado', () => {
++  test('no emite eventos desde un botón con aria-disabled', () => {
+     const onStatusChange = vi.fn();
+     render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={onStatusChange} />);
+     fireEvent.click(screen.getByLabelText(/como inspeccionado/));
+diff --git a/src/components/PackageCard.tsx b/src/components/PackageCard.tsx
+index 401e23a..0f7f465 100644
+--- a/src/components/PackageCard.tsx
++++ b/src/components/PackageCard.tsx
+@@ -9,7 +9,7 @@ import {
+   scaleOutline,
+   timeOutline,
+ } from 'ionicons/icons';
+-import { memo } from 'react';
++import { memo, useEffect, useRef } from 'react';
+ 
+ import type { PackagePriority, PackageStatus, StatusChangeEvent, WarehousePackage } from '../models/package.model';
+ import './PackageCard.css';
+@@ -40,7 +40,43 @@ const PRIORITY_INFO: Record<PackagePriority, BadgeInfo> = {
+ const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+ const dateFormat = new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+ 
++/**
++ * ion-button copia los atributos aria-* al botón nativo solo al cargar y su render los restablece al cambiar
++ * el estado. Se mantiene aria-disabled del botón nativo sincronizado para que lo anuncien los lectores de pantalla.
++ */
++function syncAriaDisabled(host: HTMLIonButtonElement | null, disabled: boolean): () => void {
++  const expected = String(disabled);
++  let observer: MutationObserver | undefined;
++  let frame = 0;
++  let attempts = 0;
++  const attach = (): void => {
++    const native = host?.shadowRoot?.querySelector('button');
++    if (!native) {
++      // El componente se hidrata de forma asíncrona: se reintenta unos fotogramas.
++      if (attempts++ < 120) frame = requestAnimationFrame(attach);
++      return;
++    }
++    const apply = (): void => {
++      if (native.getAttribute('aria-disabled') !== expected) native.setAttribute('aria-disabled', expected);
++    };
++    apply();
++    observer = new MutationObserver(apply);
++    observer.observe(native, { attributes: true, attributeFilter: ['aria-disabled'] });
++  };
++  attach();
++  return () => {
++    cancelAnimationFrame(frame);
++    observer?.disconnect();
++  };
++}
++
+ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
++  const inspectRef = useRef<HTMLIonButtonElement>(null);
++  const rejectRef = useRef<HTMLIonButtonElement>(null);
++  const inspected = pkg.status === 'INSPECTED';
++  const rejected = pkg.status === 'REJECTED';
++  useEffect(() => syncAriaDisabled(inspectRef.current, inspected), [inspected]);
++  useEffect(() => syncAriaDisabled(rejectRef.current, rejected), [rejected]);
+   const status = STATUS_INFO[pkg.status];
+   const priority = PRIORITY_INFO[pkg.priority];
+   const emit = (newStatus: PackageStatus): void => {
+@@ -91,18 +127,20 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
+       </div>
+       <div className="lt-card__actions">
+         <IonButton
++          ref={inspectRef}
+           className="lt-btn-inspect"
+           aria-label={`Marcar ${pkg.trackingCode} como inspeccionado`}
+-          disabled={pkg.status === 'INSPECTED'}
++          aria-disabled={inspected}
+           onClick={() => emit('INSPECTED')}
+         >
+           <IonIcon slot="icon-only" icon={checkmarkCircleOutline} aria-hidden="true" />
+         </IonButton>
+         <IonButton
++          ref={rejectRef}
+           className="lt-btn-reject"
+           fill="outline"
+           aria-label={`Marcar ${pkg.trackingCode} como rechazado`}
+-          disabled={pkg.status === 'REJECTED'}
++          aria-disabled={rejected}
+           onClick={() => emit('REJECTED')}
+         >
+           <IonIcon slot="icon-only" icon={closeCircleOutline} aria-hidden="true" />
+diff --git a/src/pages/Home.a11y.test.tsx b/src/pages/Home.a11y.test.tsx
+new file mode 100644
+index 0000000..ea53255
+--- /dev/null
++++ b/src/pages/Home.a11y.test.tsx
+@@ -0,0 +1,57 @@
++import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
++import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
++
++import { resetStore } from '../services/packageStore';
++
++import Home from './Home';
++
++function liveRegion(): HTMLElement {
++  const region = screen.getAllByRole('status').find((el) => el.classList.contains('lt-sr-only'));
++  if (!region) throw new Error('No existe la región de anuncios');
++  return region;
++}
++
++describe('Home accesibilidad', () => {
++  beforeEach(() => resetStore());
++  afterEach(() => {
++    vi.restoreAllMocks();
++    resetStore();
++  });
++
++  test('anuncia el cambio de estado al inspeccionar con el botón de la tarjeta', () => {
++    render(<Home />);
++    expect(liveRegion()).toHaveTextContent('');
++    fireEvent.click(screen.getByLabelText('Marcar LTK-0001-ES como inspeccionado'));
++    expect(liveRegion()).toHaveTextContent('LTK-0001-ES marcado como inspeccionado');
++  });
++
++  test('anuncia el rechazo de otro paquete', () => {
++    render(<Home />);
++    fireEvent.click(screen.getByLabelText('Marcar LTK-0001-ES como rechazado'));
++    expect(liveRegion()).toHaveTextContent('LTK-0001-ES marcado como rechazado');
++    fireEvent.click(screen.getByLabelText('Marcar LTK-0002-ES como rechazado'));
++    expect(liveRegion()).toHaveTextContent('LTK-0002-ES marcado como rechazado');
++  });
++
++  test('el contador anuncia el estado vacío', () => {
++    render(<Home />);
++    const searchbar = screen.getByPlaceholderText('Buscar código o destino');
++    act(() => {
++      fireEvent(searchbar, new CustomEvent('ionInput', { detail: { value: 'zzzz' }, bubbles: true }));
++    });
++    const count = screen.getByText(/paquetes? mostrados?/);
++    expect(count).toHaveAttribute('role', 'status');
++    expect(count).toHaveAttribute('aria-live', 'polite');
++  });
++
++  test('el campo de búsqueda recibe un nombre accesible en español', async () => {
++    const input = document.createElement('input');
++    input.setAttribute('aria-label', 'search text');
++    // Ionic fija un aria-label en inglés en su input interno: se simula devolviendo ese input.
++    const ctor = customElements.get('ion-searchbar');
++    expect(ctor).toBeDefined();
++    vi.spyOn(ctor?.prototype, 'getInputElement').mockResolvedValue(input);
++    render(<Home />);
++    await waitFor(() => expect(input).toHaveAttribute('aria-label', 'Buscar código o destino'));
++  });
++});
+diff --git a/src/pages/Home.css b/src/pages/Home.css
+index 1f0b1a5..5ac5fd0 100644
+--- a/src/pages/Home.css
++++ b/src/pages/Home.css
+@@ -107,8 +107,19 @@
+   max-width: var(--lt-content-max);
+   margin-inline: auto;
+   display: grid;
++  grid-template-columns: minmax(0, 1fr);
+   gap: var(--lt-space-2);
+ }
++.lt-controls ion-searchbar,
++.lt-controls ion-segment {
++  min-width: 0;
++  max-width: 100%;
++}
++.lt-controls ion-segment-button {
++  min-width: 0;
++  --padding-start: var(--lt-space-1);
++  --padding-end: var(--lt-space-1);
++}
+ .lt-controls ion-searchbar {
+   padding: 0;
+ }
+diff --git a/src/pages/Home.test.tsx b/src/pages/Home.test.tsx
+index b4efee7..659755d 100644
+--- a/src/pages/Home.test.tsx
++++ b/src/pages/Home.test.tsx
+@@ -81,7 +81,7 @@ describe('Home', () => {
+   test('el contenedor de búsqueda expone role search', () => {
+     render(<Home />);
+     expect(screen.getByRole('search')).toContainElement(screen.getByPlaceholderText('Buscar código o destino'));
+-    expect(screen.getByRole('status')).toHaveTextContent('8 paquetes mostrados');
++    expect(screen.getByText('8 paquetes mostrados')).toHaveAttribute('role', 'status');
+   });
+ 
+   test('el filtro de prioridad restringe la lista', () => {
+@@ -134,3 +134,18 @@ describe('Home', () => {
+     expect(kpiValue('Inspeccionados')).toBe('4');
+   });
+ });
++
++describe('Home estructura de lista', () => {
++  beforeEach(() => resetStore());
++
++  test('cada elemento de la lista tiene un único rol listitem sin anidar', () => {
++    const { container } = render(<Home />);
++    const list = screen.getByRole('list', { name: 'Paquetes' });
++    const items = list.querySelectorAll('[role="listitem"]');
++    items.forEach((item) => {
++      expect(item.parentElement?.closest('[role="listitem"]')).toBeNull();
++      expect(item.closest('[role="list"]')).toBe(list);
++    });
++    expect(container.querySelectorAll('ion-item-sliding[role="listitem"]')).toHaveLength(0);
++  });
++});
+diff --git a/src/pages/Home.tsx b/src/pages/Home.tsx
+index fcd975c..c0781ee 100644
+--- a/src/pages/Home.tsx
++++ b/src/pages/Home.tsx
+@@ -17,11 +17,11 @@ import {
+   IonToolbar,
+ } from '@ionic/react';
+ import { checkmarkCircleOutline, closeCircleOutline, cubeOutline, fileTrayOutline, timeOutline } from 'ionicons/icons';
+-import { useCallback, useMemo, useState } from 'react';
++import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+ 
+ import { PackageCard } from '../components/PackageCard';
+ import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
+-import type { PriorityFilter, StatusChangeEvent } from '../models/package.model';
++import type { PackageStatus, PriorityFilter, StatusChangeEvent } from '../models/package.model';
+ import { updateStatus, usePackages } from '../services/packageStore';
+ import './Home.css';
+ 
+@@ -36,11 +36,21 @@ function isPriorityFilter(value: unknown): value is PriorityFilter {
+   return PRIORITY_OPTIONS.some((option) => option.value === value);
+ }
+ 
++const STATUS_ANNOUNCEMENT: Record<PackageStatus, string> = {
++  IN_TRANSIT: 'en tránsito',
++  INSPECTED: 'inspeccionado',
++  REJECTED: 'rechazado',
++};
++
++const SEARCH_LABEL = 'Buscar código o destino';
++
+ const Home: React.FC = () => {
++  const searchbarRef = useRef<HTMLIonSearchbarElement>(null);
+   const packages = usePackages();
+   const [query, setQuery] = useState('');
+   const [term, setSearchInput] = useDebouncedSearchTerm();
+   const [priority, setPriority] = useState<PriorityFilter>('ALL');
++  const [announcement, setAnnouncement] = useState('');
+ 
+   const visible = useMemo(() => {
+     return packages.filter(
+@@ -65,10 +75,32 @@ const Home: React.FC = () => {
+     setPriority('ALL');
+   }, [setSearchInput]);
+ 
+-  const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
+-    updateStatus(e.id, e.newStatus);
++  // Ionic fija aria-label="search text" en el input interno y no lo reenvía desde el host:
++  // se sustituye por el mismo texto que describe el campo para que el nombre accesible esté en español.
++  useEffect(() => {
++    let active = true;
++    void customElements
++      .whenDefined('ion-searchbar')
++      .then(() => searchbarRef.current?.getInputElement())
++      .then((input) => {
++        if (active) input?.setAttribute('aria-label', SEARCH_LABEL);
++      });
++    return () => {
++      active = false;
++    };
+   }, []);
+ 
++  const handleStatusChange = useCallback(
++    (e: StatusChangeEvent): void => {
++      const target = packages.find((p) => p.id === e.id);
++      updateStatus(e.id, e.newStatus);
++      if (target && target.status !== e.newStatus) {
++        setAnnouncement(`${target.trackingCode} marcado como ${STATUS_ANNOUNCEMENT[e.newStatus]}`);
++      }
++    },
++    [packages],
++  );
++
+   return (
+     <IonPage>
+       <IonHeader className="lt-header">
+@@ -111,8 +143,9 @@ const Home: React.FC = () => {
+         <div className="lt-controls">
+           <div className="lt-controls__inner" role="search">
+             <IonSearchbar
++              ref={searchbarRef}
+               debounce={0}
+-              aria-label="Buscar paquete por código o destino"
++              aria-label={SEARCH_LABEL}
+               placeholder="Buscar código o destino"
+               value={query}
+               onIonInput={(e) => {
+@@ -139,6 +172,9 @@ const Home: React.FC = () => {
+         </div>
+         <main className="lt-main">
+           <h1 className="lt-sr-only">Listado de paquetes</h1>
++          <div role="status" className="lt-sr-only">
++            {announcement}
++          </div>
+           <p className="lt-result-count" role="status" aria-live="polite">
+             {visible.length === 1 ? '1 paquete mostrado' : `${visible.length} paquetes mostrados`}
+           </p>
+@@ -156,15 +192,21 @@ const Home: React.FC = () => {
+           ) : (
+             <IonList className="lt-grid" lines="none" role="list" aria-label="Paquetes">
+               {visible.map((pkg) => (
+-                <IonItemSliding key={pkg.id} role="listitem">
++                <IonItemSliding key={pkg.id}>
+                   <IonItem lines="none" className="lt-item">
+                     <PackageCard pkg={pkg} onStatusChange={handleStatusChange} />
+                   </IonItem>
+                   <IonItemOptions side="end">
+-                    <IonItemOption className="lt-option-inspect" onClick={() => updateStatus(pkg.id, 'INSPECTED')}>
++                    <IonItemOption
++                      className="lt-option-inspect"
++                      onClick={() => handleStatusChange({ id: pkg.id, newStatus: 'INSPECTED' })}
++                    >
+                       Inspeccionar
+                     </IonItemOption>
+-                    <IonItemOption className="lt-option-reject" onClick={() => updateStatus(pkg.id, 'REJECTED')}>
++                    <IonItemOption
++                      className="lt-option-reject"
++                      onClick={() => handleStatusChange({ id: pkg.id, newStatus: 'REJECTED' })}
++                    >
+                       Rechazar
+                     </IonItemOption>
+                   </IonItemOptions>
+diff --git a/src/theme/global.css b/src/theme/global.css
+index 3d11dc3..7385135 100644
+--- a/src/theme/global.css
++++ b/src/theme/global.css
+@@ -82,8 +82,6 @@ ion-button.ion-focused {
+ ion-searchbar {
+   --background: var(--lt-surface-3);
+   --color: var(--lt-text);
+-  --placeholder-color: var(--lt-text-muted);
+-  --placeholder-opacity: 1;
+   --icon-color: var(--lt-text-muted);
+   --clear-button-color: var(--lt-text);
+   --border-radius: var(--lt-radius-md);
+@@ -91,6 +89,11 @@ ion-searchbar {
+   --cancel-button-color: var(--lt-text);
+   min-height: var(--lt-touch-min);
+ }
++/* Mayor especificidad que el valor por defecto del host (.sc-ion-searchbar-md-h) */
++ion-searchbar.hydrated {
++  --placeholder-color: var(--lt-text-muted);
++  --placeholder-opacity: 1;
++}
+ ion-searchbar.ion-focused {
+   --box-shadow: inset 0 0 0 2px var(--lt-focus);
+ }
