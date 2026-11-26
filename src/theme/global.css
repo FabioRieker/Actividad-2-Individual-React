@@ -136,6 +136,8 @@ ion-searchbar {
 }
 /* Mayor especificidad que el valor por defecto del host (.sc-ion-searchbar-md-h) */
 ion-searchbar.hydrated {
+  --background: var(--lt-field);
+  --box-shadow: inset 0 0 0 1px var(--lt-border-control);
   --placeholder-color: var(--lt-text-muted);
   --placeholder-opacity: 1;
 }
