@@ -1,0 +1,122 @@
+name: Docker
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build de la imagen
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          push: false
+          tags: logitrack-express:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Servir con nginx y comprobar respuesta y cabeceras
+        run: |
+          docker run -d --name web -p 8080:80 logitrack-express:ci
+          for i in $(seq 1 15); do
+            curl -sf http://127.0.0.1:8080/ >/dev/null && break
+            sleep 1
+          done
+          curl -sfI http://127.0.0.1:8080/ | tee headers.txt
+          grep -qi '^x-content-type-options: nosniff' headers.txt
+          # Fallback SPA: una ruta de cliente debe devolver index.html
+          curl -sf -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8080/ruta/spa
+
+      - name: Logs si falla
+        if: failure()
+        run: docker logs web
+
+      - name: Limpieza
+        if: always()
+        run: docker rm -f web
+
+  aws-emulator-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      EMULATOR_DEB_URL: https://downloads.aws.com/aws-emulator/packages/aws-emulator/LTS/latest/aws-emulator_amd64.deb
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar aws-emulator
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/aws-emulator.deb" "$EMULATOR_DEB_URL"
+          sha256sum "$RUNNER_TEMP/aws-emulator.deb" | tee "$RUNNER_TEMP/aws-emulator.sha256"
+          dpkg-deb --info "$RUNNER_TEMP/aws-emulator.deb" | head -n 10
+          sudo apt-get install -y "$RUNNER_TEMP/aws-emulator.deb"
+          aws-emulator -v
+
+      - name: Arrancar el emulador en segundo plano
+        run: |
+          nohup aws-emulator -t off > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          CA="$HOME/.aws/emulator/9297/ca.pem"
+          for i in $(seq 1 30); do
+            if [ -f "$CA" ] && curl -fsS --cacert "$CA" https://127.0.0.1:9297/__admin/health >/dev/null 2>&1; then
+              echo "emulador listo"; exit 0
+            fi
+            sleep 1
+          done
+          echo "el emulador no arrancó"; cat "$RUNNER_TEMP/emulator.log"; exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Construir dist/ real
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+
+      - name: Ejecutar el script de despliegue
+        run: bash scripts/deploy-aws-emulator.sh
+
+      - name: Comprobar idempotencia y recuento
+        run: |
+          bash scripts/deploy-aws-emulator.sh
+          export AWS_ENDPOINT_URL=https://127.0.0.1:9297
+          export AWS_SHARED_CREDENTIALS_FILE="$HOME/.aws/emulator/9297/emulator_credentials"
+          export AWS_CONFIG_FILE="$HOME/.aws/emulator/9297/config"
+          export AWS_CA_BUNDLE="$HOME/.aws/emulator/9297/ca.pem"
+          export AWS_REGION=us-east-1
+          COUNT=$(aws dynamodb scan --table-name packages --select COUNT --query Count --output text)
+          test "$COUNT" = "8"
+
+      - name: Log del emulador si falla
+        if: failure()
+        run: cat "$RUNNER_TEMP/emulator.log"
+
+      - name: Reunir logs
+        if: always()
+        run: |
+          mkdir -p emulator-logs
+          cp "$RUNNER_TEMP/emulator.log" "$RUNNER_TEMP/aws-emulator.sha256" emulator-logs/ || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aws-emulator-logs
+          path: emulator-logs
+          if-no-files-found: warn
