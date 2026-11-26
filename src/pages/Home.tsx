@@ -13,6 +13,7 @@ import {
   IonList,
 } from '@ionic/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 import { PackageCard } from '../components/PackageCard';
 import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
@@ -38,6 +39,22 @@ const STATUS_ANNOUNCEMENT: Record<PackageStatus, string> = {
 };
 
 const SEARCH_LABEL = 'Buscar código o destino';
+
+/**
+ * Aplica el cambio dentro de una View Transition (fundido corto) cuando el navegador la soporta
+ * y el usuario no pide movimiento reducido; si no, lo aplica directamente.
+ */
+function runWithViewTransition(update: () => void): void {
+  const reduceMotion =
+    typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || !('startViewTransition' in document)) {
+    update();
+    return;
+  }
+  document.startViewTransition(() => {
+    flushSync(update);
+  });
+}
 
 function percentage(part: number, total: number): number {
   return total === 0 ? 0 : Math.round((part / total) * 100);
@@ -92,10 +109,12 @@ const Home: React.FC = () => {
   const handleStatusChange = useCallback(
     (e: StatusChangeEvent): void => {
       const target = packages.find((p) => p.id === e.id);
-      updateStatus(e.id, e.newStatus);
-      if (target && target.status !== e.newStatus) {
-        setAnnouncement(`${target.trackingCode} marcado como ${STATUS_ANNOUNCEMENT[e.newStatus]}`);
-      }
+      runWithViewTransition(() => {
+        updateStatus(e.id, e.newStatus);
+        if (target && target.status !== e.newStatus) {
+          setAnnouncement(`${target.trackingCode} marcado como ${STATUS_ANNOUNCEMENT[e.newStatus]}`);
+        }
+      });
     },
     [packages],
   );
