@@ -1,0 +1,16 @@
+.lt-set-hint {
+  margin: 0 0 var(--lt-space-3);
+}
+.lt-set-about {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--lt-space-2) var(--lt-space-4);
+  margin: 0;
+}
+.lt-set-about dt {
+  color: var(--lt-text-muted);
+}
+.lt-set-about dd {
+  margin: 0;
+  font-weight: 600;
+}
