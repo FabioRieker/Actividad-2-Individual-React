@@ -113,21 +113,23 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
           <IonButton
             ref={inspectRef}
             className="lt-btn-inspect"
-            aria-label={`Marcar ${pkg.trackingCode} como inspeccionado`}
-            aria-disabled={inspected}
+            aria-label={`Inspeccionar ${pkg.trackingCode}`}
+            aria-disabled={inspected ? 'true' : 'false'}
             onClick={() => emit('INSPECTED')}
           >
-            <IonIcon slot="icon-only" icon={checkmarkCircleOutline} aria-hidden="true" />
+            <IonIcon slot="start" icon={checkmarkCircleOutline} aria-hidden="true" />
+            Inspeccionar
           </IonButton>
           <IonButton
             ref={rejectRef}
             className="lt-btn-reject"
             fill="outline"
-            aria-label={`Marcar ${pkg.trackingCode} como rechazado`}
-            aria-disabled={rejected}
+            aria-label={`Rechazar ${pkg.trackingCode}`}
+            aria-disabled={rejected ? 'true' : 'false'}
             onClick={() => emit('REJECTED')}
           >
-            <IonIcon slot="icon-only" icon={closeCircleOutline} aria-hidden="true" />
+            <IonIcon slot="start" icon={closeCircleOutline} aria-hidden="true" />
+            Rechazar
           </IonButton>
         </div>
       </article>

@@ -21,15 +21,15 @@ describe('Home accesibilidad', () => {
   test('anuncia el cambio de estado al inspeccionar con el botón de la tarjeta', () => {
     render(<Home />);
     expect(liveRegion()).toHaveTextContent('');
-    fireEvent.click(screen.getByLabelText('Marcar LTK-0001-ES como inspeccionado'));
+    fireEvent.click(screen.getByLabelText('Inspeccionar LTK-0001-ES'));
     expect(liveRegion()).toHaveTextContent('LTK-0001-ES marcado como inspeccionado');
   });
 
   test('anuncia el rechazo de otro paquete', () => {
     render(<Home />);
-    fireEvent.click(screen.getByLabelText('Marcar LTK-0001-ES como rechazado'));
+    fireEvent.click(screen.getByLabelText('Rechazar LTK-0001-ES'));
     expect(liveRegion()).toHaveTextContent('LTK-0001-ES marcado como rechazado');
-    fireEvent.click(screen.getByLabelText('Marcar LTK-0002-ES como rechazado'));
+    fireEvent.click(screen.getByLabelText('Rechazar LTK-0002-ES'));
     expect(liveRegion()).toHaveTextContent('LTK-0002-ES marcado como rechazado');
   });
 

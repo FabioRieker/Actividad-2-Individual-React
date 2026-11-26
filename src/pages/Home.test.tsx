@@ -116,10 +116,10 @@ describe('Home', () => {
 
   test('la acción de la tarjeta cambia el estado y actualiza los indicadores', () => {
     render(<Home />);
-    fireEvent.click(screen.getByLabelText('Marcar LTK-0001-ES como inspeccionado'));
+    fireEvent.click(screen.getByLabelText('Inspeccionar LTK-0001-ES'));
     expect(kpiValue('En tránsito')).toBe('2');
     expect(kpiValue('Inspeccionados')).toBe('4');
-    fireEvent.click(screen.getByLabelText('Marcar LTK-0005-ES como rechazado'));
+    fireEvent.click(screen.getByLabelText('Rechazar LTK-0005-ES'));
     expect(kpiValue('En tránsito')).toBe('1');
     expect(kpiValue('Rechazados')).toBe('3');
   });
@@ -128,9 +128,9 @@ describe('Home', () => {
     render(<Home />);
     const item = screen.getByRole('heading', { name: 'LTK-0001-ES' }).closest('ion-item-sliding');
     if (!(item instanceof HTMLElement)) throw new Error('No se encontró el elemento deslizable');
-    fireEvent.click(within(item).getByText('Rechazar'));
+    fireEvent.click(within(item).getByText('Rechazar', { selector: 'ion-item-option' }));
     expect(kpiValue('Rechazados')).toBe('3');
-    fireEvent.click(within(item).getByText('Inspeccionar'));
+    fireEvent.click(within(item).getByText('Inspeccionar', { selector: 'ion-item-option' }));
     expect(kpiValue('Inspeccionados')).toBe('4');
   });
 });

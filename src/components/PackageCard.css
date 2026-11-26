@@ -136,9 +136,17 @@
 .lt-btn-inspect,
 .lt-btn-reject {
   --border-radius: var(--lt-radius-md);
+  --padding-start: var(--lt-space-2);
+  --padding-end: var(--lt-space-2);
   min-height: 52px;
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+}
+.lt-btn-inspect ion-icon,
+.lt-btn-reject ion-icon {
+  font-size: 1.25rem;
+  margin-inline-end: 6px;
 }
 .lt-btn-inspect {
   --background: color-mix(in oklch, var(--lt-accent) 18%, transparent);
@@ -160,9 +168,16 @@
   --border-style: solid;
   --border-width: 1px;
 }
+/* Deshabilitado (aria-disabled): claramente inactivo, sin borde de acento y con el foco intacto */
 .lt-btn-inspect[aria-disabled='true'],
 .lt-btn-reject[aria-disabled='true'] {
-  cursor: default;
+  --background: var(--lt-chip-bg);
+  --background-hover: var(--lt-chip-bg);
+  --background-activated: var(--lt-chip-bg);
+  --color: var(--lt-text-muted);
+  --color-hover: var(--lt-text-muted);
+  --border-color: var(--lt-glass-edge);
+  cursor: not-allowed;
   opacity: 0.45;
 }
 
@@ -189,14 +204,14 @@
   }
   .lt-card__actions {
     grid-area: actions;
-    grid-template-columns: repeat(2, 3.5rem);
+    grid-template-columns: minmax(10.5rem, 1fr);
     align-self: center;
     margin-top: 0;
   }
 }
 
-/* Contenedor muy estrecho (movil de 320 px): botones apilados */
-@container lt-card (max-width: 20.5rem) {
+/* Contenedor estrecho (movil pequeno): botones apilados para que el texto quepa */
+@container lt-card (max-width: 22.5rem) {
   .lt-card__actions {
     grid-template-columns: 1fr;
   }

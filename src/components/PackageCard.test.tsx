@@ -38,16 +38,22 @@ describe('PackageCard', () => {
     expect(screen.getByText('Rechazado')).toBeInTheDocument();
   });
 
+  test('los botones muestran el texto y su aria-label lo contiene (2.5.3)', () => {
+    render(<PackageCard pkg={basePkg} onStatusChange={vi.fn()} />);
+    expect(screen.getByLabelText('Inspeccionar LTK-0001-ES')).toHaveTextContent('Inspeccionar');
+    expect(screen.getByLabelText('Rechazar LTK-0001-ES')).toHaveTextContent('Rechazar');
+  });
+
   test('los botones tienen aria-label descriptivo con el código', () => {
     render(<PackageCard pkg={basePkg} onStatusChange={vi.fn()} />);
-    expect(screen.getByLabelText('Marcar LTK-0001-ES como inspeccionado')).toBeInTheDocument();
-    expect(screen.getByLabelText('Marcar LTK-0001-ES como rechazado')).toBeInTheDocument();
+    expect(screen.getByLabelText('Inspeccionar LTK-0001-ES')).toBeInTheDocument();
+    expect(screen.getByLabelText('Rechazar LTK-0001-ES')).toBeInTheDocument();
   });
 
   test('emite INSPECTED al pulsar el botón de inspeccionar', () => {
     const onStatusChange = vi.fn();
     render(<PackageCard pkg={basePkg} onStatusChange={onStatusChange} />);
-    fireEvent.click(screen.getByLabelText(/como inspeccionado/));
+    fireEvent.click(screen.getByLabelText(/^Inspeccionar /));
     expect(onStatusChange).toHaveBeenCalledTimes(1);
     expect(onStatusChange).toHaveBeenCalledWith({ id: 'a1b2c3d4-0001', newStatus: 'INSPECTED' });
   });
@@ -55,26 +61,26 @@ describe('PackageCard', () => {
   test('emite REJECTED al pulsar el botón de rechazar', () => {
     const onStatusChange = vi.fn();
     render(<PackageCard pkg={basePkg} onStatusChange={onStatusChange} />);
-    fireEvent.click(screen.getByLabelText(/como rechazado/));
+    fireEvent.click(screen.getByLabelText(/^Rechazar /));
     expect(onStatusChange).toHaveBeenCalledTimes(1);
     expect(onStatusChange).toHaveBeenCalledWith({ id: 'a1b2c3d4-0001', newStatus: 'REJECTED' });
   });
 
   test('marca con aria-disabled el botón del estado actual', () => {
     const { unmount } = render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={vi.fn()} />);
-    expect(isAriaDisabled(screen.getByLabelText(/como inspeccionado/))).toBe(true);
-    expect(isAriaDisabled(screen.getByLabelText(/como rechazado/))).toBe(false);
+    expect(isAriaDisabled(screen.getByLabelText(/^Inspeccionar /))).toBe(true);
+    expect(isAriaDisabled(screen.getByLabelText(/^Rechazar /))).toBe(false);
 
     unmount();
     render(<PackageCard pkg={{ ...basePkg, status: 'REJECTED' }} onStatusChange={vi.fn()} />);
-    expect(isAriaDisabled(screen.getByLabelText(/como rechazado/))).toBe(true);
-    expect(isAriaDisabled(screen.getByLabelText(/como inspeccionado/))).toBe(false);
+    expect(isAriaDisabled(screen.getByLabelText(/^Rechazar /))).toBe(true);
+    expect(isAriaDisabled(screen.getByLabelText(/^Inspeccionar /))).toBe(false);
   });
 
   test('no emite eventos desde un botón con aria-disabled', () => {
     const onStatusChange = vi.fn();
     render(<PackageCard pkg={{ ...basePkg, status: 'INSPECTED' }} onStatusChange={onStatusChange} />);
-    fireEvent.click(screen.getByLabelText(/como inspeccionado/));
+    fireEvent.click(screen.getByLabelText(/^Inspeccionar /));
     expect(onStatusChange).not.toHaveBeenCalled();
   });
 });
