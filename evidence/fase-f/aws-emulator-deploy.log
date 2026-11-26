@@ -1,0 +1,58 @@
+# aws-emulator 1.0.628 (deb extraido con dpkg-deb -x, sin instalar), AWS CLI aws-cli/2.42.4, dist/ minimo de prueba (2 ficheros)
+# Emulador recien arrancado (estado vacio); se ejecuta 2 veces para comprobar idempotencia
+## ejecucion 1
+==> Comprobando emulador en https://127.0.0.1:9297
+==> Identidad
+{
+    "UserId": "AIDAH5I7GEMO7ADXNFAZU",
+    "Account": "000000000000",
+    "Arn": "arn:aws:iam::000000000000:user/emulator"
+}
+==> Creando bucket logitrack-web
+{
+    "Location": "/logitrack-web",
+    "BucketArn": "arn:aws:s3:::logitrack-web"
+}
+==> Subiendo <scratchpad>/testdist a s3://logitrack-web
+upload: ../../../../../../..<scratchpad>/testdist/assets/app.js to s3://logitrack-web/assets/app.js
+upload: ../../../../../../..<scratchpad>/testdist/index.html to s3://logitrack-web/index.html
+==> Website hosting configurado
+==> Creando tabla packages
+==> Sembrando packages desde infra/seed/packages.json
+==> Buckets
+2026-11-26 15:04:55 logitrack-web
+==> Contenido de s3://logitrack-web
+2026-11-26 15:04:56         15 assets/app.js
+2026-11-26 15:04:56         50 index.html
+
+Total Objects: 2
+   Total Size: 65
+==> Elementos en packages
+8
+==> Despliegue en el emulador completado
+exit=0
+## ejecucion 2
+==> Comprobando emulador en https://127.0.0.1:9297
+==> Identidad
+{
+    "UserId": "AIDAH5I7GEMO7ADXNFAZU",
+    "Account": "000000000000",
+    "Arn": "arn:aws:iam::000000000000:user/emulator"
+}
+==> Bucket logitrack-web ya existe
+==> Subiendo <scratchpad>/testdist a s3://logitrack-web
+==> Website hosting configurado
+==> Tabla packages ya existe
+==> Sembrando packages desde infra/seed/packages.json
+==> Buckets
+2026-11-26 15:04:55 logitrack-web
+==> Contenido de s3://logitrack-web
+2026-11-26 15:04:56         15 assets/app.js
+2026-11-26 15:04:56         50 index.html
+
+Total Objects: 2
+   Total Size: 65
+==> Elementos en packages
+8
+==> Despliegue en el emulador completado
+exit=0
