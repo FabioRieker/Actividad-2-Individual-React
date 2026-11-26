@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+.lighthouseci/
+.env
+.env.*
+!.env.example
+*.log
+!evidence/**/*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
