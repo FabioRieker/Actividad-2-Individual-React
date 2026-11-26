@@ -1,0 +1,69 @@
+/* Estructura común de las páginas nuevas (resumen, actividad, ajustes, detalle) */
+.lt-page ion-toolbar {
+  --background: var(--lt-surface-1);
+  --color: var(--lt-text);
+  --border-color: var(--lt-border);
+}
+.lt-page__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: inherit;
+}
+.lt-page__title:focus {
+  outline: none;
+}
+.lt-page__title:focus-visible {
+  outline: var(--lt-focus-width) solid var(--lt-focus);
+  outline-offset: var(--lt-focus-offset);
+}
+.lt-page__content {
+  --background: var(--lt-bg);
+  --color: var(--lt-text);
+}
+.lt-page__main {
+  max-width: var(--lt-content-max);
+  margin-inline: auto;
+  padding: var(--lt-space-4);
+  color: var(--lt-text);
+}
+.lt-panel {
+  margin: 0 0 var(--lt-space-4);
+  padding: var(--lt-space-4);
+  background: var(--lt-surface-2);
+  border: 1px solid var(--lt-border);
+  border-radius: var(--lt-radius-md);
+}
+.lt-panel__title {
+  margin: 0 0 var(--lt-space-3);
+  font-size: 1rem;
+}
+.lt-muted {
+  color: var(--lt-text-muted);
+}
+.lt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lt-space-2);
+  min-height: var(--lt-touch-min);
+  min-width: var(--lt-touch-min);
+  padding: 0 var(--lt-space-4);
+  font: inherit;
+  font-weight: 600;
+  color: var(--lt-text);
+  background: transparent;
+  border: 2px solid var(--lt-border-control);
+  border-radius: var(--lt-radius-md);
+  cursor: pointer;
+}
+.lt-btn--primary {
+  color: var(--lt-on-accent);
+  background: var(--lt-accent);
+  border-color: var(--lt-accent);
+}
+.lt-btn[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
