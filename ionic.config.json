@@ -1,0 +1,7 @@
+{
+  "name": "logitrack-express",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
