@@ -5,7 +5,7 @@ import App from './App';
 import { initTheme } from './services/theme';
 
 /* Fuentes variables autoalojadas (sin CDN): un solo archivo woff2 por familia */
-import '@fontsource-variable/geist';
+import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/jetbrains-mono';
 
 /* Estilos globales propios: despues de los CSS de Ionic (importados en App) */
