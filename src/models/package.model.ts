@@ -25,3 +25,13 @@ export type StatusChangeEvent = {
 
 /** Filtro de prioridad de la lista; 'ALL' desactiva el filtro. */
 export type PriorityFilter = 'ALL' | PackagePriority;
+
+/** Registro inmutable de un cambio de estado. */
+export interface ActivityEntry {
+  readonly id: string;
+  readonly packageId: string;
+  readonly trackingCode: string;
+  readonly from: PackageStatus;
+  readonly to: PackageStatus;
+  readonly at: Date;
+}
