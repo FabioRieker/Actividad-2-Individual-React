@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LogiTrack Express - global.css
+   LogiTrack Express - global.css (senaletica industrial)
    Importar DESPUES de variables.css. Sin fuentes remotas (funciona offline).
    ========================================================================== */
 
@@ -12,74 +12,60 @@ html {
 
 body {
   block-size: 100dvh;
-  background: transparent; /* el color base lo pone html; las manchas van detras */
+  background: var(--lt-bg);
+  color: var(--lt-text);
   font-size: 1rem; /* 16 px base, respeta zoom del usuario */
   line-height: 1.5;
-  letter-spacing: 0.005em;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
 
 h1,
 h2,
 h3 {
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  font-weight: 650; /* eje wght de la fuente variable */
+  line-height: 1.1;
+  font-weight: 800;
 }
 
-/* Manchas de luz grandes, difuminadas y fijas (sin animar) detras de todo el contenido */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  block-size: 100dvh;
-  z-index: -1;
-  pointer-events: none;
-  background: var(--lt-blobs);
-}
 ion-app,
 ion-router-outlet,
 .ion-page {
   background: transparent;
 }
 
-/* --------------------------------------------------------------------------
-   Superficie de cristal: desenfoque + saturacion, base semitransparente,
-   borde fino con brillo superior y sombra amplia de baja opacidad.
-   -------------------------------------------------------------------------- */
-.lt-glass,
-.lt-panel,
-.lt-sum-kpis,
-.lt-act-list,
-.lt-act-empty,
-.lt-page ion-toolbar,
-ion-tab-bar {
-  background: var(--lt-glass);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid var(--lt-glass-edge);
-  border-radius: var(--lt-radius-lg);
-  box-shadow:
-    inset 0 1px 0 var(--lt-glass-top),
-    var(--lt-glass-shadow);
+/* Rotulo: grotesca condensada en mayusculas (eje de anchura de Archivo). El DOM conserva el texto normal. */
+.lt-sign,
+.lt-tag,
+.lt-btn,
+.lt-card__meta dt,
+.lt-kpi__label,
+.lt-sum-kpi__label,
+.lt-panel__title,
+.lt-page__title,
+.lt-brand__name,
+.lt-result-count,
+ion-segment-button,
+ion-tab-button,
+ion-back-button,
+ion-button {
+  font-stretch: var(--lt-display-stretch);
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
 }
-.lt-glass--strong,
-.lt-page ion-toolbar,
-ion-tab-bar {
-  background: var(--lt-glass-strong);
+
+/* El boton nativo dentro del shadow DOM restablece font-stretch: se reaplica el rotulo condensado */
+ion-button::part(native),
+ion-segment-button::part(native),
+ion-tab-button::part(native),
+ion-back-button::part(native) {
+  font-stretch: var(--lt-display-stretch);
+  letter-spacing: inherit;
+  text-transform: uppercase;
 }
-/* Sin backdrop-filter: fondo opaco equivalente (mismo contraste) */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .lt-glass,
-  .lt-glass--strong,
-  .lt-panel,
-  .lt-sum-kpis,
-  .lt-act-list,
-  .lt-act-empty,
-  .lt-page ion-toolbar,
-  ion-tab-bar {
-    background: var(--lt-glass-solid);
-  }
+ion-tab-button ion-label {
+  font-stretch: var(--lt-display-stretch);
+  letter-spacing: var(--lt-display-tracking);
+  text-transform: uppercase;
 }
 
 /* Texto solo para lectores de pantalla */
@@ -110,68 +96,70 @@ ion-tab-bar {
   }
 }
 
-/* Badge de estado: texto + punto; el estado nunca depende solo del color */
-.lt-badge {
-  --badge-color: var(--lt-text-muted);
+/* Etiqueta de estado: bloque rectangular macizo con texto sobre fondo solido (nunca sobre franjas) */
+.lt-tag {
+  --tag-bg: var(--lt-fill-transit);
+  --tag-fg: light-dark(var(--lt-ink), var(--lt-bone));
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 28px;
-  padding: 0 10px;
-  background: var(--lt-chip-bg);
-  color: var(--badge-color);
-  border: 1px solid var(--lt-glass-edge);
-  border-radius: var(--lt-radius-pill);
-  font-size: 0.875rem;
-  font-weight: 600;
+  min-height: 32px;
+  padding: 0 var(--lt-space-3);
+  background: var(--tag-bg);
+  color: var(--tag-fg);
+  border: var(--lt-rule-thin) solid var(--lt-ink);
+  border-radius: 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
   line-height: 1;
+  letter-spacing: 0.06em;
   white-space: nowrap;
 }
-.lt-badge__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
+.lt-tag--status-inspected {
+  --tag-bg: var(--lt-fill-inspected);
+  --tag-fg: var(--lt-ink);
 }
-.lt-badge--status-transit {
-  --badge-color: var(--lt-status-transit);
+.lt-tag--status-rejected {
+  --tag-bg: var(--lt-fill-rejected);
+  --tag-fg: #ffffff;
 }
-.lt-badge--status-inspected {
-  --badge-color: var(--lt-status-inspected);
+.lt-tag--plain {
+  --tag-bg: transparent;
+  --tag-fg: var(--lt-text);
+  border-color: var(--lt-border);
 }
-.lt-badge--status-rejected {
-  --badge-color: var(--lt-status-rejected);
+
+/* Franjas de peligro (decorativas): negro/rojo en diagonal */
+.lt-hazard {
+  background: repeating-linear-gradient(-45deg, var(--lt-ink) 0 14px, var(--lt-stop) 14px 28px);
 }
 
 /* --------------------------------------------------------------------------
-   Foco visible fuerte (WCAG 2.4.7). Anillo de 3 px con offset: va sobre la
-   superficie contigua, no sobre el relleno del control, asi mantiene >= 3:1.
+   Foco visible fuerte (WCAG 2.4.7): contorno grueso con separacion; no se anima.
    -------------------------------------------------------------------------- */
 :focus-visible {
   outline: var(--lt-focus-width) solid var(--lt-focus);
   outline-offset: var(--lt-focus-offset);
 }
-
-/* Componentes Ionic con shadow DOM: la clase la anade Ionic al host */
 ion-button.ion-focused,
 ion-segment-button.ion-focused,
 ion-searchbar.ion-focused,
 ion-item.ion-focused,
-ion-card.ion-focused,
-ion-chip.ion-focused {
+ion-tab-button.ion-focused {
   outline: var(--lt-focus-width) solid var(--lt-focus);
   outline-offset: var(--lt-focus-offset);
 }
-
-/* Parte nativa interna (boton/input real dentro del shadow DOM) */
 ion-button::part(native):focus-visible,
 ion-segment-button::part(native):focus-visible,
-ion-searchbar::part(native):focus-visible {
+ion-searchbar::part(native):focus-visible,
+ion-tab-button::part(native):focus-visible {
   outline: var(--lt-focus-width) solid var(--lt-focus);
   outline-offset: var(--lt-focus-offset);
 }
+/* Sobre la barra negra el foco claro es siempre el naranja */
+ion-tab-button.ion-focused {
+  outline-color: var(--lt-signal);
+}
 
-/* Evita el halo difuso de Ionic: el anillo solido ya lo sustituye */
 ion-button {
   --box-shadow: none;
 }
@@ -180,66 +168,73 @@ ion-button.ion-focused {
   --background-focused-opacity: 0;
 }
 
-/* Searchbar: el input recibe el foco, se resalta el contenedor */
+/* Buscador: caja recta con contorno grueso */
 ion-searchbar {
-  --background: var(--lt-field);
+  --background: var(--lt-surface-1);
   --color: var(--lt-text);
-  --icon-color: var(--lt-text-muted);
+  --icon-color: var(--lt-text);
   --clear-button-color: var(--lt-text);
-  --border-radius: var(--lt-radius-md);
-  --box-shadow: inset 0 0 0 1px var(--lt-border-control); /* borde 3:1 */
+  --border-radius: 0;
+  --box-shadow: none;
   --cancel-button-color: var(--lt-text);
   min-height: var(--lt-touch-min);
 }
 /* Mayor especificidad que el valor por defecto del host (.sc-ion-searchbar-md-h) */
 ion-searchbar.hydrated {
-  --background: var(--lt-field);
-  --box-shadow: inset 0 0 0 1px var(--lt-border-control);
+  --background: var(--lt-surface-1);
+  --box-shadow: inset 0 0 0 var(--lt-rule) var(--lt-border-control);
   --placeholder-color: var(--lt-text-muted);
   --placeholder-opacity: 1;
 }
 ion-searchbar.ion-focused {
-  --box-shadow: inset 0 0 0 2px var(--lt-focus);
+  --box-shadow: inset 0 0 0 var(--lt-rule) var(--lt-focus);
 }
 
 /* --------------------------------------------------------------------------
-   Tamanos tactiles minimos (uso con guantes): 48 px
+   Botones y selectores: rectangulares, altos, tactiles con guantes (>= 48 px)
    -------------------------------------------------------------------------- */
 ion-button {
   --padding-top: var(--lt-space-3);
   --padding-bottom: var(--lt-space-3);
   --padding-start: var(--lt-space-4);
   --padding-end: var(--lt-space-4);
-  --border-radius: var(--lt-radius-md);
+  --border-radius: 0;
   min-height: var(--lt-touch-min);
   min-width: var(--lt-touch-min);
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.01em;
-  text-transform: none;
+  font-weight: 800;
+  font-size: 1.125rem;
 }
 ion-button[size='large'] {
   min-height: 56px;
 }
 
-/* Segment propio: pista de cristal con 4 px de margen y pildora interior ambar para el elemento activo */
+/* Segment = conmutador industrial: pastillas rectas, la activa en naranja con texto negro */
 ion-segment {
-  --background: var(--lt-field);
+  --background: var(--lt-surface-1);
   min-height: var(--lt-touch-min);
-  padding: 4px;
-  border: 1px solid var(--lt-border-control);
-  border-radius: var(--lt-radius-md);
+  padding: 0;
+  border: var(--lt-rule) solid var(--lt-border-control);
+  border-radius: 0;
 }
 ion-segment-button {
-  min-height: calc(var(--lt-touch-min) - 10px);
+  min-height: calc(var(--lt-touch-min) - 2 * var(--lt-rule));
+  min-width: 0;
   margin: 0;
   --color: var(--lt-text);
   --color-checked: var(--lt-on-accent);
   --indicator-color: transparent;
   --background-checked: var(--lt-accent-fill);
-  --border-radius: var(--lt-radius-sm);
-  font-weight: 600;
-  text-transform: none;
+  --border-radius: 0;
+  --border-color: var(--lt-border-control);
+  --border-style: solid;
+  --border-width: 0 var(--lt-rule-thin) 0 0;
+  --padding-start: var(--lt-space-1);
+  --padding-end: var(--lt-space-1);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+ion-segment-button:last-of-type {
+  --border-width: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -260,14 +255,58 @@ ion-segment-button {
   }
 }
 
-/* View Transition al cambiar el estado de un paquete: fundido muy corto */
+/* View Transition al cambiar el estado de un paquete: fundido corto */
 ::view-transition-group(root) {
-  animation-duration: 140ms;
+  animation-duration: var(--lt-dur-1);
 }
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 140ms;
-  animation-timing-function: ease-out;
+  animation-duration: var(--lt-dur-1);
+  animation-timing-function: var(--lt-ease-out);
+}
+
+/* --------------------------------------------------------------------------
+   Sistema de movimiento (solo transform / opacity / clip-path)
+   -------------------------------------------------------------------------- */
+@keyframes lt-enter {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+@keyframes lt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes lt-stamp {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes lt-tick {
+  from {
+    opacity: 0;
+    transform: translateY(45%);
+  }
+}
+@keyframes lt-slide {
+  from {
+    transform: translateX(-28px);
+  }
+}
+@keyframes lt-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+/* Entrada de pantalla: deslizamiento corto + fundido; la barra superior no se mueve */
+.lt-enter {
+  animation: lt-enter var(--lt-dur-3) var(--lt-ease-out) both;
 }
 
 /* Alto contraste forzado de Windows / Android */

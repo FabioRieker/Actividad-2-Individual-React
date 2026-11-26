@@ -12,6 +12,7 @@ import { useState } from 'react';
 
 import packageInfo from '../../package.json';
 import { useFocusHeading } from '../hooks/useFocusHeading';
+import { usePageEnter } from '../hooks/usePageEnter';
 import { applyTheme, getStoredTheme, isThemePreference, saveTheme } from '../services/theme';
 import type { ThemePreference } from '../services/theme';
 import './PageShell.css';
@@ -25,6 +26,7 @@ const THEME_OPTIONS: readonly { readonly value: ThemePreference; readonly label:
 
 const Settings: React.FC = () => {
   const headingRef = useFocusHeading();
+  const mainRef = usePageEnter<HTMLElement>();
   const [theme, setTheme] = useState<ThemePreference>(getStoredTheme);
 
   return (
@@ -39,7 +41,7 @@ const Settings: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="lt-page__content">
-        <main className="lt-page__main">
+        <main className="lt-page__main" ref={mainRef}>
           <section className="lt-panel" aria-labelledby="set-theme">
             <h2 className="lt-panel__title" id="set-theme">
               Tema

@@ -2,6 +2,7 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/rea
 import { useMemo } from 'react';
 
 import { useFocusHeading } from '../hooks/useFocusHeading';
+import { usePageEnter } from '../hooks/usePageEnter';
 import type { PackagePriority, WarehousePackage } from '../models/package.model';
 import { usePackages } from '../services/packageStore';
 import { formatShare, percentOf, PRIORITY_LABEL } from '../utils/labels';
@@ -31,11 +32,12 @@ interface BarListProps {
   readonly label: string;
   readonly buckets: readonly Bucket[];
   readonly total: number;
+  readonly tone: 'signal' | 'concrete';
 }
 
-function BarList({ label, buckets, total }: BarListProps) {
+function BarList({ label, buckets, total, tone }: BarListProps) {
   return (
-    <ul className="lt-bars" aria-label={label}>
+    <ul className={`lt-bars lt-bars--${tone}`} aria-label={label}>
       {buckets.map((b) => (
         <li key={b.label}>
           <span className="lt-bars__name">{b.label}</span>
@@ -51,6 +53,7 @@ function BarList({ label, buckets, total }: BarListProps) {
 
 const Summary: React.FC = () => {
   const headingRef = useFocusHeading();
+  const mainRef = usePageEnter<HTMLElement>();
   const packages = usePackages();
   const total = packages.length;
 
@@ -83,7 +86,7 @@ const Summary: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="lt-page__content">
-        <main className="lt-page__main">
+        <main className="lt-page__main" ref={mainRef}>
           <ul className="lt-sum-kpis" aria-label="Indicadores">
             <li className="lt-sum-kpi">
               <span className="lt-sum-kpi__value">{total}</span>
@@ -114,13 +117,13 @@ const Summary: React.FC = () => {
             <h2 className="lt-panel__title" id="sum-hub">
               Paquetes por destino
             </h2>
-            <BarList label="Paquetes por destino" buckets={stats.byHub} total={total} />
+            <BarList label="Paquetes por destino" buckets={stats.byHub} total={total} tone="signal" />
           </section>
           <section className="lt-panel" aria-labelledby="sum-prio">
             <h2 className="lt-panel__title" id="sum-prio">
               Paquetes por prioridad
             </h2>
-            <BarList label="Paquetes por prioridad" buckets={stats.byPriority} total={total} />
+            <BarList label="Paquetes por prioridad" buckets={stats.byPriority} total={total} tone="concrete" />
           </section>
         </main>
       </IonContent>

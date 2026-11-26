@@ -1,4 +1,4 @@
-/* Actividad: historial como lista de cristal con una linea de tiempo sobria */
+/* Actividad: registro tipo albaran, con hora en monoespaciada y marca de estado a la izquierda */
 .lt-act-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -13,61 +13,70 @@
   text-wrap: pretty;
 }
 .lt-act-list {
-  --dot-color: var(--lt-text-muted);
+  --dot-color: var(--lt-fill-transit);
   display: grid;
   margin: 0;
-  padding: var(--lt-space-2) var(--lt-space-4);
+  padding: 0;
   list-style: none;
+  background: var(--lt-surface-2);
+  border: var(--lt-rule) solid var(--lt-border);
 }
 .lt-act-item {
-  position: relative;
   display: grid;
-  gap: 2px;
-  padding: var(--lt-space-3) 0 var(--lt-space-3) var(--lt-space-5);
-  font-variant-numeric: tabular-nums;
+  gap: var(--lt-space-1) var(--lt-space-4);
+  padding: var(--lt-space-3) var(--lt-space-4);
+  border-inline-start: 10px solid var(--dot-color);
 }
 .lt-act-item + .lt-act-item {
-  border-top: 1px solid var(--lt-border);
-}
-.lt-act-item::before {
-  content: '';
-  position: absolute;
-  inset-block-start: 1.2rem;
-  inset-inline-start: 2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--dot-color);
+  border-top: var(--lt-rule-thin) dashed var(--lt-border-soft);
 }
 .lt-act-item[data-status='IN_TRANSIT'] {
-  --dot-color: var(--lt-status-transit);
+  --dot-color: var(--lt-fill-transit);
 }
 .lt-act-item[data-status='INSPECTED'] {
-  --dot-color: var(--lt-status-inspected);
+  --dot-color: var(--lt-fill-inspected);
 }
 .lt-act-item[data-status='REJECTED'] {
-  --dot-color: var(--lt-status-rejected);
+  --dot-color: var(--lt-fill-rejected);
 }
 .lt-act-item__code {
   font-family: var(--lt-font-mono);
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 800;
 }
 .lt-act-item__time {
-  font-size: 0.8125rem;
+  font-family: var(--lt-font-mono);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
   color: var(--lt-text-muted);
+}
+@media (min-width: 640px) {
+  .lt-act-item {
+    grid-template-columns: 13rem minmax(0, 1fr);
+    grid-template-areas: 'time text';
+    align-items: baseline;
+  }
+  .lt-act-item__time {
+    grid-area: time;
+  }
 }
 .lt-act-empty {
   display: grid;
-  justify-items: center;
+  justify-items: start;
   gap: var(--lt-space-2);
   min-height: min(16rem, 40dvh);
   align-content: center;
   padding: var(--lt-space-5) var(--lt-space-4);
-  text-align: center;
+  background: var(--lt-surface-2);
+  border: var(--lt-rule) solid var(--lt-border);
   color: var(--lt-text-muted);
+}
+.lt-act-empty p {
+  margin: 0;
 }
 .lt-act-empty .lt-panel__title {
   margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 2rem;
   color: var(--lt-text);
 }

@@ -18,6 +18,7 @@ import { flushSync } from 'react-dom';
 import { PackageCard } from '../components/PackageCard';
 import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
 import { useFocusHeading } from '../hooks/useFocusHeading';
+import { usePageEnter } from '../hooks/usePageEnter';
 import type { PackageStatus, PriorityFilter, StatusChangeEvent } from '../models/package.model';
 import { updateStatus, usePackages } from '../services/packageStore';
 import './Home.css';
@@ -57,9 +58,26 @@ function runWithViewTransition(update: () => void): void {
   });
 }
 
+/** Cifra de un indicador: al cambiar, el digito se «teclea» con un breve desplazamiento vertical. */
+function KpiValue({ value }: { readonly value: number }) {
+  const [shown, setShown] = useState(value);
+  const [changed, setChanged] = useState(false);
+  if (shown !== value) {
+    setShown(value);
+    setChanged(true);
+  }
+  return (
+    <span key={value} className={`lt-kpi__value${changed ? ' is-tick' : ''}`}>
+      {value}
+    </span>
+  );
+}
+
 const Home: React.FC = () => {
   const searchbarRef = useRef<HTMLIonSearchbarElement>(null);
   const headingRef = useFocusHeading();
+  const mainRef = usePageEnter<HTMLElement>();
+  const [intro, setIntro] = useState(true);
   const packages = usePackages();
   const [query, setQuery] = useState('');
   const [term, setSearchInput] = useDebouncedSearchTerm();
@@ -82,6 +100,12 @@ const Home: React.FC = () => {
     }),
     [packages],
   );
+
+  // La entrada escalonada de la lista solo se reproduce en la primera carga.
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIntro(false), 900);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const clearFilters = useCallback((): void => {
     setQuery('');
@@ -134,57 +158,51 @@ const Home: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen className="lt-content">
-        <div className="lt-dock lt-glass lt-glass--strong">
-          <header className="lt-brand">
-            <svg className="lt-brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-              <rect width="32" height="32" rx="9" />
-              <path d="M16 6.8 24.6 11.4v9.2L16 25.2 7.4 20.6v-9.2z" />
-              <path d="M7.8 11.6 16 16l8.2-4.4M16 16v9" />
-            </svg>
-            <p className="lt-brand__name">LogiTrack Express</p>
-          </header>
-          <div className="lt-controls lt-glass lt-glass--strong" role="search">
-            <IonSearchbar
-              ref={searchbarRef}
-              debounce={0}
-              aria-label={SEARCH_LABEL}
-              placeholder="Buscar código o destino"
-              value={query}
-              onIonInput={(e) => {
-                const value = e.detail.value ?? '';
-                setQuery(value);
-                setSearchInput(value);
-              }}
-            />
-            <IonSegment
-              aria-label="Filtrar por prioridad"
-              value={priority}
-              onIonChange={(e) => {
-                const value = e.detail.value;
-                if (isPriorityFilter(value)) setPriority(value);
-              }}
-            >
-              {PRIORITY_OPTIONS.map((option) => (
-                <IonSegmentButton key={option.value} value={option.value}>
-                  <IonLabel>{option.label}</IonLabel>
-                </IonSegmentButton>
-              ))}
-            </IonSegment>
-          </div>
+        <header className="lt-topbar">
+          <p className="lt-brand__name">LogiTrack Express</p>
+          <p className="lt-topbar__dock">
+            <span>Muelle</span>
+            <span className="lt-topbar__dock-no">02</span>
+          </p>
+        </header>
+        <div className="lt-controls" role="search">
+          <IonSearchbar
+            ref={searchbarRef}
+            debounce={0}
+            aria-label={SEARCH_LABEL}
+            placeholder="Buscar código o destino"
+            value={query}
+            onIonInput={(e) => {
+              const value = e.detail.value ?? '';
+              setQuery(value);
+              setSearchInput(value);
+            }}
+          />
+          <IonSegment
+            aria-label="Filtrar por prioridad"
+            value={priority}
+            onIonChange={(e) => {
+              const value = e.detail.value;
+              if (isPriorityFilter(value)) setPriority(value);
+            }}
+          >
+            {PRIORITY_OPTIONS.map((option) => (
+              <IonSegmentButton key={option.value} value={option.value}>
+                <IonLabel>{option.label}</IonLabel>
+              </IonSegmentButton>
+            ))}
+          </IonSegment>
         </div>
-        <main className="lt-main">
+        <main className="lt-main" ref={mainRef}>
           <h1 className="lt-sr-only" ref={headingRef} tabIndex={-1}>
             Listado de paquetes
           </h1>
-          <div className="lt-overview lt-glass">
+          <div className="lt-overview">
             <ul className="lt-kpis" aria-label="Resumen por estado">
               {kpiCells.map((cell) => (
                 <li key={cell.key} className={`lt-kpi lt-kpi--${cell.key}`}>
-                  <span className="lt-kpi__value">{cell.value}</span>
-                  <span className="lt-kpi__label">
-                    <span className="lt-kpi__dot" aria-hidden="true" />
-                    {cell.label}
-                  </span>
+                  <KpiValue value={cell.value} />
+                  <span className="lt-kpi__label">{cell.label}</span>
                 </li>
               ))}
             </ul>
@@ -207,17 +225,22 @@ const Home: React.FC = () => {
             {countLabel}
           </p>
           {visible.length === 0 ? (
-            <div className="lt-empty lt-glass">
+            <div className="lt-empty">
               <h2 className="lt-empty__title">Sin paquetes</h2>
               <p className="lt-empty__text">
                 Ningún paquete coincide con la búsqueda o el filtro. Prueba con otro código o selecciona Todas.
               </p>
-              <IonButton fill="outline" onClick={clearFilters}>
+              <IonButton fill="outline" className="lt-btn-outline" onClick={clearFilters}>
                 Limpiar filtros
               </IonButton>
             </div>
           ) : (
-            <IonList className="lt-grid" lines="none" role="list" aria-label="Paquetes">
+            <IonList
+              className={`lt-grid${intro ? ' lt-grid--intro' : ''}`}
+              lines="none"
+              role="list"
+              aria-label="Paquetes"
+            >
               {visible.map((pkg) => (
                 <IonItemSliding key={pkg.id}>
                   <IonItem lines="none" className="lt-item">

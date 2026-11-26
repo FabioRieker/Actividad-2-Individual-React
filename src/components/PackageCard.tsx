@@ -1,12 +1,5 @@
-import { IonButton, IonIcon } from '@ionic/react';
-import {
-  arrowDownOutline,
-  arrowUpOutline,
-  checkmarkCircleOutline,
-  closeCircleOutline,
-  removeOutline,
-} from 'ionicons/icons';
-import { memo, useEffect, useRef } from 'react';
+import { IonButton } from '@ionic/react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import type { PackagePriority, PackageStatus, StatusChangeEvent, WarehousePackage } from '../models/package.model';
 
@@ -29,10 +22,10 @@ const STATUS_INFO: Record<PackageStatus, BadgeInfo & { readonly dataStatus: stri
   REJECTED: { label: 'Rechazado', modifier: 'rejected', dataStatus: 'rejected' },
 };
 
-const PRIORITY_INFO: Record<PackagePriority, BadgeInfo & { readonly icon: string }> = {
-  CRITICAL: { label: 'Alta', modifier: 'high', icon: arrowUpOutline },
-  STANDARD: { label: 'Media', modifier: 'medium', icon: removeOutline },
-  LOW: { label: 'Baja', modifier: 'low', icon: arrowDownOutline },
+const PRIORITY_INFO: Record<PackagePriority, BadgeInfo> = {
+  CRITICAL: { label: 'Alta', modifier: 'high' },
+  STANDARD: { label: 'Media', modifier: 'medium' },
+  LOW: { label: 'Baja', modifier: 'low' },
 };
 
 const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
@@ -80,6 +73,13 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
   const rejected = pkg.status === 'REJECTED';
   useEffect(() => syncAriaDisabled(inspectRef.current, inspected), [inspected]);
   useEffect(() => syncAriaDisabled(rejectRef.current, rejected), [rejected]);
+  // Al cambiar el estado se «estampa» la etiqueta (barrido) y, si es un rechazo, entran las franjas.
+  const [shownStatus, setShownStatus] = useState(pkg.status);
+  const [stamping, setStamping] = useState(false);
+  if (shownStatus !== pkg.status) {
+    setShownStatus(pkg.status);
+    setStamping(true);
+  }
   const status = STATUS_INFO[pkg.status];
   const priority = PRIORITY_INFO[pkg.priority];
   const emit = (newStatus: PackageStatus): void => {
@@ -90,7 +90,8 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
   return (
     <div className="lt-card-host">
       <article
-        className={`lt-card lt-glass lt-card--${status.modifier}`}
+        className={`lt-card lt-card--${status.modifier}${stamping ? ' is-stamping' : ''}`}
+        onAnimationEnd={() => setStamping(false)}
         data-status={status.dataStatus}
         aria-labelledby={titleId}
       >
@@ -98,10 +99,7 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
           <h2 className="lt-card__code" id={titleId}>
             <PackageLink id={pkg.id} trackingCode={pkg.trackingCode} />
           </h2>
-          <span className={`lt-badge lt-badge--status-${status.modifier}`}>
-            <span className="lt-badge__dot" aria-hidden="true" />
-            {status.label}
-          </span>
+          <span className={`lt-tag lt-tag--status-${status.modifier}`}>{status.label}</span>
         </header>
         <dl className="lt-card__meta">
           <div>
@@ -120,10 +118,7 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
           </div>
           <div>
             <dt>Prioridad</dt>
-            <dd className={`lt-priority lt-priority--${priority.modifier}`}>
-              <IonIcon icon={priority.icon} aria-hidden="true" />
-              {priority.label}
-            </dd>
+            <dd className={`lt-priority lt-priority--${priority.modifier}`}>{priority.label}</dd>
           </div>
         </dl>
         <div className="lt-card__actions">
@@ -134,7 +129,6 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
             aria-disabled={inspected ? 'true' : 'false'}
             onClick={() => emit('INSPECTED')}
           >
-            <IonIcon slot="start" icon={checkmarkCircleOutline} aria-hidden="true" />
             Inspeccionar
           </IonButton>
           <IonButton
@@ -145,7 +139,6 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
             aria-disabled={rejected ? 'true' : 'false'}
             onClick={() => emit('REJECTED')}
           >
-            <IonIcon slot="start" icon={closeCircleOutline} aria-hidden="true" />
             Rechazar
           </IonButton>
         </div>

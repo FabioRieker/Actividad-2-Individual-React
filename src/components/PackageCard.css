@@ -1,31 +1,40 @@
-/* PackageCard.css - tarjeta de paquete de cristal (article.lt-card)
+/* PackageCard.css - placa de identificacion de paquete (article.lt-card)
    La disposicion depende del ancho del contenedor (.lt-card-host), no del viewport. */
 
 .lt-card-host {
   container: lt-card / inline-size;
 }
 
-.lt-card.lt-glass {
-  --lt-status-color: var(--lt-status-transit);
+.lt-card {
+  --band-h: 14px;
+  --band-bg: var(--lt-fill-transit);
   --card-pad: clamp(1rem, 4.5cqi, 1.5rem);
+  position: relative;
   display: grid;
   gap: var(--lt-space-3);
-  padding: var(--card-pad);
+  padding: calc(var(--band-h) + var(--card-pad)) var(--card-pad) var(--card-pad);
+  overflow: hidden;
+  background: var(--lt-surface-2);
   color: var(--lt-text);
-  /* Senal de estado discreta: linea fina interior en el borde izquierdo */
-  box-shadow:
-    inset 3px 0 0 var(--lt-status-color),
-    inset 0 1px 0 var(--lt-glass-top),
-    var(--lt-glass-shadow);
-}
-.lt-card[data-status='transit'] {
-  --lt-status-color: var(--lt-status-transit);
+  border: var(--lt-rule) solid var(--lt-border);
+  border-radius: 0;
 }
 .lt-card[data-status='inspected'] {
-  --lt-status-color: var(--lt-status-inspected);
+  --band-bg: var(--lt-fill-inspected);
 }
-.lt-card[data-status='rejected'] {
-  --lt-status-color: var(--lt-status-rejected);
+
+/* Banda superior de estado: gris (transito), verde macizo (inspeccionado), franjas de peligro (rechazado).
+   Es decorativa: el texto del estado va siempre en la etiqueta sobre fondo solido. */
+.lt-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--band-h);
+  background: var(--band-bg);
+}
+.lt-card[data-status='rejected']::before {
+  inset-inline: -28px 0;
+  background: repeating-linear-gradient(-45deg, var(--lt-ink) 0 14px, var(--lt-stop) 14px 28px);
 }
 
 .lt-card__head {
@@ -40,102 +49,145 @@
   margin: 0;
   font-family: var(--lt-font-mono);
   font-variant-numeric: tabular-nums slashed-zero;
-  font-size: var(--lt-fs-code);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
+  font-size: clamp(1.125rem, 6cqi, 1.75rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0;
   color: var(--lt-text);
   overflow-wrap: anywhere;
 }
 
-/* Datos alineados: la columna de etiquetas mide lo que su texto mas largo (subgrid) */
+/* Placa de datos: celdas separadas por reglas; destino a todo el ancho, luego peso, fecha y prioridad */
 .lt-card__meta {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--lt-space-2) var(--lt-space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
-  font-size: 0.9375rem;
+  border-top: var(--lt-rule-thin) solid var(--lt-border);
 }
 .lt-card__meta > div {
   display: grid;
-  grid-template-columns: subgrid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--lt-space-2) var(--lt-space-2) var(--lt-space-2) 0;
+}
+.lt-card__meta > div:first-child {
   grid-column: 1 / -1;
-  align-items: center;
+  border-bottom: var(--lt-rule-thin) solid var(--lt-border-soft);
+}
+.lt-card__meta > div + div + div {
+  padding-inline-start: var(--lt-space-2);
+  border-inline-start: var(--lt-rule-thin) solid var(--lt-border-soft);
 }
 .lt-card__meta dt {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
   color: var(--lt-text-muted);
 }
 .lt-card__meta dd {
   margin: 0;
-  font-weight: 500;
+  font-stretch: 75%;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.15;
   font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
   color: var(--lt-text);
   overflow-wrap: anywhere;
 }
-.lt-priority {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.lt-priority ion-icon {
-  flex: none;
-  font-size: 1rem;
-  align-self: center;
-}
-.lt-priority--high {
-  font-weight: 650;
-}
-.lt-priority--medium,
-.lt-priority--low {
-  color: var(--lt-text-muted);
+.lt-card__meta > div:first-child dd {
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
-/* Acciones: cristal neutro, texto visible y color semantico solo en el icono */
+/* Prioridad con flecha de senal: ALTA en naranja */
+.lt-priority::before {
+  content: '▬ ' / '';
+  font-weight: 800;
+}
+.lt-priority--high {
+  color: var(--lt-priority-high);
+  font-weight: 800;
+}
+.lt-priority--high::before {
+  content: '▲ ' / '';
+}
+.lt-priority--medium::before {
+  content: '▶ ' / '';
+}
+.lt-priority--low {
+  color: var(--lt-priority-low);
+}
+.lt-priority--low::before {
+  content: '▼ ' / '';
+}
+
+/* Enlace del codigo: subrayado grueso naranja */
+.lt-card__code .lt-pkg-link {
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--lt-signal);
+  text-underline-offset: 6px;
+}
+
+/* Acciones: rectangulares, altas; primario naranja con texto negro, secundario con contorno grueso */
 .lt-card__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--lt-space-3);
-  margin-top: var(--lt-space-1);
 }
 .lt-btn-inspect,
 .lt-btn-reject {
-  --border-radius: var(--lt-radius-md);
+  --border-radius: 0;
   --padding-start: var(--lt-space-2);
   --padding-end: var(--lt-space-2);
-  --background: var(--lt-chip-bg);
-  --background-hover: var(--lt-chip-bg);
-  --background-activated: var(--lt-chip-bg);
+  --border-style: solid;
+  --border-width: var(--lt-rule);
+  min-height: 56px;
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.lt-btn-inspect {
+  --background: var(--lt-action-ok-bg);
+  --background-hover: var(--lt-action-ok-bg);
+  --background-activated: var(--lt-action-ok-bg);
+  --color: var(--lt-action-ok-fg);
+  --color-hover: var(--lt-action-ok-fg);
+  --border-color: var(--lt-ink);
+}
+.lt-btn-reject {
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: transparent;
   --color: var(--lt-text);
   --color-hover: var(--lt-text);
-  --border-color: var(--lt-glass-edge-hover);
-  --border-style: solid;
-  --border-width: 1px;
-  min-height: 52px;
-  margin: 0;
-  font-size: 0.9375rem;
-  letter-spacing: 0;
-}
-.lt-btn-inspect ion-icon,
-.lt-btn-reject ion-icon {
-  font-size: 1.25rem;
-  margin-inline-end: 6px;
-}
-.lt-btn-inspect ion-icon {
-  color: var(--lt-status-inspected);
-}
-.lt-btn-reject ion-icon {
-  color: var(--lt-status-rejected);
+  --border-color: var(--lt-border-control);
 }
 
-/* Estado actual (aria-disabled en el boton nativo): claramente inactivo y con el foco intacto.
-   Ionic retira aria-disabled del host, por eso se marca con la clase is-inactive. */
+/* Estado actual: boton inactivo, atenuado, rayado y tachado (aria-disabled va en el boton nativo) */
 .lt-btn-inspect.is-inactive,
 .lt-btn-reject.is-inactive {
+  --background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 6px,
+      light-dark(rgb(0 0 0 / 0.16), rgb(255 255 255 / 0.16)) 6px 8px
+    ),
+    var(--lt-surface-3);
+  --background-hover: var(--lt-surface-3);
+  --background-activated: var(--lt-surface-3);
   --color: var(--lt-text-muted);
   --color-hover: var(--lt-text-muted);
-  --border-color: var(--lt-glass-edge);
+  --border-color: var(--lt-border-soft);
   cursor: not-allowed;
-  opacity: 0.45;
+  opacity: 0.55;
+}
+.lt-btn-inspect.is-inactive::part(native),
+.lt-btn-reject.is-inactive::part(native) {
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
 }
 
 /* Contenedor ancho (>= 520 px): datos a la izquierda, acciones a la derecha */
@@ -157,9 +209,8 @@
   }
   .lt-card__actions {
     grid-area: actions;
-    grid-template-columns: minmax(10.5rem, 1fr);
+    grid-template-columns: minmax(11rem, 1fr);
     align-self: center;
-    margin-top: 0;
   }
 }
 
@@ -170,20 +221,29 @@
   }
 }
 
-/* Pulsacion y hover de los botones: solo transform y opacity, <= 150 ms. La tarjeta no es pulsable. */
+/* Movimiento: sello y franjas al cambiar de estado; pulsacion mecanica de botones */
+.lt-card.is-stamping .lt-tag,
+.lt-card.is-stamping:not([data-status='rejected'])::before {
+  animation: lt-stamp var(--lt-dur-2) var(--lt-ease-out) both;
+}
+.lt-card.is-stamping[data-status='rejected']::before {
+  animation: lt-slide var(--lt-dur-2) var(--lt-ease-out) both;
+}
 @media (prefers-reduced-motion: no-preference) {
   .lt-btn-inspect,
   .lt-btn-reject {
-    transition: transform var(--lt-dur) var(--lt-ease);
+    transition:
+      transform var(--lt-dur-1) var(--lt-ease-out),
+      opacity var(--lt-dur-1) var(--lt-ease-out);
   }
 }
 @media (hover: hover) {
   .lt-btn-inspect:not(.is-inactive):hover,
   .lt-btn-reject:not(.is-inactive):hover {
-    transform: translateY(-1px);
+    opacity: 0.88;
   }
 }
 .lt-btn-inspect:not(.is-inactive):active,
 .lt-btn-reject:not(.is-inactive):active {
-  transform: scale(0.97);
+  transform: translateY(1px);
 }

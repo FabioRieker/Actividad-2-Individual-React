@@ -4,16 +4,15 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
   IonPage,
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useFocusHeading } from '../hooks/useFocusHeading';
+import { usePageEnter } from '../hooks/usePageEnter';
 import type { PackageStatus } from '../models/package.model';
 import { updateStatus, useActivity, usePackages } from '../services/packageStore';
 import { formatDateTime, PRIORITY_LABEL, STATUS_LABEL } from '../utils/labels';
@@ -30,6 +29,7 @@ const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, 
 
 const PackageDetail: React.FC = () => {
   const headingRef = useFocusHeading();
+  const mainRef = usePageEnter<HTMLElement>();
   const { id } = useParams<{ id: string }>();
   const packages = usePackages();
   const activity = useActivity();
@@ -58,15 +58,12 @@ const PackageDetail: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="lt-page__content">
-        <main className="lt-page__main">
+        <main className="lt-page__main" ref={mainRef}>
           {pkg ? (
             <>
               <div className="lt-det-badges">
-                <span className={`lt-badge lt-badge--status-${STATUS_CLASS[pkg.status]}`}>
-                  <span className="lt-badge__dot" aria-hidden="true" />
-                  {STATUS_LABEL[pkg.status]}
-                </span>
-                <span className="lt-badge">{PRIORITY_LABEL[pkg.priority]}</span>
+                <span className={`lt-tag lt-tag--status-${STATUS_CLASS[pkg.status]}`}>{STATUS_LABEL[pkg.status]}</span>
+                <span className="lt-tag lt-tag--plain">{PRIORITY_LABEL[pkg.priority]}</span>
               </div>
               <section className="lt-panel" aria-labelledby="det-data">
                 <h2 className="lt-panel__title" id="det-data">
@@ -98,20 +95,18 @@ const PackageDetail: React.FC = () => {
                 <div className="lt-det-actions">
                   <button
                     type="button"
-                    className="lt-btn lt-btn--ok"
+                    className="lt-btn lt-btn--primary"
                     aria-disabled={pkg.status === 'INSPECTED'}
                     onClick={() => change('INSPECTED')}
                   >
-                    <IonIcon icon={checkmarkCircleOutline} aria-hidden="true" />
                     Inspeccionar
                   </button>
                   <button
                     type="button"
-                    className="lt-btn lt-btn--ko"
+                    className="lt-btn"
                     aria-disabled={pkg.status === 'REJECTED'}
                     onClick={() => change('REJECTED')}
                   >
-                    <IonIcon icon={closeCircleOutline} aria-hidden="true" />
                     Rechazar
                   </button>
                 </div>

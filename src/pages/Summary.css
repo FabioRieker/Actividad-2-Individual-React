@@ -1,27 +1,33 @@
-/* Resumen: franja de indicadores de cristal y barras horizontales como la barra apilada de Paquetes */
+/* Resumen: tablero de rotulos y barras horizontales macizas */
 .lt-sum-kpis {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--lt-space-4) var(--lt-space-3);
+  gap: var(--lt-rule-thin);
   margin: 0 0 var(--lt-space-4);
-  padding: var(--lt-space-4);
+  padding: 0;
   list-style: none;
+  background: var(--lt-border);
+  border: var(--lt-rule) solid var(--lt-border);
 }
 .lt-sum-kpi {
   display: grid;
-  gap: 2px;
+  align-content: end;
+  gap: var(--lt-space-1);
   min-width: 0;
+  padding: var(--lt-space-3);
+  background: var(--lt-surface-2);
 }
 .lt-sum-kpi__value {
-  font-size: 1.375rem;
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-stretch: var(--lt-display-stretch);
+  font-size: var(--lt-fs-kpi);
+  font-weight: 900;
+  line-height: 0.95;
   font-variant-numeric: tabular-nums;
 }
 .lt-sum-kpi__label {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.1;
   color: var(--lt-text-muted);
 }
 @media (min-width: 640px) {
@@ -49,27 +55,49 @@
   align-items: baseline;
 }
 .lt-bars__name {
-  font-weight: 600;
+  font-stretch: 75%;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
   overflow-wrap: anywhere;
 }
 .lt-bars__value {
-  font-size: 0.8125rem;
-  color: var(--lt-text-muted);
+  font-family: var(--lt-font-mono);
+  font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
+  color: var(--lt-text-muted);
   text-align: end;
 }
 .lt-bars__track {
   grid-column: 1 / -1;
   grid-row: 2;
   display: block;
-  height: 6px;
+  height: 20px;
   overflow: hidden;
-  background: var(--lt-track);
-  border-radius: 6px;
+  background: var(--lt-surface-3);
+  border: var(--lt-rule-thin) solid var(--lt-border);
 }
 .lt-bars__fill {
   display: block;
   height: 100%;
-  background: color-mix(in oklch, var(--lt-text) 72%, transparent);
-  border-radius: 6px;
+  background: var(--lt-signal);
+  transform-origin: left center;
+}
+.lt-bars--concrete .lt-bars__fill {
+  background: var(--lt-fill-transit);
+  border-inline-end: var(--lt-rule-thin) solid var(--lt-border);
+}
+
+/* Las barras crecen desde 0 al entrar en vista (scroll-driven; sin soporte, al montar) */
+@media (prefers-reduced-motion: no-preference) {
+  .lt-bars__fill {
+    animation: lt-grow var(--lt-dur-3) var(--lt-ease-out) both;
+  }
+  @supports (animation-timeline: view()) {
+    .lt-bars__fill {
+      animation: lt-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+    }
+  }
 }

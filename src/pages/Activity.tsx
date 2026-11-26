@@ -1,8 +1,8 @@
-import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { arrowUndoOutline } from 'ionicons/icons';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import { useState } from 'react';
 
 import { useFocusHeading } from '../hooks/useFocusHeading';
+import { usePageEnter } from '../hooks/usePageEnter';
 import { undoLast, useActivity } from '../services/packageStore';
 import { formatDateTime, STATUS_LABEL } from '../utils/labels';
 import './PageShell.css';
@@ -10,6 +10,7 @@ import './Activity.css';
 
 const Activity: React.FC = () => {
   const headingRef = useFocusHeading();
+  const mainRef = usePageEnter<HTMLElement>();
   const activity = useActivity();
   const [announcement, setAnnouncement] = useState('');
   const entries = [...activity].reverse();
@@ -35,11 +36,10 @@ const Activity: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="lt-page__content">
-        <main className="lt-page__main">
+        <main className="lt-page__main" ref={mainRef}>
           <div className="lt-act-toolbar">
             <p className="lt-muted">Cambios de estado, del más reciente al más antiguo.</p>
             <button type="button" className="lt-btn lt-btn--primary" aria-disabled={empty} onClick={handleUndo}>
-              <IonIcon icon={arrowUndoOutline} aria-hidden="true" />
               Deshacer último cambio
             </button>
           </div>
