@@ -1,0 +1,166 @@
+name: cd
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_CLI_VERSION: 67.0.0
+
+jobs:
+  checks:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: cd-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Comprobar secretos de Vercel
+        id: gate
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::notice::Faltan secretos de Vercel (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID). Se omite la vista previa. Ver docs/despliegue.md."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.enabled == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - if: steps.gate.outputs.enabled == 'true'
+        run: npm ci
+      - if: steps.gate.outputs.enabled == 'true'
+        run: npm i -g "vercel@${VERCEL_CLI_VERSION}"
+      - name: Descargar configuración del proyecto
+        if: steps.gate.outputs.enabled == 'true'
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+      - name: Build
+        if: steps.gate.outputs.enabled == 'true'
+        run: vercel build --token="$VERCEL_TOKEN"
+      - name: Desplegar vista previa
+        id: deploy
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -n 1)
+          echo "URL: $url"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Comentar la URL en el PR
+        if: steps.gate.outputs.enabled == 'true'
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+        with:
+          script: |
+            const marker = '<!-- vercel-preview -->';
+            const body = `${marker}\nVista previa: ${process.env.PREVIEW_URL}\n\nCommit: ${context.sha.slice(0, 7)}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const previous = comments.find((c) => c.body && c.body.startsWith(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+  production:
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    concurrency:
+      group: cd-production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+    steps:
+      - name: Comprobar secretos de Vercel
+        id: gate
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::notice::Faltan secretos de Vercel (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID). Se omite el despliegue a producción. Ver docs/despliegue.md."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.enabled == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - if: steps.gate.outputs.enabled == 'true'
+        run: npm ci
+      - if: steps.gate.outputs.enabled == 'true'
+        run: npm i -g "vercel@${VERCEL_CLI_VERSION}"
+      - name: Descargar configuración del proyecto
+        if: steps.gate.outputs.enabled == 'true'
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Build
+        if: steps.gate.outputs.enabled == 'true'
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Desplegar a producción
+        id: deploy
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" | tail -n 1)
+          echo "URL: $url"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Smoke test de cabeceras
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          target="${PRODUCTION_URL:-$DEPLOY_URL}"
+          mkdir -p smoke
+          echo "Objetivo: $target" | tee smoke/headers.txt
+          curl -fsSI "$target" | tee -a smoke/headers.txt
+          missing=0
+          for h in content-security-policy strict-transport-security x-frame-options x-content-type-options; do
+            if grep -qi "^$h:" smoke/headers.txt; then
+              echo "OK $h" | tee -a smoke/result.txt
+            else
+              echo "FALTA $h" | tee -a smoke/result.txt
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.gate.outputs.enabled == 'true'
+        with:
+          name: smoke-cabeceras
+          path: smoke
+          if-no-files-found: warn

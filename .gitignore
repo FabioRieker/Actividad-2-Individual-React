@@ -35,3 +35,6 @@ yarn-debug.log*
 .nx/
 .eslintcache
 *.tsbuildinfo
+
+# vercel (enlace local con orgId/projectId)
+.vercel/
