@@ -1,0 +1,13 @@
+
+> logitrack-express@0.0.1 test
+> vitest run
+
+
+ RUN  v5.1.2 .
+
+
+ Test Files  4 passed (4)
+      Tests  22 passed (22)
+   Start at  15:12:21
+   Duration  2.17s (tests 39%, environment 37%, import 9%, transform 9%, setup 5%)
+

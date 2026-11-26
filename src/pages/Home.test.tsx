@@ -92,9 +92,11 @@ describe('Home', () => {
 
   test('las opciones deslizables cambian el estado', () => {
     render(<Home />);
-    fireEvent.click(screen.getAllByText('Rechazar')[0]);
+    const item = screen.getByRole('heading', { name: 'LTK-0001-ES' }).closest('ion-item-sliding');
+    if (!(item instanceof HTMLElement)) throw new Error('No se encontró el elemento deslizable');
+    fireEvent.click(within(item).getByText('Rechazar'));
     expect(kpiValue('Rechazados')).toBe('3');
-    fireEvent.click(screen.getAllByText('Inspeccionar')[0]);
+    fireEvent.click(within(item).getByText('Inspeccionar'));
     expect(kpiValue('Inspeccionados')).toBe('4');
   });
 });
