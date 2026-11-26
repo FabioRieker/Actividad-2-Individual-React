@@ -1,0 +1,305 @@
+diff --git a/package.json b/package.json
+index 5edbf0d..2499864 100644
+--- a/package.json
++++ b/package.json
+@@ -27,7 +27,8 @@
+     "react": "19.0.0",
+     "react-dom": "19.0.0",
+     "react-router": "5.3.4",
+-    "react-router-dom": "5.3.4"
++    "react-router-dom": "5.3.4",
++    "rxjs": "7.8.2"
+   },
+   "devDependencies": {
+     "@capacitor/cli": "8.6.3",
+diff --git a/src/hooks/useDebouncedSearchTerm.test.ts b/src/hooks/useDebouncedSearchTerm.test.ts
+new file mode 100644
+index 0000000..b2233f2
+--- /dev/null
++++ b/src/hooks/useDebouncedSearchTerm.test.ts
+@@ -0,0 +1,100 @@
++import { act, renderHook } from '@testing-library/react';
++import { StrictMode } from 'react';
++import { Subject } from 'rxjs';
++import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
++
++import { useDebouncedSearchTerm } from './useDebouncedSearchTerm';
++
++function advance(ms: number): void {
++  act(() => {
++    vi.advanceTimersByTime(ms);
++  });
++}
++
++/** Cuenta los Subject suscritos con `observed` activo entre los receptores de `subscribe`. */
++function subjectsObserved(contexts: readonly unknown[]): number {
++  const subjects = new Set<Subject<unknown>>();
++  for (const context of contexts) {
++    if (context instanceof Subject) subjects.add(context);
++  }
++  return [...subjects].filter((subject) => subject.observed).length;
++}
++
++describe('useDebouncedSearchTerm', () => {
++  beforeEach(() => {
++    vi.useFakeTimers();
++  });
++
++  afterEach(() => {
++    vi.useRealTimers();
++    vi.restoreAllMocks();
++  });
++
++  test('empieza con el término vacío', () => {
++    const { result } = renderHook(() => useDebouncedSearchTerm());
++    expect(result.current[0]).toBe('');
++  });
++
++  test('no emite antes de 300 ms', () => {
++    const { result } = renderHook(() => useDebouncedSearchTerm());
++    act(() => result.current[1]('Madrid'));
++    advance(299);
++    expect(result.current[0]).toBe('');
++  });
++
++  test('emite el término normalizado tras 300 ms', () => {
++    const { result } = renderHook(() => useDebouncedSearchTerm());
++    act(() => result.current[1]('  MaDrid '));
++    advance(300);
++    expect(result.current[0]).toBe('madrid');
++  });
++
++  test('solo emite el último valor de una ráfaga de pulsaciones', () => {
++    const { result } = renderHook(() => useDebouncedSearchTerm());
++    act(() => result.current[1]('m'));
++    advance(200);
++    act(() => result.current[1]('ma'));
++    advance(200);
++    expect(result.current[0]).toBe('');
++    advance(100);
++    expect(result.current[0]).toBe('ma');
++  });
++
++  test('distinctUntilChanged evita reemitir un término repetido', () => {
++    let renders = 0;
++    const { result } = renderHook(() => {
++      renders += 1;
++      return useDebouncedSearchTerm();
++    });
++    act(() => result.current[1]('bilbao'));
++    advance(300);
++    const afterFirst = renders;
++    act(() => result.current[1]('Bilbao '));
++    advance(300);
++    expect(result.current[0]).toBe('bilbao');
++    expect(renders).toBe(afterFirst);
++  });
++
++  test('tras desmontar no quedan suscripciones vivas al Subject', () => {
++    const spy = vi.spyOn(Subject.prototype, 'subscribe');
++    const { unmount } = renderHook(() => useDebouncedSearchTerm());
++    expect(subjectsObserved(spy.mock.contexts)).toBe(1);
++    unmount();
++    expect(subjectsObserved(spy.mock.contexts)).toBe(0);
++  });
++
++  test('en StrictMode queda una única suscripción viva y 0 tras desmontar', () => {
++    const spy = vi.spyOn(Subject.prototype, 'subscribe');
++    const { unmount } = renderHook(() => useDebouncedSearchTerm(), { wrapper: StrictMode });
++    expect(subjectsObserved(spy.mock.contexts)).toBe(1);
++    unmount();
++    expect(subjectsObserved(spy.mock.contexts)).toBe(0);
++  });
++
++  test('funciona en StrictMode sin duplicar la emisión', () => {
++    const { result } = renderHook(() => useDebouncedSearchTerm(), { wrapper: StrictMode });
++    act(() => result.current[1]('Valencia'));
++    advance(300);
++    expect(result.current[0]).toBe('valencia');
++  });
++});
+diff --git a/src/hooks/useDebouncedSearchTerm.ts b/src/hooks/useDebouncedSearchTerm.ts
+new file mode 100644
+index 0000000..3cf1546
+--- /dev/null
++++ b/src/hooks/useDebouncedSearchTerm.ts
+@@ -0,0 +1,33 @@
++import { useCallback, useEffect, useState } from 'react';
++import { Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
++
++/** Espera, en milisegundos, antes de aplicar el texto escrito en la búsqueda. */
++export const SEARCH_DEBOUNCE_MS = 300;
++
++/**
++ * Convierte el texto escrito en un término de búsqueda normalizado (sin espacios
++ * en los extremos y en minúsculas) que solo cambia cuando el usuario deja de
++ * teclear durante `delayMs` y el valor es distinto del anterior.
++ *
++ * La suscripción se crea en el efecto y se cancela en su limpieza, por lo que
++ * sobrevive al doble montaje de StrictMode sin dejar suscripciones vivas.
++ */
++export function useDebouncedSearchTerm(delayMs: number = SEARCH_DEBOUNCE_MS): readonly [string, (raw: string) => void] {
++  const [input$] = useState(() => new Subject<string>());
++  const [term, setTerm] = useState('');
++
++  useEffect(() => {
++    const subscription = input$
++      .pipe(
++        map((raw) => raw.trim().toLowerCase()),
++        debounceTime(delayMs),
++        distinctUntilChanged(),
++      )
++      .subscribe(setTerm);
++    return () => subscription.unsubscribe();
++  }, [input$, delayMs]);
++
++  const setInput = useCallback((raw: string): void => input$.next(raw), [input$]);
++
++  return [term, setInput];
++}
+diff --git a/src/pages/Home.test.tsx b/src/pages/Home.test.tsx
+index 9985300..b4efee7 100644
+--- a/src/pages/Home.test.tsx
++++ b/src/pages/Home.test.tsx
+@@ -1,5 +1,5 @@
+ import { act, fireEvent, render, screen, within } from '@testing-library/react';
+-import { beforeEach, describe, expect, test } from 'vitest';
++import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+ 
+ import { resetStore } from '../services/packageStore';
+ 
+@@ -13,13 +13,20 @@ function kpiValue(label: string): string | null {
+   return item?.querySelector('.lt-kpi__value')?.textContent ?? null;
+ }
+ 
+-function typeInSearch(value: string): void {
++function typeWithoutWaiting(value: string): void {
+   const searchbar = screen.getByPlaceholderText('Buscar código o destino');
+   act(() => {
+     fireEvent(searchbar, new CustomEvent('ionInput', { detail: { value }, bubbles: true }));
+   });
+ }
+ 
++function typeInSearch(value: string): void {
++  typeWithoutWaiting(value);
++  act(() => {
++    vi.advanceTimersByTime(300);
++  });
++}
++
+ function selectPriority(value: string): void {
+   const segment = screen.getByLabelText('Filtrar por prioridad');
+   act(() => {
+@@ -29,9 +36,14 @@ function selectPriority(value: string): void {
+ 
+ describe('Home', () => {
+   beforeEach(() => {
++    vi.useFakeTimers();
+     resetStore();
+   });
+ 
++  afterEach(() => {
++    vi.useRealTimers();
++  });
++
+   test('muestra los 8 paquetes y los indicadores iniciales', () => {
+     render(<Home />);
+     expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+@@ -53,6 +65,25 @@ describe('Home', () => {
+     expect(screen.getAllByRole('article')).toHaveLength(1);
+   });
+ 
++  test('la búsqueda se aplica tras 300 ms sin teclear y la UI conserva el texto', () => {
++    render(<Home />);
++    typeWithoutWaiting('bilbao');
++    act(() => {
++      vi.advanceTimersByTime(299);
++    });
++    expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
++    act(() => {
++      vi.advanceTimersByTime(1);
++    });
++    expect(screen.getByText('1 paquete mostrado')).toBeInTheDocument();
++  });
++
++  test('el contenedor de búsqueda expone role search', () => {
++    render(<Home />);
++    expect(screen.getByRole('search')).toContainElement(screen.getByPlaceholderText('Buscar código o destino'));
++    expect(screen.getByRole('status')).toHaveTextContent('8 paquetes mostrados');
++  });
++
+   test('el filtro de prioridad restringe la lista', () => {
+     render(<Home />);
+     selectPriority('CRITICAL');
+@@ -76,6 +107,9 @@ describe('Home', () => {
+     expect(screen.getByText('0 paquetes mostrados')).toBeInTheDocument();
+     expect(screen.getByText('Sin paquetes')).toBeInTheDocument();
+     fireEvent.click(screen.getByText('Limpiar filtros'));
++    act(() => {
++      vi.advanceTimersByTime(300);
++    });
+     expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
+     expect(screen.queryByText('Sin paquetes')).not.toBeInTheDocument();
+   });
+diff --git a/src/pages/Home.tsx b/src/pages/Home.tsx
+index f3cdadd..fcd975c 100644
+--- a/src/pages/Home.tsx
++++ b/src/pages/Home.tsx
+@@ -20,6 +20,7 @@ import { checkmarkCircleOutline, closeCircleOutline, cubeOutline, fileTrayOutlin
+ import { useCallback, useMemo, useState } from 'react';
+ 
+ import { PackageCard } from '../components/PackageCard';
++import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
+ import type { PriorityFilter, StatusChangeEvent } from '../models/package.model';
+ import { updateStatus, usePackages } from '../services/packageStore';
+ import './Home.css';
+@@ -38,16 +39,16 @@ function isPriorityFilter(value: unknown): value is PriorityFilter {
+ const Home: React.FC = () => {
+   const packages = usePackages();
+   const [query, setQuery] = useState('');
++  const [term, setSearchInput] = useDebouncedSearchTerm();
+   const [priority, setPriority] = useState<PriorityFilter>('ALL');
+ 
+   const visible = useMemo(() => {
+-    const term = query.trim().toLowerCase();
+     return packages.filter(
+       (p) =>
+         (priority === 'ALL' || p.priority === priority) &&
+         (term === '' || p.trackingCode.toLowerCase().includes(term) || p.destinationHub.toLowerCase().includes(term)),
+     );
+-  }, [packages, query, priority]);
++  }, [packages, term, priority]);
+ 
+   const kpis = useMemo(
+     () => ({
+@@ -60,8 +61,9 @@ const Home: React.FC = () => {
+ 
+   const clearFilters = useCallback((): void => {
+     setQuery('');
++    setSearchInput('');
+     setPriority('ALL');
+-  }, []);
++  }, [setSearchInput]);
+ 
+   const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
+     updateStatus(e.id, e.newStatus);
+@@ -107,12 +109,17 @@ const Home: React.FC = () => {
+       </IonHeader>
+       <IonContent fullscreen className="lt-content">
+         <div className="lt-controls">
+-          <div className="lt-controls__inner">
++          <div className="lt-controls__inner" role="search">
+             <IonSearchbar
++              debounce={0}
+               aria-label="Buscar paquete por código o destino"
+               placeholder="Buscar código o destino"
+               value={query}
+-              onIonInput={(e) => setQuery(e.detail.value ?? '')}
++              onIonInput={(e) => {
++                const value = e.detail.value ?? '';
++                setQuery(value);
++                setSearchInput(value);
++              }}
+             />
+             <IonSegment
+               aria-label="Filtrar por prioridad"
