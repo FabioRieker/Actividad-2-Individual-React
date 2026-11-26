@@ -143,9 +143,7 @@ const Home: React.FC = () => {
               <path d="M7.8 11.6 16 16l8.2-4.4M16 16v9" />
             </svg>
             <div className="lt-brand__text">
-              <p className="lt-brand__name">
-                LogiTrack <span>Express</span>
-              </p>
+              <p className="lt-brand__name">LogiTrack Express</p>
               <p className="lt-brand__tag">Recepción, inspección y clasificación de paquetes.</p>
             </div>
           </header>

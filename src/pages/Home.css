@@ -54,10 +54,6 @@
   letter-spacing: -0.02em;
   color: var(--lt-text);
 }
-.lt-brand__name span {
-  font-weight: 400;
-  color: var(--lt-text-muted);
-}
 .lt-brand__tag {
   margin: 2px 0 0;
   font-size: 0.8125rem;
