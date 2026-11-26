@@ -133,7 +133,7 @@ const Home: React.FC = () => {
         <main className="lt-main">
           <h1 className="lt-sr-only">Listado de paquetes</h1>
           <p className="lt-result-count" role="status" aria-live="polite">
-            {visible.length} paquetes mostrados
+            {visible.length === 1 ? '1 paquete mostrado' : `${visible.length} paquetes mostrados`}
           </p>
           {visible.length === 0 ? (
             <div className="lt-empty">

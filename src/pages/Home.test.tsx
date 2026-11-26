@@ -46,7 +46,7 @@ describe('Home', () => {
   test('la búsqueda filtra por código o destino sin distinguir mayúsculas', () => {
     render(<Home />);
     typeInSearch('bilbao');
-    expect(screen.getByText('1 paquetes mostrados')).toBeInTheDocument();
+    expect(screen.getByText('1 paquete mostrado')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'LTK-0005-ES' })).toBeInTheDocument();
     typeInSearch('ltk-0002');
     expect(screen.getByRole('heading', { name: 'LTK-0002-ES' })).toBeInTheDocument();

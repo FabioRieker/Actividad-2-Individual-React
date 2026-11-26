@@ -1,11 +1,14 @@
-// Captura de evidencia: arranca vite, abre la app con emulación Pixel 7 y guarda un PNG.
+// Captura de evidencia: arranca vite, abre la app con un dispositivo emulado y guarda un PNG.
+// Uso: node scripts/capture.mjs [ruta-salida.png] [dispositivo]  (por defecto Pixel 7)
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
+import { dirname } from 'node:path';
 import { chromium, devices } from '@playwright/test';
 
 const PORT = 5173;
 const URL = `http://localhost:${PORT}/`;
-const OUT = 'evidence/tarea1/ionic-serve.png';
+const OUT = process.argv[2] ?? 'evidence/tarea1/ionic-serve.png';
+const DEVICE = process.argv[3] ?? 'Pixel 7';
 
 async function waitFor(url, timeoutMs) {
   const deadline = Date.now() + timeoutMs;
@@ -24,9 +27,11 @@ async function waitFor(url, timeoutMs) {
 const server = spawn('npx', ['vite', '--port', String(PORT), '--strictPort'], { stdio: 'inherit' });
 try {
   await waitFor(URL, 60_000);
-  await mkdir('evidence/tarea1', { recursive: true });
+  await mkdir(dirname(OUT), { recursive: true });
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
-  const context = await browser.newContext({ ...devices['Pixel 7'] });
+  const descriptor = devices[DEVICE];
+  if (!descriptor) throw new Error(`Dispositivo desconocido: ${DEVICE}`);
+  const context = await browser.newContext({ ...descriptor });
   const page = await context.newPage();
   await page.goto(URL);
   await page.getByText('Recepción, inspección y clasificación de paquetes.').waitFor();
