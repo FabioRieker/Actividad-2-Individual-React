@@ -1,0 +1,28 @@
+
+== Tema light a 320 px ==
+  datos: {"placeholderColor":"rgb(74, 83, 101)","placeholderOpacity":"1","background":"#e6e9ef","ratio":6.36,"searchbarWidth":288,"segmentWidth":288,"segmentScrollWidth":286,"docScrollWidth":320,"viewport":320,"inputAriaLabel":"Buscar código o destino","inputName":null,"listItems":8,"nestedListItems":0,"slidingWithRole":0}
+  [OK] searchbar dentro del viewport: 288 <= 320
+  [OK] segment dentro del viewport: 288 <= 320
+  [OK] sin desbordamiento horizontal: 320 <= 320
+  [OK] contraste del placeholder >= 4.5: 6.36:1 (rgb(74, 83, 101), opacidad 1)
+  [OK] aria-label del input en español: "Buscar código o destino"
+  [OK] listitem sin anidar: 8 items, 0 anidados, 0 sliding con role
+  botón objetivo: "Marcar LTK-0001-ES como inspeccionado"
+  [OK] foco conservado en el botón: {"tag":"ION-BUTTON","label":"Marcar LTK-0001-ES como inspeccionado","ariaDisabled":"true","nativeDisabled":false}
+  [OK] botón con aria-disabled (sin disabled nativo): aria-disabled=true, disabled=false
+  [OK] anuncio en la región de estado: "LTK-0001-ES marcado como inspeccionado"
+
+== Tema dark a 320 px ==
+  datos: {"placeholderColor":"rgb(180, 188, 203)","placeholderOpacity":"1","background":"#2b303c","ratio":6.91,"searchbarWidth":288,"segmentWidth":288,"segmentScrollWidth":286,"docScrollWidth":320,"viewport":320,"inputAriaLabel":"Buscar código o destino","inputName":null,"listItems":8,"nestedListItems":0,"slidingWithRole":0}
+  [OK] searchbar dentro del viewport: 288 <= 320
+  [OK] segment dentro del viewport: 288 <= 320
+  [OK] sin desbordamiento horizontal: 320 <= 320
+  [OK] contraste del placeholder >= 4.5: 6.91:1 (rgb(180, 188, 203), opacidad 1)
+  [OK] aria-label del input en español: "Buscar código o destino"
+  [OK] listitem sin anidar: 8 items, 0 anidados, 0 sliding con role
+  botón objetivo: "Marcar LTK-0001-ES como inspeccionado"
+  [OK] foco conservado en el botón: {"tag":"ION-BUTTON","label":"Marcar LTK-0001-ES como inspeccionado","ariaDisabled":"true","nativeDisabled":false}
+  [OK] botón con aria-disabled (sin disabled nativo): aria-disabled=true, disabled=false
+  [OK] anuncio en la región de estado: "LTK-0001-ES marcado como inspeccionado"
+
+Resultado: todas las comprobaciones correctas
