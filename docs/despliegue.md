@@ -143,6 +143,44 @@ Definidas en `vercel.json` y `nginx/security-headers.conf` (mantener sincronizad
 - `docker`: construye la imagen, la sirve con nginx y comprueba respuesta, cabecera `nosniff` y fallback SPA.
 - `aws-emulator-smoke`: descarga el `.deb`, registra su sha256 (el proveedor no publica uno oficial), lo instala con `sudo apt-get`, arranca el emulador en segundo plano, espera el health, y construye el `dist/` real (`npm ci` y `npm run build`), ejecuta dos veces el script y comprueba Count 8. Sube el log del emulador como artefacto `aws-emulator-logs`.
 
+## Despliegue continuo (CD)
+
+`.github/workflows/cd.yml` despliega con la CLI de Vercel fijada en la versión 67.0.0. `ci.yml` es reutilizable (`workflow_call`) sin perder sus disparadores.
+
+```mermaid
+flowchart TD
+    PR[Pull request a develop o main] --> CI[ci.yml: lint, typecheck, build, test, Lighthouse]
+    PR --> PV[job preview: pull, build, deploy]
+    PV --> CM[Comentario con la URL en el PR]
+    M[Merge o push a main] --> CH[job checks: reutiliza ci.yml]
+    CH --> PROD[job production: pull, build --prod, deploy --prod]
+    PROD --> SM[Smoke test: curl -fsSI y 4 cabeceras]
+    SM --> ART[Artefacto smoke-cabeceras]
+```
+
+Comportamiento:
+
+- Si falta algún secreto (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`), los jobs `preview` y `production` emiten un `::notice::` y omiten sus pasos sin fallar, de modo que los PR no se rompen hasta configurarlos.
+- `preview`: `pull-requests: write` solo en ese job; la concurrencia cancela la ejecución anterior del mismo PR.
+- `production`: `environment: production` con la URL desplegada; no cancela despliegues en curso. El smoke test falla si falta `content-security-policy`, `strict-transport-security`, `x-frame-options` o `x-content-type-options`.
+- Las URL `*.vercel.app` de despliegue pueden estar tras la protección de despliegues de Vercel y responder 401 sin esas cabeceras. Si ocurre, define la variable de repositorio `PRODUCTION_URL` con el dominio público de producción (el smoke test la usa en lugar de la URL del despliegue) o desactiva la protección para producción.
+- Evitar duplicados: en Vercel, proyecto, Settings, Git, desactivar el despliegue automático (por ejemplo con "Ignored Build Step" en `exit 0`, o desconectando el repositorio). Alternativa: mantener la integración Git para las vistas previas y dejar este workflow solo para producción, eliminando el job `preview`.
+
+Pasos para el alumno (el `.vercel/` está en `.gitignore` y no se versiona):
+
+1. Crear un token en https://vercel.com/account/tokens.
+2. `npx vercel login` y `npx vercel link` en la raíz; leer `orgId` y `projectId` de `.vercel/project.json`.
+3. Registrar los secretos:
+
+```bash
+gh secret set VERCEL_TOKEN -R FabioRieker/Actividad-2-Individual-React
+gh secret set VERCEL_ORG_ID -R FabioRieker/Actividad-2-Individual-React
+gh secret set VERCEL_PROJECT_ID -R FabioRieker/Actividad-2-Individual-React
+```
+
+4. Crear en GitHub el entorno `production` (Settings, Environments), opcionalmente con revisores requeridos.
+5. Abrir un PR para ver la vista previa y fusionar a `main` para producción.
+
 ## Verificación realizada (evidence/fase-f/)
 
 - `docker-compose-config.log`: salida de `docker compose config` (exit 0).
@@ -157,3 +195,4 @@ Definidas en `vercel.json` y `nginx/security-headers.conf` (mantener sincronizad
 - Ejecución del workflow en GitHub (el job `aws-emulator-smoke` ahora construye el `dist/` real con `npm ci` y `npm run build`).
 - `shellcheck` no está instalado en la máquina: `sudo apt-get install -y shellcheck && shellcheck scripts/deploy-aws-emulator.sh`.
 - Despliegue en Vercel (pasos en la sección Vercel): no ejecutado, lo hace el alumno.
+- CD a Vercel: configurar los secretos y el entorno `production` (sección Despliegue continuo); el workflow `cd.yml` no se ha ejecutado.
