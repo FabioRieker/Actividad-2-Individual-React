@@ -107,7 +107,18 @@
   max-width: var(--lt-content-max);
   margin-inline: auto;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--lt-space-2);
+}
+.lt-controls ion-searchbar,
+.lt-controls ion-segment {
+  min-width: 0;
+  max-width: 100%;
+}
+.lt-controls ion-segment-button {
+  min-width: 0;
+  --padding-start: var(--lt-space-1);
+  --padding-end: var(--lt-space-1);
 }
 .lt-controls ion-searchbar {
   padding: 0;
