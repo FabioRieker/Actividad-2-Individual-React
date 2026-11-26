@@ -82,14 +82,17 @@ ion-button.ion-focused {
 ion-searchbar {
   --background: var(--lt-surface-3);
   --color: var(--lt-text);
-  --placeholder-color: var(--lt-text-muted);
-  --placeholder-opacity: 1;
   --icon-color: var(--lt-text-muted);
   --clear-button-color: var(--lt-text);
   --border-radius: var(--lt-radius-md);
   --box-shadow: inset 0 0 0 1px var(--lt-border-control); /* borde 3:1 */
   --cancel-button-color: var(--lt-text);
   min-height: var(--lt-touch-min);
+}
+/* Mayor especificidad que el valor por defecto del host (.sc-ion-searchbar-md-h) */
+ion-searchbar.hydrated {
+  --placeholder-color: var(--lt-text-muted);
+  --placeholder-opacity: 1;
 }
 ion-searchbar.ion-focused {
   --box-shadow: inset 0 0 0 2px var(--lt-focus);
