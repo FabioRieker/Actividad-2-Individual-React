@@ -78,11 +78,15 @@ jobs:
           done
           echo "el emulador no arrancó"; cat "$RUNNER_TEMP/emulator.log"; exit 1
 
-      - name: Crear un dist/ mínimo de prueba
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Construir dist/ real
         run: |
-          mkdir -p dist/assets
-          echo '<!doctype html><title>smoke</title><div id="root"></div>' > dist/index.html
-          echo 'console.log("smoke")' > dist/assets/app.js
+          npm ci --ignore-scripts
+          npm run build
 
       - name: Ejecutar el script de despliegue
         run: bash scripts/deploy-aws-emulator.sh

@@ -2,7 +2,7 @@ name: fase-f
 services:
   web:
     build:
-      context: /home/elseto/DAM2/interfaces/ActividadInd2/wt-react/fase-f
+      context: .
       dockerfile: Dockerfile
     healthcheck:
       test:
