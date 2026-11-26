@@ -1,0 +1,227 @@
+/* Home.css - cabecera, KPIs, controles fijos, rejilla y estado vacio */
+
+/* ---------- Cabecera ---------- */
+.lt-header ion-toolbar {
+  --background: var(--lt-surface-1);
+  --color: var(--lt-text);
+  --border-width: 0;
+}
+.lt-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--lt-space-3);
+  padding: var(--lt-space-2) var(--lt-space-4);
+  max-width: var(--lt-content-max);
+  margin-inline: auto;
+}
+.lt-brand__mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  background: var(--lt-accent);
+  color: var(--lt-on-accent);
+  border-radius: var(--lt-radius-md);
+  font-size: 26px;
+}
+.lt-brand__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.lt-brand__name span {
+  color: var(--lt-accent);
+}
+.lt-brand__tag {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--lt-text-muted);
+}
+
+/* ---------- Franja de KPIs ---------- */
+.lt-kpis {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--lt-space-4) var(--lt-space-3);
+  max-width: var(--lt-content-max);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--lt-space-2);
+  background: var(--lt-surface-1);
+}
+.lt-kpi {
+  --kpi-color: var(--lt-text);
+  background: var(--lt-surface-3);
+  border-radius: var(--lt-radius-md);
+  border-top: 4px solid var(--kpi-color);
+  padding: var(--lt-space-2) var(--lt-space-3);
+  min-height: 64px;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+}
+.lt-kpi__value {
+  font-family: var(--lt-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--kpi-color);
+}
+.lt-kpi__label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--lt-text-muted);
+}
+.lt-kpi__label ion-icon {
+  font-size: 16px;
+  color: var(--kpi-color);
+}
+.lt-kpi--transit {
+  --kpi-color: var(--lt-status-transit);
+}
+.lt-kpi--inspected {
+  --kpi-color: var(--lt-status-inspected);
+}
+.lt-kpi--rejected {
+  --kpi-color: var(--lt-status-rejected);
+}
+
+/* ---------- Controles fijos (busqueda + prioridad) ---------- */
+.lt-controls {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--lt-surface-1);
+  border-bottom: 1px solid var(--lt-border);
+  padding: var(--lt-space-2) var(--lt-space-4) var(--lt-space-3);
+}
+.lt-controls__inner {
+  max-width: var(--lt-content-max);
+  margin-inline: auto;
+  display: grid;
+  gap: var(--lt-space-2);
+}
+.lt-controls ion-searchbar {
+  padding: 0;
+}
+
+/* ---------- Contenido y rejilla ---------- */
+.lt-content {
+  --background: var(--lt-bg);
+}
+.lt-main {
+  max-width: var(--lt-content-max);
+  margin-inline: auto;
+  padding: var(--lt-space-4);
+  padding-bottom: calc(var(--lt-space-6) + env(safe-area-inset-bottom));
+}
+.lt-result-count {
+  margin: 0 0 var(--lt-space-3);
+  color: var(--lt-text-muted);
+  font-size: 0.9375rem;
+}
+
+.lt-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--lt-space-4);
+}
+@media (min-width: 768px) {
+  .lt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--lt-space-5);
+  }
+  .lt-main,
+  .lt-controls,
+  .lt-kpis {
+    padding-inline: var(--lt-space-5);
+  }
+}
+
+/* ---------- Estado vacio ---------- */
+.lt-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--lt-space-3);
+  text-align: center;
+  padding: var(--lt-space-6) var(--lt-space-4);
+  border: 2px dashed var(--lt-border-control);
+  border-radius: var(--lt-radius-lg);
+  color: var(--lt-text-muted);
+}
+.lt-empty ion-icon {
+  font-size: 56px;
+  color: var(--ion-color-medium);
+}
+.lt-empty__title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--lt-text);
+}
+.lt-empty__text {
+  margin: 0;
+  max-width: 36ch;
+}
+
+/* ---------- Ajustes de la implementacion ---------- */
+.lt-brand__tag {
+  margin: 0;
+  padding: 0 var(--lt-space-4) var(--lt-space-2);
+  max-width: var(--lt-content-max);
+  margin-inline: auto;
+  background: var(--lt-surface-1);
+}
+.lt-kpis {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 480px) {
+  .lt-kpis {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.lt-kpi--total {
+  --kpi-color: var(--lt-text);
+}
+.lt-header ion-toolbar {
+  --min-height: 48px;
+}
+
+/* Cada paquete es un elemento deslizable sin cromo propio */
+.lt-grid {
+  background: transparent;
+  padding: 0;
+}
+.lt-grid ion-item-sliding {
+  overflow: visible;
+}
+.lt-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  --inner-border-width: 0;
+}
+.lt-item .lt-card {
+  width: 100%;
+}
+.lt-option-inspect {
+  --background: var(--lt-action-ok-bg);
+  --color: var(--lt-action-ok-fg);
+  font-weight: 700;
+}
+.lt-option-reject {
+  --background: var(--lt-surface-3);
+  --color: var(--lt-action-ko-fg);
+  font-weight: 700;
+}
