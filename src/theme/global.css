@@ -9,13 +9,19 @@ html {
 }
 
 body {
-  font-size: 1rem;            /* 16 px base, respeta zoom del usuario */
+  font-size: 1rem; /* 16 px base, respeta zoom del usuario */
   line-height: 1.5;
   letter-spacing: 0.005em;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; font-weight: 700; }
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
 
 .lt-mono {
   font-family: var(--lt-font-mono);
@@ -24,8 +30,15 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; font-weight: 700; }
 
 /* Texto solo para lectores de pantalla */
 .lt-sr-only {
-  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -57,8 +70,13 @@ ion-searchbar::part(native):focus-visible {
 }
 
 /* Evita el halo difuso de Ionic: el anillo solido ya lo sustituye */
-ion-button { --box-shadow: none; }
-ion-button.ion-focused { --background-focused: transparent; --background-focused-opacity: 0; }
+ion-button {
+  --box-shadow: none;
+}
+ion-button.ion-focused {
+  --background-focused: transparent;
+  --background-focused-opacity: 0;
+}
 
 /* Searchbar: el input recibe el foco, se resalta el contenedor */
 ion-searchbar {
@@ -73,7 +91,9 @@ ion-searchbar {
   --cancel-button-color: var(--lt-text);
   min-height: var(--lt-touch-min);
 }
-ion-searchbar.ion-focused { --box-shadow: inset 0 0 0 2px var(--lt-focus); }
+ion-searchbar.ion-focused {
+  --box-shadow: inset 0 0 0 2px var(--lt-focus);
+}
 
 /* --------------------------------------------------------------------------
    Tamanos tactiles minimos (uso con guantes): 48 px
@@ -91,7 +111,9 @@ ion-button {
   letter-spacing: 0.01em;
   text-transform: none;
 }
-ion-button[size="large"] { min-height: 56px; }
+ion-button[size='large'] {
+  min-height: 56px;
+}
 
 ion-segment-button {
   min-height: var(--lt-touch-min);
@@ -102,13 +124,19 @@ ion-segment-button {
   font-weight: 600;
   text-transform: none;
 }
-ion-segment { --background: var(--lt-surface-3); border: 1px solid var(--lt-border-control); border-radius: var(--lt-radius-md); }
+ion-segment {
+  --background: var(--lt-surface-3);
+  border: 1px solid var(--lt-border-control);
+  border-radius: var(--lt-radius-md);
+}
 
 /* --------------------------------------------------------------------------
    Movimiento reducido (WCAG 2.3.3 / preferencia del sistema)
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -118,5 +146,8 @@ ion-segment { --background: var(--lt-surface-3); border: 1px solid var(--lt-bord
 
 /* Alto contraste forzado de Windows / Android */
 @media (forced-colors: active) {
-  :focus-visible, .ion-focused { outline: 3px solid Highlight; }
+  :focus-visible,
+  .ion-focused {
+    outline: 3px solid Highlight;
+  }
 }

@@ -10,9 +10,8 @@
     "lint": "eslint --max-warnings 0 && prettier --check .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "prepare": "husky",
-    "deploy:local": "npm run build && docker compose up -d",
     "capture": "node scripts/capture.mjs",
     "lint:fix": "eslint --fix && prettier --write ."
   },
@@ -61,7 +60,7 @@
     "vitest": "^5.1.0"
   },
   "prettier": "@ionic/prettier-config",
-  "description": "An Ionic project",
+  "description": "Interfaz de recepción, inspección y clasificación de paquetes de LogiTrack Express",
   "engines": {
     "node": "24.21.0"
   }
