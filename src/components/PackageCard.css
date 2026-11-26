@@ -5,14 +5,18 @@
   container: lt-card / inline-size;
 }
 
-.lt-card {
+.lt-card.lt-glass {
   --lt-status-color: var(--lt-status-transit);
   --card-pad: clamp(1rem, 4.5cqi, 1.5rem);
-  position: relative;
   display: grid;
   gap: var(--lt-space-3);
   padding: var(--card-pad);
   color: var(--lt-text);
+  /* Senal de estado discreta: linea fina interior en el borde izquierdo */
+  box-shadow:
+    inset 3px 0 0 var(--lt-status-color),
+    inset 0 1px 0 var(--lt-glass-top),
+    var(--lt-glass-shadow);
 }
 .lt-card[data-status='transit'] {
   --lt-status-color: var(--lt-status-transit);
@@ -22,17 +26,6 @@
 }
 .lt-card[data-status='rejected'] {
   --lt-status-color: var(--lt-status-rejected);
-}
-
-/* Borde mas marcado al pasar el puntero: solo opacidad */
-.lt-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px var(--lt-glass-edge-hover);
-  opacity: 0;
-  pointer-events: none;
 }
 
 .lt-card__head {
@@ -55,18 +48,19 @@
   overflow-wrap: anywhere;
 }
 
-/* Datos: etiqueta a la izquierda, valor alineado en una segunda columna */
+/* Datos alineados: la columna de etiquetas mide lo que su texto mas largo (subgrid) */
 .lt-card__meta {
   display: grid;
-  gap: var(--lt-space-2);
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--lt-space-2) var(--lt-space-4);
   margin: 0;
   font-size: 0.9375rem;
 }
 .lt-card__meta > div {
   display: grid;
-  grid-template-columns: minmax(5.5rem, 28cqi) minmax(0, 1fr);
-  gap: var(--lt-space-3);
-  align-items: baseline;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
 }
 .lt-card__meta dt {
   color: var(--lt-text-muted);
@@ -78,13 +72,25 @@
   color: var(--lt-text);
   overflow-wrap: anywhere;
 }
-
-/* Badges: texto + punto; el estado nunca depende solo del color */
-.lt-card__tags {
+.lt-priority {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--lt-space-2);
+  align-items: center;
+  gap: 4px;
 }
+.lt-priority ion-icon {
+  flex: none;
+  font-size: 1rem;
+  align-self: center;
+}
+.lt-priority--high {
+  font-weight: 650;
+}
+.lt-priority--medium,
+.lt-priority--low {
+  color: var(--lt-text-muted);
+}
+
+/* Badge de estado: texto + punto; el estado nunca depende solo del color */
 .lt-badge {
   --badge-color: var(--lt-text-muted);
   display: inline-flex;
@@ -96,7 +102,7 @@
   color: var(--badge-color);
   border: 1px solid var(--lt-glass-edge);
   border-radius: var(--lt-radius-pill);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -116,17 +122,8 @@
 .lt-badge--status-rejected {
   --badge-color: var(--lt-status-rejected);
 }
-.lt-badge--priority-high {
-  --badge-color: var(--lt-priority-high);
-}
-.lt-badge--priority-medium {
-  --badge-color: var(--lt-priority-medium);
-}
-.lt-badge--priority-low {
-  --badge-color: var(--lt-priority-low);
-}
 
-/* Acciones: inspeccionar (tono del acento) y rechazar (neutra), ambas tonales */
+/* Acciones: cristal neutro, texto visible y color semantico solo en el icono */
 .lt-card__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -138,6 +135,14 @@
   --border-radius: var(--lt-radius-md);
   --padding-start: var(--lt-space-2);
   --padding-end: var(--lt-space-2);
+  --background: var(--lt-chip-bg);
+  --background-hover: var(--lt-chip-bg);
+  --background-activated: var(--lt-chip-bg);
+  --color: var(--lt-text);
+  --color-hover: var(--lt-text);
+  --border-color: var(--lt-glass-edge-hover);
+  --border-style: solid;
+  --border-width: 1px;
   min-height: 52px;
   margin: 0;
   font-size: 0.9375rem;
@@ -148,32 +153,17 @@
   font-size: 1.25rem;
   margin-inline-end: 6px;
 }
-.lt-btn-inspect {
-  --background: color-mix(in oklch, var(--lt-accent) 18%, transparent);
-  --background-hover: color-mix(in oklch, var(--lt-accent) 28%, transparent);
-  --background-activated: color-mix(in oklch, var(--lt-accent) 28%, transparent);
-  --color: var(--lt-accent);
-  --color-hover: var(--lt-accent);
-  --border-color: color-mix(in oklch, var(--lt-accent) 55%, transparent);
-  --border-style: solid;
-  --border-width: 1px;
+.lt-btn-inspect ion-icon {
+  color: var(--lt-status-inspected);
 }
-.lt-btn-reject {
-  --background: var(--lt-chip-bg);
-  --background-hover: var(--lt-chip-bg);
-  --background-activated: var(--lt-chip-bg);
-  --color: var(--lt-action-ko-fg);
-  --color-hover: var(--lt-action-ko-fg);
-  --border-color: var(--lt-glass-edge-hover);
-  --border-style: solid;
-  --border-width: 1px;
+.lt-btn-reject ion-icon {
+  color: var(--lt-status-rejected);
 }
-/* Deshabilitado (aria-disabled): claramente inactivo, sin borde de acento y con el foco intacto */
-.lt-btn-inspect[aria-disabled='true'],
-.lt-btn-reject[aria-disabled='true'] {
-  --background: var(--lt-chip-bg);
-  --background-hover: var(--lt-chip-bg);
-  --background-activated: var(--lt-chip-bg);
+
+/* Estado actual (aria-disabled en el boton nativo): claramente inactivo y con el foco intacto.
+   Ionic retira aria-disabled del host, por eso se marca con la clase is-inactive. */
+.lt-btn-inspect.is-inactive,
+.lt-btn-reject.is-inactive {
   --color: var(--lt-text-muted);
   --color-hover: var(--lt-text-muted);
   --border-color: var(--lt-glass-edge);
@@ -187,8 +177,7 @@
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
       'head actions'
-      'meta actions'
-      'tags actions';
+      'meta actions';
     column-gap: var(--lt-space-5);
     align-items: start;
   }
@@ -198,9 +187,6 @@
   }
   .lt-card__meta {
     grid-area: meta;
-  }
-  .lt-card__tags {
-    grid-area: tags;
   }
   .lt-card__actions {
     grid-area: actions;
@@ -217,33 +203,20 @@
   }
 }
 
-/* Hover y pulsacion: solo transform y opacity, <= 150 ms */
+/* Pulsacion y hover de los botones: solo transform y opacity, <= 150 ms. La tarjeta no es pulsable. */
 @media (prefers-reduced-motion: no-preference) {
-  .lt-card,
   .lt-btn-inspect,
   .lt-btn-reject {
     transition: transform var(--lt-dur) var(--lt-ease);
   }
-  .lt-card::after {
-    transition: opacity var(--lt-dur) var(--lt-ease);
-  }
 }
 @media (hover: hover) {
-  .lt-card:hover {
-    transform: translateY(-2px);
-  }
-  .lt-card:hover::after {
-    opacity: 1;
-  }
-  .lt-btn-inspect:not([aria-disabled='true']):hover,
-  .lt-btn-reject:not([aria-disabled='true']):hover {
+  .lt-btn-inspect:not(.is-inactive):hover,
+  .lt-btn-reject:not(.is-inactive):hover {
     transform: translateY(-1px);
   }
 }
-.lt-card:active:not(:has(ion-button:active)) {
-  transform: scale(0.992);
-}
-.lt-btn-inspect:not([aria-disabled='true']):active,
-.lt-btn-reject:not([aria-disabled='true']):active {
+.lt-btn-inspect:not(.is-inactive):active,
+.lt-btn-reject:not(.is-inactive):active {
   transform: scale(0.97);
 }

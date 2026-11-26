@@ -28,8 +28,9 @@ describe('PackageCard', () => {
     expect(screen.getByText('Madrid')).toBeInTheDocument();
     expect(screen.getByText('4,2 kg')).toBeInTheDocument();
     expect(screen.getByText('En tránsito')).toBeInTheDocument();
-    expect(screen.getByText('Prioridad alta')).toBeInTheDocument();
-    expect(screen.getByText(/15\/3\/26|15\/03\/26/)).toBeInTheDocument();
+    expect(screen.getByText('Prioridad')).toBeInTheDocument();
+    expect(screen.getByText('Alta')).toBeInTheDocument();
+    expect(screen.getByText(/15 mar/)).toBeInTheDocument();
   });
 
   test('aplica la clase CSS del estado', () => {

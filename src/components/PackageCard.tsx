@@ -1,5 +1,11 @@
 import { IonButton, IonIcon } from '@ionic/react';
-import { checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
+import {
+  arrowDownOutline,
+  arrowUpOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  removeOutline,
+} from 'ionicons/icons';
 import { memo, useEffect, useRef } from 'react';
 
 import type { PackagePriority, PackageStatus, StatusChangeEvent, WarehousePackage } from '../models/package.model';
@@ -21,14 +27,19 @@ const STATUS_INFO: Record<PackageStatus, BadgeInfo & { readonly dataStatus: stri
   REJECTED: { label: 'Rechazado', modifier: 'rejected', dataStatus: 'rejected' },
 };
 
-const PRIORITY_INFO: Record<PackagePriority, BadgeInfo> = {
-  CRITICAL: { label: 'Prioridad alta', modifier: 'high' },
-  STANDARD: { label: 'Prioridad media', modifier: 'medium' },
-  LOW: { label: 'Prioridad baja', modifier: 'low' },
+const PRIORITY_INFO: Record<PackagePriority, BadgeInfo & { readonly icon: string }> = {
+  CRITICAL: { label: 'Alta', modifier: 'high', icon: arrowUpOutline },
+  STANDARD: { label: 'Media', modifier: 'medium', icon: removeOutline },
+  LOW: { label: 'Baja', modifier: 'low', icon: arrowDownOutline },
 };
 
 const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
-const dateFormat = new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+const dateFormat = new Intl.DateTimeFormat('es-ES', {
+  day: 'numeric',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+});
 
 /**
  * ion-button copia los atributos aria-* al botón nativo solo al cargar y su render los restablece al cambiar
@@ -105,14 +116,18 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
               <time dateTime={pkg.timestamp.toISOString()}>{dateFormat.format(pkg.timestamp)}</time>
             </dd>
           </div>
+          <div>
+            <dt>Prioridad</dt>
+            <dd className={`lt-priority lt-priority--${priority.modifier}`}>
+              <IonIcon icon={priority.icon} aria-hidden="true" />
+              {priority.label}
+            </dd>
+          </div>
         </dl>
-        <div className="lt-card__tags">
-          <span className={`lt-badge lt-badge--priority-${priority.modifier}`}>{priority.label}</span>
-        </div>
         <div className="lt-card__actions">
           <IonButton
             ref={inspectRef}
-            className="lt-btn-inspect"
+            className={`lt-btn-inspect${inspected ? ' is-inactive' : ''}`}
             aria-label={`Inspeccionar ${pkg.trackingCode}`}
             aria-disabled={inspected ? 'true' : 'false'}
             onClick={() => emit('INSPECTED')}
@@ -122,7 +137,7 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
           </IonButton>
           <IonButton
             ref={rejectRef}
-            className="lt-btn-reject"
+            className={`lt-btn-reject${rejected ? ' is-inactive' : ''}`}
             fill="outline"
             aria-label={`Rechazar ${pkg.trackingCode}`}
             aria-disabled={rejected ? 'true' : 'false'}
