@@ -77,12 +77,12 @@ transforming...
 427 |  .ion-text-uppercase{text-transform:uppercase !important}.ion-text-lowercase{text-transform:lowercase !important}.ion-...
 rendering chunks...
 computing gzip size...
-dist/assets/p-du4WR5yd-legacy-ns6YM7Oe.js      0.49 kB │ gzip:   0.33 kB
-dist/assets/p-CRcc_AVn-legacy-DuBUwG5y.js      0.66 kB │ gzip:   0.45 kB
-dist/assets/p-LIYB2NaM-legacy-CLluJrrk.js      1.62 kB │ gzip:   0.81 kB
-dist/assets/p-DlwWvSZ--legacy-DQbUQR72.js      4.76 kB │ gzip:   2.06 kB
+dist/assets/p-du4WR5yd-legacy-DbjVm9SR.js      0.49 kB │ gzip:   0.33 kB
+dist/assets/p-CRcc_AVn-legacy-0laDVhUh.js      0.66 kB │ gzip:   0.45 kB
+dist/assets/p-LIYB2NaM-legacy-Csk2ngZ8.js      1.62 kB │ gzip:   0.81 kB
+dist/assets/p-DlwWvSZ--legacy-Sd6oK-08.js      4.76 kB │ gzip:   2.06 kB
 dist/assets/polyfills-legacy-D-iwYujv.js      74.80 kB │ gzip:  26.81 kB
-dist/assets/index-legacy-DIwV14lc.js       1,427.96 kB │ gzip: 319.39 kB
+dist/assets/index-legacy-BZTPw1QE.js       1,433.76 kB │ gzip: 321.34 kB
 
 [plugin builtin:vite-reporter] 
 (!) Some chunks are larger than 500 kB after minification. Consider:
@@ -165,22 +165,22 @@ rendering chunks...
 computing gzip size...
 dist/index.html                         2.32 kB │ gzip:   1.01 kB
 dist/assets/index-Df1D112b.css         69.56 kB │ gzip:  10.36 kB
-dist/assets/p-du4WR5yd-Du3nAOux.js      0.41 kB │ gzip:   0.29 kB
-dist/assets/p-CRcc_AVn-D47nQ_D-.js      0.57 kB │ gzip:   0.41 kB
-dist/assets/p-LIYB2NaM-DrJwtlHz.js      1.53 kB │ gzip:   0.77 kB
-dist/assets/p-DlwWvSZ--DDuERB6p.js      4.61 kB │ gzip:   1.99 kB
-dist/assets/index-D0qG7m2s.js       1,353.18 kB │ gzip: 305.74 kB
+dist/assets/p-du4WR5yd-3Qm6S532.js      0.41 kB │ gzip:   0.29 kB
+dist/assets/p-CRcc_AVn-3haU37oE.js      0.57 kB │ gzip:   0.41 kB
+dist/assets/p-LIYB2NaM-DdlBivzG.js      1.53 kB │ gzip:   0.77 kB
+dist/assets/p-DlwWvSZ--CEIRTZRb.js      4.61 kB │ gzip:   1.99 kB
+dist/assets/index-DLsD6aZy.js       1,358.89 kB │ gzip: 307.63 kB
 
 [plugin builtin:vite-reporter] 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 4.27s
-[PLUGIN_TIMINGS] JavaScript callbacks ran for 3.8s of the 4.3s build (89%).
+✓ built in 4.03s
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 3.5s of the 4.0s build (88%).
 
   total  %build  calls    avg   max  callback
-   3.7s     86%     10  368ms  3.6s  plugin vite:legacy-post-process · renderChunk
+   3.4s     85%     10  343ms  3.4s  plugin vite:legacy-post-process · renderChunk
 
 Learn more at https://rolldown.rs/reference/InputOptions.checks#bundlertimings
 

@@ -14,10 +14,10 @@ index 5edbf0d..2499864 100644
      "@capacitor/cli": "8.6.3",
 diff --git a/src/hooks/useDebouncedSearchTerm.test.ts b/src/hooks/useDebouncedSearchTerm.test.ts
 new file mode 100644
-index 0000000..b2233f2
+index 0000000..fee8561
 --- /dev/null
 +++ b/src/hooks/useDebouncedSearchTerm.test.ts
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,110 @@
 +import { act, renderHook } from '@testing-library/react';
 +import { StrictMode } from 'react';
 +import { Subject } from 'rxjs';
@@ -80,6 +80,16 @@ index 0000000..b2233f2
 +    expect(result.current[0]).toBe('ma');
 +  });
 +
++  test('el término vacío se aplica sin esperar el retardo', () => {
++    const { result } = renderHook(() => useDebouncedSearchTerm());
++    act(() => result.current[1]('madrid'));
++    advance(300);
++    expect(result.current[0]).toBe('madrid');
++    act(() => result.current[1]('   '));
++    advance(0);
++    expect(result.current[0]).toBe('');
++  });
++
 +  test('distinctUntilChanged evita reemitir un término repetido', () => {
 +    let renders = 0;
 +    const { result } = renderHook(() => {
@@ -120,12 +130,12 @@ index 0000000..b2233f2
 +});
 diff --git a/src/hooks/useDebouncedSearchTerm.ts b/src/hooks/useDebouncedSearchTerm.ts
 new file mode 100644
-index 0000000..3cf1546
+index 0000000..92e5109
 --- /dev/null
 +++ b/src/hooks/useDebouncedSearchTerm.ts
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,36 @@
 +import { useCallback, useEffect, useState } from 'react';
-+import { Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
++import { Subject, debounce, distinctUntilChanged, map, timer } from 'rxjs';
 +
 +/** Espera, en milisegundos, antes de aplicar el texto escrito en la búsqueda. */
 +export const SEARCH_DEBOUNCE_MS = 300;
@@ -146,7 +156,10 @@ index 0000000..3cf1546
 +    const subscription = input$
 +      .pipe(
 +        map((raw) => raw.trim().toLowerCase()),
-+        debounceTime(delayMs),
++        // El término vacío (limpiar filtros, botón ×) se aplica sin esperar:
++        // así la lista no queda en blanco durante el retardo y sigue pasando
++        // por distinctUntilChanged.
++        debounce((term) => timer(term === '' ? 0 : delayMs)),
 +        distinctUntilChanged(),
 +      )
 +      .subscribe(setTerm);
@@ -158,7 +171,7 @@ index 0000000..3cf1546
 +  return [term, setInput];
 +}
 diff --git a/src/pages/Home.test.tsx b/src/pages/Home.test.tsx
-index 9985300..b4efee7 100644
+index 9985300..0415439 100644
 --- a/src/pages/Home.test.tsx
 +++ b/src/pages/Home.test.tsx
 @@ -1,5 +1,5 @@
@@ -236,7 +249,7 @@ index 9985300..b4efee7 100644
      expect(screen.getByText('Sin paquetes')).toBeInTheDocument();
      fireEvent.click(screen.getByText('Limpiar filtros'));
 +    act(() => {
-+      vi.advanceTimersByTime(300);
++      vi.advanceTimersByTime(0);
 +    });
      expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
      expect(screen.queryByText('Sin paquetes')).not.toBeInTheDocument();
