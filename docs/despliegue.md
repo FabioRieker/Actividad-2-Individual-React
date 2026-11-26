@@ -93,7 +93,39 @@ Limitaciones reales:
 
 ## Vercel
 
-`vercel.json`: framework `vite`, `buildCommand` `npm run build`, `outputDirectory` `dist`, rewrite SPA a `/index.html`, caché inmutable en `/assets/*`. El despliegue lo lanza el alumno (`vercel --prod`); no se ha ejecutado.
+`vercel.json`: framework `vite`, `installCommand` `npm ci`, `buildCommand` `npm run build`, `outputDirectory` `dist`, rewrite SPA a `/index.html`, caché inmutable en `/assets/*` y las cabeceras de seguridad. `.vercelignore` excluye del envío lo que no hace falta para compilar. El despliegue lo lanza el alumno; no se ha ejecutado.
+
+Pasos exactos (desde la raíz del proyecto):
+
+1. `npx vercel login`: autenticación (correo o proveedor Git) en el navegador.
+2. `npx vercel link`: crear o enlazar el proyecto. Responder: ámbito personal, proyecto nuevo, directorio `./`. Los ajustes se leen de `vercel.json`.
+3. `npx vercel`: despliegue de vista previa. Imprime una URL `https://<proyecto>-<hash>.vercel.app`.
+4. `npx vercel --prod`: despliegue a producción (alias `https://<proyecto>.vercel.app`).
+
+Conexión Git opcional: en el panel de Vercel, proyecto, Settings, Git, conectar el repositorio y fijar la rama de producción en `main`. Cada push a `main` despliega a producción y el resto de ramas y PR generan vistas previas.
+
+Verificación tras desplegar:
+
+```bash
+curl -I https://<url>/
+curl -I https://<url>/assets/<fichero-con-hash>.js
+curl -sI https://<url>/ruta/inexistente | head -n 1
+```
+
+Cabeceras esperadas en `/`:
+
+- `content-security-policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`
+- `x-frame-options: DENY`
+- `x-content-type-options: nosniff`
+- `referrer-policy: strict-origin-when-cross-origin`
+- `permissions-policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()`
+- `strict-transport-security: max-age=63072000; includeSubDomains; preload`
+
+En `/assets/*` además: `cache-control: public, max-age=31536000, immutable`. Una ruta inexistente debe responder `200` (rewrite SPA). Después, abrir la URL con la consola del navegador y confirmar que no hay mensajes de Content Security Policy.
+
+Nota sobre la CSP: se eliminó `@vitejs/plugin-legacy` porque inyectaba scripts en línea y un `data:` en `index.html` que la CSP (`script-src 'self'`) bloquea y dejaba la app en blanco. Los navegadores objetivo (`.browserslistrc`) soportan módulos ES.
+
+`npx vercel build` no se ejecutó: exige sesión y enlace de proyecto (`vercel pull`). La comprobación se hizo sirviendo `dist/` con nginx y las mismas cabeceras (ver más abajo).
 
 ## Cabeceras y CSP
 
@@ -109,7 +141,7 @@ Definidas en `vercel.json` y `nginx/security-headers.conf` (mantener sincronizad
 `.github/workflows/docker.yml` (`permissions: contents: read`, `concurrency`, `timeout-minutes`):
 
 - `docker`: construye la imagen, la sirve con nginx y comprueba respuesta, cabecera `nosniff` y fallback SPA.
-- `aws-emulator-smoke`: descarga el `.deb`, lo instala con `sudo apt-get`, arranca el emulador en segundo plano, espera el health, y construye el `dist/` real (`npm ci` y `npm run build`), ejecuta dos veces el script y comprueba Count 8.
+- `aws-emulator-smoke`: descarga el `.deb`, registra su sha256 (el proveedor no publica uno oficial), lo instala con `sudo apt-get`, arranca el emulador en segundo plano, espera el health, y construye el `dist/` real (`npm ci` y `npm run build`), ejecuta dos veces el script y comprueba Count 8. Sube el log del emulador como artefacto `aws-emulator-logs`.
 
 ## Verificación realizada (evidence/fase-f/)
 
@@ -117,9 +149,11 @@ Definidas en `vercel.json` y `nginx/security-headers.conf` (mantener sincronizad
 - `docker-up.log` (Docker 29.9.3, Compose v5.0.1): `docker compose build` exit 0, `up -d` exit 0, contenedor `healthy`, `curl -sI http://localhost:8080/` devuelve 200 con CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy` y HSTS; `/ruta-inexistente` devuelve 200 con el mismo `index.html` (fallback SPA); `docker compose down` exit 0.
 - `aws-emulator-deploy.log` (emulador 1.0.628, AWS CLI 2.42.4, Node 24.21.0): `npm run deploy:aws-emulator` con el `dist/` real, exit 0. Bucket `logitrack-web` con 15 objetos (2958072 bytes), tabla `packages` con Count 8. Segunda ejecución idempotente (exit 0). Al terminar se paró el emulador y no quedó proceso ni el puerto 9297 abierto.
 
+- `csp-chrome.log`: Chrome estable headless (Playwright, canal `chrome`) contra la imagen nginx en `/` y `/ruta/spa`: consola vacía, 0 violaciones CSP. Antes de quitar el plugin legacy había 6 violaciones.
+
 ## Pendiente
 
 - Instalar el emulador de forma permanente con `sudo apt-get install -y ./aws-emulator.deb` (el alumno); la verificación se hizo con el binario extraído sin instalar.
 - Ejecución del workflow en GitHub (el job `aws-emulator-smoke` ahora construye el `dist/` real con `npm ci` y `npm run build`).
 - `shellcheck` no está instalado en la máquina: `sudo apt-get install -y shellcheck && shellcheck scripts/deploy-aws-emulator.sh`.
-- Despliegue en Vercel (`vercel --prod`): no ejecutado, solo con orden del alumno.
+- Despliegue en Vercel (pasos en la sección Vercel): no ejecutado, lo hace el alumno.
