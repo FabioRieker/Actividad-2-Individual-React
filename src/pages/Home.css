@@ -34,7 +34,7 @@
   height: 36px;
 }
 .lt-brand__mark rect {
-  fill: var(--lt-accent);
+  fill: var(--lt-accent-fill);
 }
 .lt-brand__mark path {
   fill: none;

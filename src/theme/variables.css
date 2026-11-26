@@ -95,7 +95,8 @@
   --lt-border-control: #8791a5; /* borde de controles (>= 3:1) */
   --lt-text: oklch(0.97 0.004 262);
   --lt-text-muted: oklch(0.79 0.02 262);
-  --lt-accent: #ffb020;
+  --lt-accent-fill: #ffb020; /* relleno: marca y seleccion */
+  --lt-accent-text: #ffb020; /* texto e iconos sobre cristal */
   --lt-on-accent: #14100a;
   --lt-focus: #ffd23f;
 
@@ -121,12 +122,12 @@
   --lt-status-rejected: oklch(0.76 0.13 25);
 
   /* ---- Prioridad ---- */
-  --lt-priority-high: oklch(0.83 0.13 80);
+  --lt-priority-high: var(--lt-text);
   --lt-priority-medium: var(--lt-text-muted);
   --lt-priority-low: var(--lt-text-muted);
 
   /* ---- Acciones secundarias ---- */
-  --lt-action-ok-bg: var(--lt-accent);
+  --lt-action-ok-bg: var(--lt-accent-fill);
   --lt-action-ok-fg: var(--lt-on-accent);
   --lt-action-ko-fg: var(--lt-status-rejected);
 
@@ -259,8 +260,9 @@
     --lt-border-control: #6b7588;
     --lt-text: oklch(0.2 0.015 260);
     --lt-text-muted: oklch(0.44 0.025 260);
-    --lt-accent: #9a4a00;
-    --lt-on-accent: #ffffff;
+    --lt-accent-fill: #ffb020;
+    --lt-accent-text: #9a4a00;
+    --lt-on-accent: #14100a;
     --lt-focus: #1f55c0;
 
     --lt-glass: oklch(1 0 0 / 0.62);
@@ -276,17 +278,17 @@
     --lt-blobs:
       radial-gradient(46rem 38rem at 8% -8%, oklch(0.86 0.08 250 / 0.85), transparent 66%),
       radial-gradient(40rem 34rem at 102% 30%, oklch(0.9 0.06 205 / 0.75), transparent 66%),
-      radial-gradient(34rem 28rem at 62% 108%, oklch(0.9 0.09 80 / 0.7), transparent 66%);
+      radial-gradient(34rem 28rem at 62% 108%, oklch(0.9 0.09 80 / 0.25), transparent 66%);
 
     --lt-status-transit: oklch(0.48 0.13 260);
     --lt-status-inspected: oklch(0.45 0.09 155);
     --lt-status-rejected: oklch(0.48 0.16 27);
 
-    --lt-priority-high: oklch(0.46 0.1 60);
+    --lt-priority-high: var(--lt-text);
     --lt-priority-medium: var(--lt-text-muted);
     --lt-priority-low: var(--lt-text-muted);
 
-    --lt-action-ok-bg: var(--lt-accent);
+    --lt-action-ok-bg: var(--lt-accent-fill);
     --lt-action-ok-fg: var(--lt-on-accent);
     --lt-action-ko-fg: var(--lt-status-rejected);
 
