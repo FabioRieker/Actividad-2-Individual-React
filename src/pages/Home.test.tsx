@@ -108,7 +108,7 @@ describe('Home', () => {
     expect(screen.getByText('Sin paquetes')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Limpiar filtros'));
     act(() => {
-      vi.advanceTimersByTime(300);
+      vi.advanceTimersByTime(0);
     });
     expect(screen.getByText('8 paquetes mostrados')).toBeInTheDocument();
     expect(screen.queryByText('Sin paquetes')).not.toBeInTheDocument();

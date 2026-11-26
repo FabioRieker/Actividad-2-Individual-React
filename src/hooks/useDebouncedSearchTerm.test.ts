@@ -60,6 +60,16 @@ describe('useDebouncedSearchTerm', () => {
     expect(result.current[0]).toBe('ma');
   });
 
+  test('el término vacío se aplica sin esperar el retardo', () => {
+    const { result } = renderHook(() => useDebouncedSearchTerm());
+    act(() => result.current[1]('madrid'));
+    advance(300);
+    expect(result.current[0]).toBe('madrid');
+    act(() => result.current[1]('   '));
+    advance(0);
+    expect(result.current[0]).toBe('');
+  });
+
   test('distinctUntilChanged evita reemitir un término repetido', () => {
     let renders = 0;
     const { result } = renderHook(() => {
