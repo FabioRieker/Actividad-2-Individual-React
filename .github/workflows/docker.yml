@@ -1,0 +1,64 @@
+name: Docker
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build de la imagen (sin push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: logitrack-express:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  localstack-smoke:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: eu-west-1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # El init necesita montar dist/ y los scripts, por lo que se usa compose
+      # en lugar de un service container (que no admite bind mounts).
+      - name: Levantar LocalStack e init
+        run: docker compose up -d --wait localstack
+
+      - name: Smoke test de bucket, website S3 y tabla
+        run: |
+          set -x
+          docker compose exec -T localstack awslocal s3 ls s3://logitrack-express/
+          curl -si -H 'Host: logitrack-express.s3-website.localhost.localstack.cloud' http://localhost:4566/ | head -15
+          curl -si -H 'Host: logitrack-express.s3-website.localhost.localstack.cloud' http://localhost:4566/ruta/spa | head -1
+          docker compose exec -T localstack awslocal dynamodb scan --table-name packages
+          COUNT=$(docker compose exec -T localstack awslocal dynamodb scan --table-name packages --select COUNT --query Count --output text)
+          test "$COUNT" = "8"
+          curl -sf http://localhost:4566/_localstack/health
+
+      - name: Logs si falla
+        if: failure()
+        run: docker compose logs localstack
+
+      - run: docker compose down -v
+        if: always()

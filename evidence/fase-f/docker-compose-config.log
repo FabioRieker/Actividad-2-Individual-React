@@ -1,0 +1,69 @@
+name: fase-f
+services:
+  localstack:
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_SECRET_ACCESS_KEY: test
+      SERVICES: s3,dynamodb
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'curl -sf http://localhost:4566/_localstack/health | grep -q ''"s3": "\(available\|running\)"'''
+      timeout: 5s
+      interval: 10s
+      retries: 12
+      start_period: 15s
+    image: localstack/localstack:4.4.0
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 4566
+        published: "4566"
+        protocol: tcp
+    tmpfs:
+      - /var/lib/localstack
+    volumes:
+      - type: bind
+        source: /home/elseto/DAM2/interfaces/ActividadInd2/wt-react/fase-f/localstack/init/ready.d
+        target: /etc/localstack/init/ready.d
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/elseto/DAM2/interfaces/ActividadInd2/wt-react/fase-f/localstack/seed
+        target: /opt/seed
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/elseto/DAM2/interfaces/ActividadInd2/wt-react/fase-f/dist
+        target: /opt/build
+        read_only: true
+        bind: {}
+  web:
+    build:
+      context: /home/elseto/DAM2/interfaces/ActividadInd2/wt-react/fase-f
+      dockerfile: Dockerfile
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -q
+        - --spider
+        - http://127.0.0.1/
+      timeout: 3s
+      interval: 30s
+      retries: 3
+      start_period: 5s
+    image: logitrack-express:local
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
+    restart: unless-stopped
+networks:
+  default:
+    name: fase-f_default
