@@ -290,7 +290,6 @@
     --lt-action-ok-fg: var(--lt-on-accent);
     --lt-action-ko-fg: var(--lt-status-rejected);
 
-
     color-scheme: light;
   }
 }
