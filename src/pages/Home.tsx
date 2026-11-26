@@ -17,7 +17,7 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import { checkmarkCircleOutline, closeCircleOutline, cubeOutline, fileTrayOutline, timeOutline } from 'ionicons/icons';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { PackageCard } from '../components/PackageCard';
 import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
@@ -36,7 +36,10 @@ function isPriorityFilter(value: unknown): value is PriorityFilter {
   return PRIORITY_OPTIONS.some((option) => option.value === value);
 }
 
+const SEARCH_LABEL = 'Buscar código o destino';
+
 const Home: React.FC = () => {
+  const searchbarRef = useRef<HTMLIonSearchbarElement>(null);
   const packages = usePackages();
   const [query, setQuery] = useState('');
   const [term, setSearchInput] = useDebouncedSearchTerm();
@@ -64,6 +67,21 @@ const Home: React.FC = () => {
     setSearchInput('');
     setPriority('ALL');
   }, [setSearchInput]);
+
+  // Ionic fija aria-label="search text" en el input interno y no lo reenvía desde el host:
+  // se sustituye por el mismo texto que describe el campo para que el nombre accesible esté en español.
+  useEffect(() => {
+    let active = true;
+    void customElements
+      .whenDefined('ion-searchbar')
+      .then(() => searchbarRef.current?.getInputElement())
+      .then((input) => {
+        if (active) input?.setAttribute('aria-label', SEARCH_LABEL);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
     updateStatus(e.id, e.newStatus);
@@ -111,8 +129,9 @@ const Home: React.FC = () => {
         <div className="lt-controls">
           <div className="lt-controls__inner" role="search">
             <IonSearchbar
+              ref={searchbarRef}
               debounce={0}
-              aria-label="Buscar paquete por código o destino"
+              aria-label={SEARCH_LABEL}
               placeholder="Buscar código o destino"
               value={query}
               onIonInput={(e) => {
