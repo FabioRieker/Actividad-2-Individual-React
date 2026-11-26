@@ -9,7 +9,7 @@ import {
   scaleOutline,
   timeOutline,
 } from 'ionicons/icons';
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
 import type { PackagePriority, PackageStatus, StatusChangeEvent, WarehousePackage } from '../models/package.model';
 import './PackageCard.css';
@@ -40,7 +40,43 @@ const PRIORITY_INFO: Record<PackagePriority, BadgeInfo> = {
 const weightFormat = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 const dateFormat = new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' });
 
+/**
+ * ion-button copia los atributos aria-* al botón nativo solo al cargar y su render los restablece al cambiar
+ * el estado. Se mantiene aria-disabled del botón nativo sincronizado para que lo anuncien los lectores de pantalla.
+ */
+function syncAriaDisabled(host: HTMLIonButtonElement | null, disabled: boolean): () => void {
+  const expected = String(disabled);
+  let observer: MutationObserver | undefined;
+  let frame = 0;
+  let attempts = 0;
+  const attach = (): void => {
+    const native = host?.shadowRoot?.querySelector('button');
+    if (!native) {
+      // El componente se hidrata de forma asíncrona: se reintenta unos fotogramas.
+      if (attempts++ < 120) frame = requestAnimationFrame(attach);
+      return;
+    }
+    const apply = (): void => {
+      if (native.getAttribute('aria-disabled') !== expected) native.setAttribute('aria-disabled', expected);
+    };
+    apply();
+    observer = new MutationObserver(apply);
+    observer.observe(native, { attributes: true, attributeFilter: ['aria-disabled'] });
+  };
+  attach();
+  return () => {
+    cancelAnimationFrame(frame);
+    observer?.disconnect();
+  };
+}
+
 function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
+  const inspectRef = useRef<HTMLIonButtonElement>(null);
+  const rejectRef = useRef<HTMLIonButtonElement>(null);
+  const inspected = pkg.status === 'INSPECTED';
+  const rejected = pkg.status === 'REJECTED';
+  useEffect(() => syncAriaDisabled(inspectRef.current, inspected), [inspected]);
+  useEffect(() => syncAriaDisabled(rejectRef.current, rejected), [rejected]);
   const status = STATUS_INFO[pkg.status];
   const priority = PRIORITY_INFO[pkg.priority];
   const emit = (newStatus: PackageStatus): void => {
@@ -91,18 +127,20 @@ function PackageCardComponent({ pkg, onStatusChange }: PackageCardProps) {
       </div>
       <div className="lt-card__actions">
         <IonButton
+          ref={inspectRef}
           className="lt-btn-inspect"
           aria-label={`Marcar ${pkg.trackingCode} como inspeccionado`}
-          disabled={pkg.status === 'INSPECTED'}
+          aria-disabled={inspected}
           onClick={() => emit('INSPECTED')}
         >
           <IonIcon slot="icon-only" icon={checkmarkCircleOutline} aria-hidden="true" />
         </IonButton>
         <IonButton
+          ref={rejectRef}
           className="lt-btn-reject"
           fill="outline"
           aria-label={`Marcar ${pkg.trackingCode} como rechazado`}
-          disabled={pkg.status === 'REJECTED'}
+          aria-disabled={rejected}
           onClick={() => emit('REJECTED')}
         >
           <IonIcon slot="icon-only" icon={closeCircleOutline} aria-hidden="true" />

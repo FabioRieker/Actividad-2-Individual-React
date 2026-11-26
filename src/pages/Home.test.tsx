@@ -81,7 +81,7 @@ describe('Home', () => {
   test('el contenedor de búsqueda expone role search', () => {
     render(<Home />);
     expect(screen.getByRole('search')).toContainElement(screen.getByPlaceholderText('Buscar código o destino'));
-    expect(screen.getByRole('status')).toHaveTextContent('8 paquetes mostrados');
+    expect(screen.getByText('8 paquetes mostrados')).toHaveAttribute('role', 'status');
   });
 
   test('el filtro de prioridad restringe la lista', () => {
@@ -132,5 +132,20 @@ describe('Home', () => {
     expect(kpiValue('Rechazados')).toBe('3');
     fireEvent.click(within(item).getByText('Inspeccionar'));
     expect(kpiValue('Inspeccionados')).toBe('4');
+  });
+});
+
+describe('Home estructura de lista', () => {
+  beforeEach(() => resetStore());
+
+  test('cada elemento de la lista tiene un único rol listitem sin anidar', () => {
+    const { container } = render(<Home />);
+    const list = screen.getByRole('list', { name: 'Paquetes' });
+    const items = list.querySelectorAll('[role="listitem"]');
+    items.forEach((item) => {
+      expect(item.parentElement?.closest('[role="listitem"]')).toBeNull();
+      expect(item.closest('[role="list"]')).toBe(list);
+    });
+    expect(container.querySelectorAll('ion-item-sliding[role="listitem"]')).toHaveLength(0);
   });
 });

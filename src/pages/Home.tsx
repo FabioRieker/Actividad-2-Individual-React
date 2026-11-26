@@ -21,7 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { PackageCard } from '../components/PackageCard';
 import { useDebouncedSearchTerm } from '../hooks/useDebouncedSearchTerm';
-import type { PriorityFilter, StatusChangeEvent } from '../models/package.model';
+import type { PackageStatus, PriorityFilter, StatusChangeEvent } from '../models/package.model';
 import { updateStatus, usePackages } from '../services/packageStore';
 import './Home.css';
 
@@ -36,6 +36,12 @@ function isPriorityFilter(value: unknown): value is PriorityFilter {
   return PRIORITY_OPTIONS.some((option) => option.value === value);
 }
 
+const STATUS_ANNOUNCEMENT: Record<PackageStatus, string> = {
+  IN_TRANSIT: 'en tránsito',
+  INSPECTED: 'inspeccionado',
+  REJECTED: 'rechazado',
+};
+
 const SEARCH_LABEL = 'Buscar código o destino';
 
 const Home: React.FC = () => {
@@ -44,6 +50,7 @@ const Home: React.FC = () => {
   const [query, setQuery] = useState('');
   const [term, setSearchInput] = useDebouncedSearchTerm();
   const [priority, setPriority] = useState<PriorityFilter>('ALL');
+  const [announcement, setAnnouncement] = useState('');
 
   const visible = useMemo(() => {
     return packages.filter(
@@ -83,9 +90,16 @@ const Home: React.FC = () => {
     };
   }, []);
 
-  const handleStatusChange = useCallback((e: StatusChangeEvent): void => {
-    updateStatus(e.id, e.newStatus);
-  }, []);
+  const handleStatusChange = useCallback(
+    (e: StatusChangeEvent): void => {
+      const target = packages.find((p) => p.id === e.id);
+      updateStatus(e.id, e.newStatus);
+      if (target && target.status !== e.newStatus) {
+        setAnnouncement(`${target.trackingCode} marcado como ${STATUS_ANNOUNCEMENT[e.newStatus]}`);
+      }
+    },
+    [packages],
+  );
 
   return (
     <IonPage>
@@ -158,6 +172,9 @@ const Home: React.FC = () => {
         </div>
         <main className="lt-main">
           <h1 className="lt-sr-only">Listado de paquetes</h1>
+          <div role="status" className="lt-sr-only">
+            {announcement}
+          </div>
           <p className="lt-result-count" role="status" aria-live="polite">
             {visible.length === 1 ? '1 paquete mostrado' : `${visible.length} paquetes mostrados`}
           </p>
@@ -180,10 +197,16 @@ const Home: React.FC = () => {
                     <PackageCard pkg={pkg} onStatusChange={handleStatusChange} />
                   </IonItem>
                   <IonItemOptions side="end">
-                    <IonItemOption className="lt-option-inspect" onClick={() => updateStatus(pkg.id, 'INSPECTED')}>
+                    <IonItemOption
+                      className="lt-option-inspect"
+                      onClick={() => handleStatusChange({ id: pkg.id, newStatus: 'INSPECTED' })}
+                    >
                       Inspeccionar
                     </IonItemOption>
-                    <IonItemOption className="lt-option-reject" onClick={() => updateStatus(pkg.id, 'REJECTED')}>
+                    <IonItemOption
+                      className="lt-option-reject"
+                      onClick={() => handleStatusChange({ id: pkg.id, newStatus: 'REJECTED' })}
+                    >
                       Rechazar
                     </IonItemOption>
                   </IonItemOptions>
