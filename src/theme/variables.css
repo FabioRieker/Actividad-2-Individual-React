@@ -71,54 +71,70 @@
   --ion-color-dark-tint: #404550;
 
   /* ---- Superficies Ionic ---- */
-  --ion-background-color: #12141a;
+  --ion-background-color: var(--lt-bg);
   --ion-background-color-rgb: 18, 20, 26;
   --ion-text-color: #f2f4f7;
   --ion-text-color-rgb: 242, 244, 247;
-  --ion-item-background: #1a1d24;
-  --ion-toolbar-background: #1a1d24;
-  --ion-toolbar-color: #f2f4f7;
-  --ion-toolbar-border-color: #3a4150;
-  --ion-card-background: #222630;
-  --ion-card-color: #f2f4f7;
-  --ion-border-color: #3a4150;
-  --ion-placeholder-color: #b4bccb;
+  --ion-item-background: var(--lt-surface-1);
+  --ion-toolbar-background: var(--lt-surface-1);
+  --ion-toolbar-color: var(--lt-text);
+  --ion-toolbar-border-color: var(--lt-border);
+  --ion-card-background: var(--lt-surface-2);
+  --ion-card-color: var(--lt-text);
+  --ion-border-color: var(--lt-border);
+  --ion-placeholder-color: var(--lt-text-muted);
   --ion-placeholder-opacity: 1;
   --ion-tab-bar-background: #1a1d24;
 
   /* ---- Tokens propios: superficies ---- */
-  --lt-bg: #12141a;
-  --lt-surface-1: #1a1d24; /* cabecera, barra de busqueda */
-  --lt-surface-2: #222630; /* tarjetas */
-  --lt-surface-3: #2b303c; /* chips, inputs, segment */
-  --lt-border: #3a4150; /* separadores decorativos */
+  --lt-bg: oklch(0.15 0.028 262); /* azul pizarra profundo */
+  --lt-surface-1: oklch(0.2 0.025 262); /* base opaca (sin backdrop-filter) */
+  --lt-surface-2: oklch(0.23 0.025 262);
+  --lt-surface-3: oklch(0.3 0.025 262);
+  --lt-border: oklch(1 0 0 / 0.12);
   --lt-border-control: #8791a5; /* borde de controles (>= 3:1) */
-  --lt-text: #f2f4f7;
-  --lt-text-muted: #b4bccb;
+  --lt-text: oklch(0.97 0.004 262);
+  --lt-text-muted: oklch(0.79 0.02 262);
   --lt-accent: #ffb020;
   --lt-on-accent: #14100a;
   --lt-focus: #ffd23f;
 
-  /* ---- Estado del paquete (indicador, chip, KPI) ---- */
-  --lt-status-transit: #7fb0ff;
-  --lt-status-inspected: #3ddc84;
-  --lt-status-rejected: #ff7070;
+  /* ---- Cristal ---- */
+  --lt-glass: oklch(0.25 0.02 260 / 0.58);
+  --lt-glass-strong: oklch(0.22 0.022 260 / 0.74);
+  --lt-glass-solid: oklch(0.24 0.025 262);
+  --lt-glass-edge: oklch(1 0 0 / 0.14);
+  --lt-glass-edge-hover: oklch(1 0 0 / 0.3);
+  --lt-glass-top: oklch(1 0 0 / 0.1);
+  --lt-glass-shadow: 0 10px 36px oklch(0.04 0.03 262 / 0.4);
+  --lt-field: oklch(0.12 0.02 262 / 0.5);
+  --lt-chip-bg: oklch(1 0 0 / 0.08);
+  --lt-track: oklch(1 0 0 / 0.12);
+  --lt-blobs:
+    radial-gradient(46rem 38rem at 8% -8%, oklch(0.48 0.14 258 / 0.55), transparent 66%),
+    radial-gradient(40rem 34rem at 102% 30%, oklch(0.5 0.09 205 / 0.34), transparent 66%),
+    radial-gradient(34rem 28rem at 62% 108%, oklch(0.7 0.15 70 / 0.2), transparent 66%);
+
+  /* ---- Estado del paquete (desaturado y coherente) ---- */
+  --lt-status-transit: oklch(0.78 0.09 255);
+  --lt-status-inspected: oklch(0.8 0.12 155);
+  --lt-status-rejected: oklch(0.76 0.13 25);
 
   /* ---- Prioridad ---- */
-  --lt-priority-high: #ff9ec4;
-  --lt-priority-medium: #ffd23f;
-  --lt-priority-low: #b4bccb;
+  --lt-priority-high: oklch(0.83 0.13 80);
+  --lt-priority-medium: var(--lt-text-muted);
+  --lt-priority-low: var(--lt-text-muted);
 
-  /* ---- Botones de accion ---- */
-  --lt-action-ok-bg: #3ddc84;
-  --lt-action-ok-fg: #0b0d11;
-  --lt-action-ko-fg: #ff7070;
+  /* ---- Acciones secundarias ---- */
+  --lt-action-ok-bg: var(--lt-accent);
+  --lt-action-ok-fg: var(--lt-on-accent);
+  --lt-action-ko-fg: var(--lt-status-rejected);
 
   /* ---- Radios ---- */
   --lt-radius-sm: 6px;
   --lt-radius-md: 10px;
-  --lt-radius-lg: 14px;
-  --lt-radius-pill: 999px;
+  --lt-radius-lg: 16px; /* superficies de cristal */
+  --lt-radius-pill: 8px; /* badges */
 
   /* ---- Espaciado (escala 4 px) ---- */
   --lt-space-1: 4px;
@@ -127,15 +143,25 @@
   --lt-space-4: 16px;
   --lt-space-5: 24px;
   --lt-space-6: 32px;
+  --lt-space-7: 48px;
 
   /* ---- Tipografia ---- */
-  --lt-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --lt-font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --lt-font-mono:
-    ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    'JetBrains Mono Variable', ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* Escala contenida: clamp(rem + vw), respeta el zoom */
+  --lt-fs-brand: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --lt-fs-kpi: clamp(1.75rem, 1.45rem + 1.4vw, 2.25rem);
+  --lt-fs-code: clamp(1.0625rem, 0.98rem + 0.5vw, 1.25rem);
+
+  /* Transiciones cortas (<= 150 ms), solo hover/foco/pulsacion */
+  --lt-dur: 140ms;
+  --lt-ease: ease-out;
 
   /* ---- Tamano tactil y ancho ---- */
   --lt-touch-min: 48px;
-  --lt-content-max: 960px;
+  --lt-content-max: 1120px;
   --lt-focus-width: 3px;
   --lt-focus-offset: 2px;
 
@@ -211,43 +237,59 @@
     --ion-color-dark-shade: #121317;
     --ion-color-dark-tint: #2c2d31;
 
-    --ion-background-color: #f1f3f6;
+    --ion-background-color: var(--lt-bg);
     --ion-background-color-rgb: 241, 243, 246;
     --ion-text-color: #14161a;
     --ion-text-color-rgb: 20, 22, 26;
-    --ion-item-background: #ffffff;
-    --ion-toolbar-background: #ffffff;
-    --ion-toolbar-color: #14161a;
-    --ion-toolbar-border-color: #c9cfda;
-    --ion-card-background: #ffffff;
-    --ion-card-color: #14161a;
-    --ion-border-color: #c9cfda;
-    --ion-placeholder-color: #4a5365;
+    --ion-item-background: var(--lt-surface-1);
+    --ion-toolbar-background: var(--lt-surface-1);
+    --ion-toolbar-color: var(--lt-text);
+    --ion-toolbar-border-color: var(--lt-border);
+    --ion-card-background: var(--lt-surface-2);
+    --ion-card-color: var(--lt-text);
+    --ion-border-color: var(--lt-border);
+    --ion-placeholder-color: var(--lt-text-muted);
     --ion-tab-bar-background: #ffffff;
 
-    --lt-bg: #f1f3f6;
-    --lt-surface-1: #ffffff;
-    --lt-surface-2: #ffffff;
-    --lt-surface-3: #e6e9ef;
-    --lt-border: #c9cfda;
+    --lt-bg: oklch(0.955 0.01 260); /* gris perla */
+    --lt-surface-1: oklch(0.99 0.004 260);
+    --lt-surface-2: oklch(0.99 0.004 260);
+    --lt-surface-3: oklch(0.94 0.008 260);
+    --lt-border: oklch(0.3 0.03 260 / 0.14);
     --lt-border-control: #6b7588;
-    --lt-text: #14161a;
-    --lt-text-muted: #4a5365;
+    --lt-text: oklch(0.2 0.015 260);
+    --lt-text-muted: oklch(0.44 0.025 260);
     --lt-accent: #9a4a00;
     --lt-on-accent: #ffffff;
     --lt-focus: #1f55c0;
 
-    --lt-status-transit: #1f55c0;
-    --lt-status-inspected: #17693a;
-    --lt-status-rejected: #b3261e;
+    --lt-glass: oklch(1 0 0 / 0.62);
+    --lt-glass-strong: oklch(1 0 0 / 0.76);
+    --lt-glass-solid: oklch(0.985 0.005 260);
+    --lt-glass-edge: oklch(1 0 0 / 0.85);
+    --lt-glass-edge-hover: oklch(0.3 0.03 260 / 0.3);
+    --lt-glass-top: oklch(1 0 0 / 0.95);
+    --lt-glass-shadow: 0 10px 34px oklch(0.4 0.06 262 / 0.14);
+    --lt-field: oklch(1 0 0 / 0.7);
+    --lt-chip-bg: oklch(0.3 0.03 260 / 0.06);
+    --lt-track: oklch(0.3 0.03 260 / 0.1);
+    --lt-blobs:
+      radial-gradient(46rem 38rem at 8% -8%, oklch(0.86 0.08 250 / 0.85), transparent 66%),
+      radial-gradient(40rem 34rem at 102% 30%, oklch(0.9 0.06 205 / 0.75), transparent 66%),
+      radial-gradient(34rem 28rem at 62% 108%, oklch(0.9 0.09 80 / 0.7), transparent 66%);
 
-    --lt-priority-high: #a3195b;
-    --lt-priority-medium: #8a5a00;
-    --lt-priority-low: #4a5365;
+    --lt-status-transit: oklch(0.48 0.13 260);
+    --lt-status-inspected: oklch(0.45 0.09 155);
+    --lt-status-rejected: oklch(0.48 0.16 27);
 
-    --lt-action-ok-bg: #17693a;
-    --lt-action-ok-fg: #ffffff;
-    --lt-action-ko-fg: #b3261e;
+    --lt-priority-high: oklch(0.46 0.1 60);
+    --lt-priority-medium: var(--lt-text-muted);
+    --lt-priority-low: var(--lt-text-muted);
+
+    --lt-action-ok-bg: var(--lt-accent);
+    --lt-action-ok-fg: var(--lt-on-accent);
+    --lt-action-ko-fg: var(--lt-status-rejected);
+
 
     color-scheme: light;
   }

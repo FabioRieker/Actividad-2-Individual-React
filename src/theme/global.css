@@ -6,9 +6,13 @@
 html {
   font-family: var(--lt-font-sans);
   -webkit-text-size-adjust: 100%;
+  block-size: 100dvh; /* altura dinamica: la barra del navegador no recorta ni salta */
+  background: var(--lt-bg);
 }
 
 body {
+  block-size: 100dvh;
+  background: transparent; /* el color base lo pone html; las manchas van detras */
   font-size: 1rem; /* 16 px base, respeta zoom del usuario */
   line-height: 1.5;
   letter-spacing: 0.005em;
@@ -20,7 +24,48 @@ h2,
 h3 {
   line-height: 1.2;
   letter-spacing: -0.01em;
-  font-weight: 700;
+  font-weight: 650; /* eje wght de la fuente variable */
+}
+
+/* Manchas de luz grandes, difuminadas y fijas (sin animar) detras de todo el contenido */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  block-size: 100dvh;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--lt-blobs);
+}
+ion-app,
+ion-router-outlet,
+.ion-page {
+  background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Superficie de cristal: desenfoque + saturacion, base semitransparente,
+   borde fino con brillo superior y sombra amplia de baja opacidad.
+   -------------------------------------------------------------------------- */
+.lt-glass {
+  background: var(--lt-glass);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--lt-glass-edge);
+  border-radius: var(--lt-radius-lg);
+  box-shadow:
+    inset 0 1px 0 var(--lt-glass-top),
+    var(--lt-glass-shadow);
+}
+.lt-glass--strong {
+  background: var(--lt-glass-strong);
+}
+/* Sin backdrop-filter: fondo opaco equivalente (mismo contraste) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .lt-glass,
+  .lt-glass--strong {
+    background: var(--lt-glass-solid);
+  }
 }
 
 .lt-mono {
@@ -80,7 +125,7 @@ ion-button.ion-focused {
 
 /* Searchbar: el input recibe el foco, se resalta el contenedor */
 ion-searchbar {
-  --background: var(--lt-surface-3);
+  --background: var(--lt-field);
   --color: var(--lt-text);
   --icon-color: var(--lt-text-muted);
   --clear-button-color: var(--lt-text);
@@ -128,7 +173,7 @@ ion-segment-button {
   text-transform: none;
 }
 ion-segment {
-  --background: var(--lt-surface-3);
+  --background: var(--lt-field);
   border: 1px solid var(--lt-border-control);
   border-radius: var(--lt-radius-md);
 }
@@ -140,11 +185,25 @@ ion-segment {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* View Transition al cambiar el estado de un paquete: fundido muy corto */
+::view-transition-group(root) {
+  animation-duration: 140ms;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 140ms;
+  animation-timing-function: ease-out;
 }
 
 /* Alto contraste forzado de Windows / Android */
